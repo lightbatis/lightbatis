@@ -18,6 +18,6 @@ import java.lang.annotation.Target;
  * @author lifei
  *
  */
-public @interface LightQuery {
+public @interface LightbatisQuery {
 
 }

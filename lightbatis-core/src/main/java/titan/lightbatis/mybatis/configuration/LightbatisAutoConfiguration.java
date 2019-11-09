@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.ExecutorType;
@@ -55,7 +56,6 @@ import titan.lightbatis.table.ITableSchemaManager;
  */
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class  })
-//@ConditionalOnBean(DataSource.class)
 @EnableConfigurationProperties({ LightbatisProperties.class, MybatisProperties.class })
 @AutoConfigureBefore({ MybatisAutoConfiguration.class})
 public class LightbatisAutoConfiguration {
@@ -184,7 +184,7 @@ public class LightbatisAutoConfiguration {
 		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
 				BeanDefinitionRegistry registry) {
 
-			logger.debug("Searching for mappers annotated with @Mapper");
+			logger.debug("Searching for mappers annotated with @Lightbatis");
 
 			ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
 
@@ -205,8 +205,8 @@ public class LightbatisAutoConfiguration {
 					}
 				}
 
-				//scanner.setAnnotationClass(Mapper.class);
-				scanner.setMarkerInterface(LightbatisMapper.class);
+				scanner.setAnnotationClass(Mapper.class);
+				//scanner.setMarkerInterface(LightbatisMapper.class);
 				scanner.registerFilters();
 				scanner.doScan(StringUtils.toStringArray(packages));
 			} catch (IllegalStateException ex) {

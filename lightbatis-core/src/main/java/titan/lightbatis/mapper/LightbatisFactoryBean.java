@@ -23,7 +23,7 @@ public class LightbatisFactoryBean<T> extends SqlSessionDaoSupport implements Fa
 
     private boolean addToConfig = true;
 
-    private MapperBuilder mapperHelper;
+    private MapperBuilder mapperBuilder;
 
     public LightbatisFactoryBean() {
         //intentionally empty
@@ -64,8 +64,8 @@ public class LightbatisFactoryBean<T> extends SqlSessionDaoSupport implements Fa
             lightbatisBuilder.parse();
         }
         //直接针对接口处理通用接口方法对应的 MappedStatement 是安全的，通用方法不会出现 IncompleteElementException 的情况
-        if (configuration.hasMapper(this.mapperInterface) && mapperHelper != null && mapperHelper.isExtendCommonMapper(this.mapperInterface)) {
-            mapperHelper.processConfiguration(getSqlSession().getConfiguration(), this.mapperInterface);
+        if (configuration.hasMapper(this.mapperInterface) && mapperBuilder != null && mapperBuilder.isExtendCommonMapper(this.mapperInterface)) {
+            mapperBuilder.processConfiguration(getSqlSession().getConfiguration(), this.mapperInterface);
         }
     }
 
@@ -133,10 +133,10 @@ public class LightbatisFactoryBean<T> extends SqlSessionDaoSupport implements Fa
     /**
      * 设置通用 Mapper 配置
      *
-     * @param mapperHelper
+     * @param mapperBuilder
      */
-    public void setMapperHelper(MapperBuilder mapperHelper) {
-        this.mapperHelper = mapperHelper;
+    public void setMapperBuilder(MapperBuilder mapperBuilder) {
+        this.mapperBuilder = mapperBuilder;
     }
     /**
      * {@inheritDoc}

@@ -26,10 +26,9 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
-import titan.lightbatis.annotations.LightQuery;
+import titan.lightbatis.annotations.LightbatisQuery;
 import titan.lightbatis.mapper.MapperMeta;
 import titan.lightbatis.mapper.QueryMapperManger;
-import titan.lightbatis.mybatis.keygen.SnowflakeIdKeyGenerator;
 import titan.lightbatis.mybatis.provider.PredicateSqlSource;
 import titan.lightbatis.mybatis.provider.impl.DynamicSelectProvider;
 
@@ -327,7 +326,7 @@ public class LightbatisMapperBuilder {
         //创建 SQL
         MapperBuilder mapperHelper = new MapperBuilder();
         DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperHelper);
-        LightQuery myQuery = method.getAnnotation(LightQuery.class);
+        LightbatisQuery myQuery = method.getAnnotation(LightbatisQuery.class);
         SqlSource sqlSource = null;
         if (myQuery != null) {
             String sql = provider.buildQuery(sqlCommandType,mappedStatementId);

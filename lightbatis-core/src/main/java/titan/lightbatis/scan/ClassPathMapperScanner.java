@@ -43,7 +43,6 @@ import java.util.Set;
  *
  * @author Hunter Presnall
  * @author Eduardo Macarron
- * @see MapperFactoryBean
  * @since 1.2.0
  */
 public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
@@ -62,7 +61,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
     private Class<?> markerInterface;
 
-    private MapperBuilder mapperHelper;
+    private MapperBuilder mapperBuilder;
 
     private String mapperHelperBeanName;
 
@@ -116,7 +115,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
                     return true;
                 }
                 return metadataReader.getAnnotationMetadata()
-                    .hasAnnotation("tk.mybatis.mapper.annotation.RegisterMapper");
+                    .hasAnnotation("titan.lightbatis.annotations.RegisterMapper");
             }
         });
     }
@@ -148,21 +147,21 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
                 logger.debug("Creating MapperFactoryBean with name '" + holder.getBeanName()
                         + "' and '" + definition.getBeanClassName() + "' mapperInterface");
             }
-            this.mapperHelper.registerMapper(definition.getBeanClassName());
+            this.mapperBuilder.registerMapper(definition.getBeanClassName());
             // the mapper interface is the original class of the bean
             // but, the actual class of the bean is MapperFactoryBean
             definition.getConstructorArgumentValues().addGenericArgumentValue(definition.getBeanClassName()); // issue #59
             definition.setBeanClass(this.mapperFactoryBean.getClass());
             //设置通用 Mapper
             if(StringUtils.hasText(this.mapperHelperBeanName)){
-                definition.getPropertyValues().add("mapperHelper", new RuntimeBeanReference(this.mapperHelperBeanName));
+                definition.getPropertyValues().add("mapperBuilder", new RuntimeBeanReference(this.mapperHelperBeanName));
             } else {
                 //不做任何配置的时候使用默认方式
-                if(this.mapperHelper == null){
-                    this.mapperHelper = new MapperBuilder();
-                    this.mapperHelper.ifEmptyRegisterDefaultInterface();
+                if(this.mapperBuilder == null){
+                    this.mapperBuilder = new MapperBuilder();
+                    this.mapperBuilder.ifEmptyRegisterDefaultInterface();
                 }
-                definition.getPropertyValues().add("mapperHelper", this.mapperHelper);
+                definition.getPropertyValues().add("mapperBuilder", this.mapperBuilder);
             }
 
             definition.getPropertyValues().add("addToConfig", this.addToConfig);
@@ -222,12 +221,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         }
     }
 
-    public MapperBuilder getMapperHelper() {
-        return mapperHelper;
+    public MapperBuilder getMapperBuilder() {
+        return mapperBuilder;
     }
 
-    public void setMapperHelper(MapperBuilder mapperHelper) {
-        this.mapperHelper = mapperHelper;
+    public void setMapperBuilder(MapperBuilder mapperBuilder) {
+        this.mapperBuilder = mapperBuilder;
     }
 
     public void setAddToConfig(boolean addToConfig) {
@@ -244,10 +243,10 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
      * @param config
      */
     public void setConfig(MapperConfig config) {
-        if (mapperHelper == null) {
-            mapperHelper = new MapperBuilder();
+        if (mapperBuilder == null) {
+            mapperBuilder = new MapperBuilder();
         }
-        mapperHelper.setConfig(config);
+        mapperBuilder.setConfig(config);
     }
 
     public void setMapperFactoryBean(LightbatisFactoryBean<?> mapperFactoryBean) {
@@ -265,13 +264,13 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
      */
     public void setMapperProperties(Environment environment) {
     	MapperConfig config = SpringBootBindUtil.bind(environment, MapperConfig.class, MapperConfig.PREFIX);
-        if (mapperHelper == null) {
-            mapperHelper = new MapperBuilder();
+        if (mapperBuilder == null) {
+            mapperBuilder = new MapperBuilder();
         }
         if(config != null){
-            mapperHelper.setConfig(config);
+            mapperBuilder.setConfig(config);
         }
-        mapperHelper.ifEmptyRegisterDefaultInterface();
+        mapperBuilder.ifEmptyRegisterDefaultInterface();
     }
 
     /**
@@ -280,25 +279,20 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
      * @param properties
      */
     public void setMapperProperties(String[] properties) {
-        if (mapperHelper == null) {
-            mapperHelper = new MapperBuilder();
+        if (mapperBuilder == null) {
+            mapperBuilder = new MapperBuilder();
         }
         Properties props = new Properties();
         for (String property : properties) {
             property = property.trim();
             int index = property.indexOf("=");
             if(index < 0){
-                throw new LightbatisException("通过 @MapperScan 注解的 properties 参数配置出错:" + property + " !\n"
-                        + "请保证配置项按 properties 文件格式要求进行配置，例如：\n"
-                        + "properties = {\n"
-                        + "\t\"mappers=tk.mybatis.mapper.common.Mapper\",\n"
-                        + "\t\"notEmpty=true\"\n"
-                        + "}"
+                throw new LightbatisException("通过 @Lightbatis 注解的 properties 参数配置出错:" + property + " !\n"
                 );
             }
             props.put(property.substring(0, index).trim(), property.substring(index + 1).trim());
         }
-        mapperHelper.setProperties(props);
+        mapperBuilder.setProperties(props);
     }
 
     public void setMarkerInterface(Class<?> markerInterface) {

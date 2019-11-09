@@ -90,10 +90,7 @@ public class LightbatisScannerRegistrar implements ImportBeanDefinitionRegistrar
         for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
             basePackages.add(ClassUtils.getPackageName(clazz));
         }
-//        if (CollectionUtils.isEmpty(basePackages)) {
-//            List<String> packages = AutoConfigurationPackages.get(beanFactory);
-//            basePackages.addAll(packages);
-//        }
+
         //优先级 mapperHelperRef > properties > springboot
         String mapperHelperRef = annoAttrs.getString("mapperHelperRef");
         String[] properties = annoAttrs.getStringArray("properties");
