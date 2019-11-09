@@ -7,6 +7,7 @@ import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.builder.annotation.MapperAnnotationBuilder;
 import org.apache.ibatis.builder.annotation.MethodResolver;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -38,7 +39,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
-public class LightbatisMapperBuilder {
+public class LightbatisMapperBuilder extends MapperAnnotationBuilder {
 
     private final Set<Class<? extends Annotation>> sqlAnnotationTypes = new HashSet<Class<? extends Annotation>>();
     private final Set<Class<? extends Annotation>> sqlProviderAnnotationTypes = new HashSet<Class<? extends Annotation>>();
@@ -48,6 +49,7 @@ public class LightbatisMapperBuilder {
     private final Class<?> type;
 
     public LightbatisMapperBuilder(Configuration configuration, Class<?> type) {
+        super(configuration,type);
         this.configuration = configuration;
         String resource = type.getName().replace('.', '/') + ".java (best guess)";
         this.assistant = new MapperBuilderAssistant(configuration, resource);
@@ -64,6 +66,7 @@ public class LightbatisMapperBuilder {
         sqlProviderAnnotationTypes.add(DeleteProvider.class);
     }
 
+    @Override
     public void parse() {
         String resource = type.toString();
         //如果已经被MyBatis 处理过,此时只处理，Mybatis 没有处理过的方法就可以了，具体的就是方法上没有任何的注释。
@@ -82,7 +85,7 @@ public class LightbatisMapperBuilder {
                     parseStatement(method);
                 }
             } catch (IncompleteElementException e) {
-                // configuration.addIncompleteMethod(new MethodResolver(this, method));
+                 configuration.addIncompleteMethod(new MethodResolver(this, method));
             }
         }
         parsePendingMethods();

@@ -12,8 +12,8 @@ import titan.lightbatis.mybatis.provider.MapperProvider;
  */
 public class QueryMapperProvider extends MapperProvider {
 
-	public QueryMapperProvider(Class<?> mapperClass, MapperBuilder mapperHelper) {
-		super(mapperClass, mapperHelper);
+	public QueryMapperProvider(Class<?> mapperClass, MapperBuilder mapperBuilder) {
+		super(mapperClass, mapperBuilder);
 	}
 
 }

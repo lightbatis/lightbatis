@@ -12,7 +12,7 @@ import titan.lightbatis.annotations.Lightbatis;
 import titan.lightbatis.sample.domain.Member;
 import titan.lightbatis.sample.mapper.MemberMapper;
 
-@Lightbatis(basePackages = "titan.lightbatis.sample.mapper")
+@Lightbatis()//basePackages = "titan.lightbatis.sample.mapper"
 @SpringBootApplication
 public class SampleMapperApplication implements CommandLineRunner {
 

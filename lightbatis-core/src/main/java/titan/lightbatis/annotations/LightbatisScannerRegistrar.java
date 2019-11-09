@@ -3,6 +3,7 @@
  */
 package titan.lightbatis.annotations;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -31,6 +33,7 @@ import org.springframework.util.StringUtils;
 
 import titan.lightbatis.mapper.LightbatisFactoryBean;
 import titan.lightbatis.scan.ClassPathMapperScanner;
+import titan.lightbatis.utils.MapperUtils;
 
 /**
  * @author lifei114@126.com
@@ -90,7 +93,12 @@ public class LightbatisScannerRegistrar implements ImportBeanDefinitionRegistrar
         for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
             basePackages.add(ClassUtils.getPackageName(clazz));
         }
-
+        if (basePackages.isEmpty()) {
+            String startupPacksage = MapperUtils.getStartupPackage();
+            if (StringUtils.hasText(startupPacksage)) {
+                basePackages.add(startupPacksage);
+            }
+        }
         //优先级 mapperHelperRef > properties > springboot
         String mapperHelperRef = annoAttrs.getString("mapperHelperRef");
         String[] properties = annoAttrs.getStringArray("properties");

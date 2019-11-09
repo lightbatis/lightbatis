@@ -3,6 +3,7 @@
  */
 package titan.lightbatis.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.decorators.SoftCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
@@ -78,5 +79,21 @@ public class MapperUtils {
      */
     public static String getMethodName(String msId) {
         return msId.substring(msId.lastIndexOf(".") + 1);
+    }
+
+    /**
+     * 获取当前应用的启动包名。
+     * @return
+     */
+    public static String getStartupPackage () {
+        StackTraceElement[] elements = new RuntimeException().getStackTrace();
+        for (StackTraceElement element : elements) {
+            if ("main".equals(element.getMethodName())) {
+                String clzName = element.getClassName();
+                String basePackage = StringUtils.substring(clzName, 0, StringUtils.lastIndexOf(clzName, "."));
+                return basePackage;
+            }
+        }
+        return null;
     }
 }
