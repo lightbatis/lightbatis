@@ -1,0 +1,51 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: titan-mybatis-web
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java, src/main/resources
+      exclude: WEB-INF/**
+  datasource:
+    #type: com.alibaba.druid.pool.DruidDataSource
+    username: odoo
+    password: hzst123!@#
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://39.107.157.29:5432/atfs_db
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/vrcodedb?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
+    #方言
+    #dialect: postgresql
+    hikari: 
+      maximumPoolSize: 10
+      minimumIdle: 2
+      idleTimeout: 600000
+      connectionTimeout: 30000
+      maxLifetime: 1800000
+    
+
+
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /apidoc
+#mybatis: 
+#   configuration: org.apache.ibatis.session.Configuration
+
+#lightbatis:
+#  mappers: titan.common.dal.mapper.QueryMapper
+
+logging:
+  config: classpath:log4j2-spring.xml 
+
+#dal: 
+#  base-package: titan.common.dal.web.provider
+
+mybatis:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+   
