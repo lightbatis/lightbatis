@@ -1,7 +1,7 @@
 /**
  * 
  */
-package titan.lightbatis.mapper;
+package titan.lightbatis.mybatis;
 
 import static org.springframework.util.Assert.notNull;
 
@@ -9,9 +9,6 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.FactoryBean;
-
-import titan.lightbatis.mybatis.LightbatisMapperBuilder;
-import titan.lightbatis.mybatis.MapperBuilder;
 
 /**
  * @author lifei114@126.com
@@ -55,12 +52,12 @@ public class LightbatisFactoryBean<T> extends SqlSessionDaoSupport implements Fa
             }
             //如果 MyBatis 不能处理的，尝试使用 Lightbatis 来处理
             logger.debug("尝试使用 lightbatis 来处理 = " + this.mapperInterface);
-            LightbatisMapperBuilder lightbatisBuilder = new LightbatisMapperBuilder(configuration, this.mapperInterface);
+            LightbatisMapperAnnotationBuilder lightbatisBuilder = new LightbatisMapperAnnotationBuilder(configuration, this.mapperInterface);
             lightbatisBuilder.parse();
         } else if (this.addToConfig && configuration.hasMapper(this.mapperInterface)) {
             //如果 MyBatis 不能处理的，尝试使用 Lightbatis 来处理
             logger.debug("尝试使用 lightbatis 来处理 = " + this.mapperInterface);
-            LightbatisMapperBuilder lightbatisBuilder = new LightbatisMapperBuilder(configuration, this.mapperInterface);
+            LightbatisMapperAnnotationBuilder lightbatisBuilder = new LightbatisMapperAnnotationBuilder(configuration, this.mapperInterface);
             lightbatisBuilder.parse();
         }
         //直接针对接口处理通用接口方法对应的 MappedStatement 是安全的，通用方法不会出现 IncompleteElementException 的情况

@@ -15,7 +15,7 @@ import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.Import;
 
 import titan.lightbatis.mapper.LightbatisMapper;
-import titan.lightbatis.mapper.LightbatisFactoryBean;
+import titan.lightbatis.mybatis.LightbatisFactoryBean;
 
 @Documented
 @Retention(RUNTIME)
