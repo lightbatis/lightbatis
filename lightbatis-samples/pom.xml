@@ -7,7 +7,6 @@
 		<artifactId>lightbatis-master</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>titan.lightbatis</groupId>
 	<artifactId>lightbatis-samples</artifactId>
 	<version>${lightbatis-version}</version>
 	<description>lightbatis 示例</description>

@@ -47,8 +47,8 @@ public class EntityMeta implements Serializable {
     //辅助表相关的信息
     private HashMap<String,SecondTableMeta> secondTables = new HashMap<>();
     //useGenerator包含多列的时候需要用到
-    private List<String> keyProperties;
-    private List<String> keyColumns;
+    private List<String> keyProperties = new ArrayList<>();
+    private List<String> keyColumns = new ArrayList<>();
     //resultMap对象
     private ResultMap resultMap;
     //属性和列对应
@@ -284,13 +284,14 @@ public class EntityMeta implements Serializable {
         return this.resultMap;
     }
 
-    /**
-     * 初始化 - Example 会使用
-     */
     public void initPropertyMap() {
         propertyMap = new HashMap<String, ColumnMeta>(entityClassColumns.size());
         for (ColumnMeta column : entityClassColumns) {
             propertyMap.put(column.getProperty(), column);
+            if (column.isIdentity()) {
+                keyColumns.add(column.getColumn());
+                keyProperties.add(column.getProperty());
+            }
         }
     }
 

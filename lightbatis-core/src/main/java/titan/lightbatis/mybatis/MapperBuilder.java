@@ -116,7 +116,7 @@ public class MapperBuilder {
 			try {
 				mapperProvider.addMethodMap(methodName, templateClass.getMethod(methodName, MappedStatement.class));
 			} catch (NoSuchMethodException e) {
-				throw new LightbatisException(templateClass.getCanonicalName() + "中缺少" + methodName + "方法!");
+				throw new LightbatisException(templateClass.getCanonicalName() + " 中缺少 " + methodName + "方法!");
 			}
 		}
 		return mapperProvider;

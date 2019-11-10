@@ -8,12 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -183,9 +178,6 @@ public class EntityMetaManager {
 		if (entityMetas.containsKey(msId) ) {
 			return entityMetas.get(msId);
 		}
-//		if (entityTableMap.get(entityClass) != null) {
-//			return entityTableMap.get(entityClass);
-//		}
 
 		// 创建并缓存EntityTable
 		EntityMeta entityTable = processEntity(entityClass,config);
@@ -197,33 +189,34 @@ public class EntityMetaManager {
 
 	private static EntityMeta processEntity(Class<?> entityClass, MapperConfig config) {
 		// 创建并缓存EntityTable
-		EntityMeta entityTable = null;
+		EntityMeta entityMeta = null;
+
 		if (entityClass.isAnnotationPresent(Table.class)) {
 			Table table = entityClass.getAnnotation(Table.class);
 			if (!table.name().equals("")) {
-				entityTable = new EntityMeta(entityClass);
-				entityTable.setTable(table);
+				entityMeta = new EntityMeta(entityClass);
+				entityMeta.setTable(table);
 			}
 		}
 		
-		if (entityTable == null) {
-			entityTable = new EntityMeta(entityClass);
+		if (entityMeta == null) {
+			entityMeta = new EntityMeta(entityClass);
 			// 可以通过stye控制
 			//entityTable.setName(StringUtil.convertByStyle(entityClass.getSimpleName(), style));
-			entityTable.setName(entityClass.getSimpleName());
+			entityMeta.setName(entityClass.getSimpleName());
 		}
 		if (entityClass.isAnnotationPresent(SecondaryTable.class)) {
 			SecondaryTable st = entityClass.getAnnotation(SecondaryTable.class);
-			entityTable.addSecondaryTable(st);
+			entityMeta.addSecondaryTable(st);
 		}
 		if (entityClass.isAnnotationPresent(SecondaryTables.class)) {
 			SecondaryTables tables = entityClass.getAnnotation(SecondaryTables.class);
 			SecondaryTable tbls[] = tables.value();
 			for (SecondaryTable secondaryTable : tbls) {
-				entityTable.addSecondaryTable(secondaryTable);
+				entityMeta.addSecondaryTable(secondaryTable);
 			}
 		}
-		TableSchema tableSchema = ITableSchemaManager.getInstance().getTable(entityTable.getName());
+		TableSchema tableSchema = ITableSchemaManager.getInstance().getTable(entityMeta.getName());
 		
 		// 处理所有列
 		List<FieldMeta> fields = null;
@@ -243,7 +236,7 @@ public class EntityMetaManager {
 			if (config.isUseSimpleType() && !SimpleTypeRegistry.isSimpleType(field.getJavaType())) {
 				continue;
 			}
-			ColumnMeta colMeta = processField(entityTable, tableSchema , field);
+			ColumnMeta colMeta = processField(entityMeta, tableSchema , field);
 			if (List.class.isAssignableFrom(colMeta.getJavaType())) {
 				Field colField = fieldMap.get(colMeta.getProperty());
 				Type fieldType = colField.getGenericType();
@@ -254,31 +247,32 @@ public class EntityMetaManager {
 				innerEntity.setMappedStatementId("");
 				entityTableMap.put(fieldClz, innerEntity);
 			}
+
 		}
 		// 当pk.size=0的时候使用所有列作为主键
-		if (entityTable.getEntityClassPKColumns().size() == 0) {
-			entityTable.setEntityClassPKColumns(entityTable.getClassColumns());
+		if (entityMeta.getEntityClassPKColumns().size() == 0) {
+			entityMeta.setEntityClassPKColumns(entityMeta.getClassColumns());
 		}
-		entityTable.initPropertyMap();
-		return entityTable;
+		entityMeta.initPropertyMap();
+		return entityMeta;
 	}
 
 	/**
 	 * 处理一列
 	 *
-	 * @param entityTable
-	 * @param style
+	 * @param entityMeta
 	 * @param field
 	 */
-	private static ColumnMeta processField(EntityMeta entityTable, TableSchema tableSchema, FieldMeta field) {
+	private static ColumnMeta processField(EntityMeta entityMeta, TableSchema tableSchema, FieldMeta field) {
 		// 排除字段
 		if (field.isAnnotationPresent(Transient.class)) {
 			return null;
 		}
-		// Id
-		ColumnMeta entityColumn = new ColumnMeta(entityTable);
+		// Id 是否是ID 字段
+		ColumnMeta entityColumn = new ColumnMeta(entityMeta);
 		if (field.isAnnotationPresent(Id.class)) {
 			entityColumn.setId(true);
+			entityColumn.setIdentity(true);
 		}
 		// Column
 		String columnName = null;
@@ -291,11 +285,11 @@ public class EntityMetaManager {
 			if (tableName != null) {
 				entityColumn.setTableName(tableName);
 			} else {
-				entityColumn.setTableName(entityTable.getName());
+				entityColumn.setTableName(entityMeta.getName());
 			}
 		}
 		if (StringUtils.isEmpty(entityColumn.getTableName())) {
-			entityColumn.setTableName(entityTable.getName());
+			entityColumn.setTableName(entityMeta.getName());
 		}
 		// ColumnType
 //		if (field.isAnnotationPresent(ColumnType.class)) {
@@ -339,7 +333,7 @@ public class EntityMetaManager {
 		if (field.isAnnotationPresent(SequenceGenerator.class)) {
 			SequenceGenerator sequenceGenerator = field.getAnnotation(SequenceGenerator.class);
 			if (sequenceGenerator.sequenceName().equals("")) {
-				throw new LightbatisException(entityTable.getEntityClass() + "字段" + field.getName()
+				throw new LightbatisException(entityMeta.getEntityClass() + "字段" + field.getName()
 						+ "的注解@SequenceGenerator未指定sequenceName!");
 			}
 			entityColumn.setSequenceName(sequenceGenerator.sequenceName());
@@ -350,13 +344,13 @@ public class EntityMetaManager {
 			} else if (generatedValue.generator().equals("JDBC")) {
 				entityColumn.setIdentity(true);
 				entityColumn.setGenerator("JDBC");
-				entityTable.setKeyProperties(entityColumn.getProperty());
-				entityTable.setKeyColumns(entityColumn.getColumn());
+				entityMeta.setKeyProperties(entityColumn.getProperty());
+				entityMeta.setKeyColumns(entityColumn.getColumn());
 			} else if (generatedValue.generator().equals(GeneratedValueType.SNOWFLAKE)) {
 				entityColumn.setIdentity(true);
 				entityColumn.setGenerator(GeneratedValueType.SNOWFLAKE);
-				entityTable.setKeyProperties(entityColumn.getProperty());
-				entityTable.setKeyColumns(entityColumn.getColumn());
+				entityMeta.setKeyProperties(entityColumn.getProperty());
+				entityMeta.setKeyColumns(entityColumn.getColumn());
 			}
 			else {
 				// 允许通过generator来设置获取id的sql,例如mysql=CALL IDENTITY(),hsqldb=SELECT
@@ -376,6 +370,7 @@ public class EntityMetaManager {
 //						}
 //						entityColumn.setGenerator(generator);
 //					}
+
 				} else {
 					throw new LightbatisException(field.getName() + " - 该字段@GeneratedValue配置只允许以下几种形式:"
 							+ "\n1.全部数据库通用的@GeneratedValue(generator=\"UUID\")"
@@ -385,10 +380,13 @@ public class EntityMetaManager {
 							);
 				}
 			}
+		} else if (entityColumn.isIdentity()) {
+			//如果是ID,又没有指定生成方式，默认是 SNOWFLAKE 算法
+			entityColumn.setGenerator(GeneratedValueType.SNOWFLAKE);
 		}
-		entityTable.addColumn(entityColumn);
+		entityMeta.addColumn(entityColumn);
 		if (entityColumn.isId()) {
-			entityTable.getEntityClassPKColumns().add(entityColumn);
+			entityMeta.getEntityClassPKColumns().add(entityColumn);
 		}
 		return entityColumn;
 	}

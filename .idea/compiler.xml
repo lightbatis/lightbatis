@@ -7,9 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="lightbatis-web" />
         <module name="lightbatis-samples" />
         <module name="lightbatis-core" />
+        <module name="lightbatis-web" />
       </profile>
     </annotationProcessing>
   </component>

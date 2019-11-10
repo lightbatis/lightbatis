@@ -27,4 +27,8 @@ public class MapperConfig implements Serializable {
     private boolean useSimpleType    = true;
     //表名的默认前缀
     private String prefix = "";
+    /**
+     * 对于一般的getAllIfColumnNode，是否判断!=''，默认不判断
+     */
+    private boolean notEmpty;
 }

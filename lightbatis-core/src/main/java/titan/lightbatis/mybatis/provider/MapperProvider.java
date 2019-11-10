@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.executor.keygen.KeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlSource;
@@ -23,8 +25,11 @@ import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
 
+import titan.lightbatis.configuration.MapperConfig;
 import titan.lightbatis.exception.LightbatisException;
 import titan.lightbatis.mybatis.MapperBuilder;
+import titan.lightbatis.mybatis.keygen.SnowflakeIdKeyGenerator;
+import titan.lightbatis.mybatis.meta.ColumnMeta;
 import titan.lightbatis.mybatis.meta.EntityMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 
@@ -33,6 +38,7 @@ import titan.lightbatis.mybatis.meta.EntityMetaManager;
  * @author lifei114@126.com
  *
  */
+@Slf4j
 public class MapperProvider {
 	private static final XMLLanguageDriver languageDriver = new XMLLanguageDriver();
     protected Map<String, Method> methodMap = new ConcurrentHashMap<String, Method>();
@@ -227,7 +233,18 @@ public class MapperProvider {
         throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
     }
 
-
+    protected void setKeyGenerator(MappedStatement ms, ColumnMeta column, KeyGenerator keyGenerator) {
+        //keyGenerator
+        try {
+            MetaObject msObject = SystemMetaObject.forObject(ms);
+            msObject.setValue("keyGenerator", keyGenerator);
+            msObject.setValue("keyProperties", column.getTable().getKeyProperties());
+            msObject.setValue("keyColumns", column.getTable().getKeyColumns());
+        } catch (Exception e) {
+            //ignore
+            log.warn(e.getMessage());
+        }
+    }
 
     /**
      * 获取实体类的表名
@@ -247,5 +264,11 @@ public class MapperProvider {
         }
         return entityTable.getName();
     }
-   
+
+    public MapperConfig getConfig() {
+        return mapperBuilder.getConfig();
+    }
+    public boolean isNotEmpty() {
+        return getConfig().isNotEmpty();
+    }
 }

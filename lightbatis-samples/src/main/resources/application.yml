@@ -47,8 +47,7 @@ logging:
   config: classpath:logback-spring.xml 
   level: 
     org.springframework: INFO
-    titan.lightbatis.mybatis: INFO
-
+    titan.lightbatis.mybatis.provider.impl: INFO
 snowflake:
   workerId: 1
   datacenterId: 1

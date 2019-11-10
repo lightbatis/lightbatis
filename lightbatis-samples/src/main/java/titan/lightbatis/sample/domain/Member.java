@@ -1,14 +1,11 @@
 package titan.lightbatis.sample.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.Column;
+import javax.persistence.*;
 import javax.annotation.Generated;
-import javax.persistence.Table;
+
 import lombok.Data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.persistence.Id;
-import javax.persistence.OrderBy;
 
 /**
  * Member企业表

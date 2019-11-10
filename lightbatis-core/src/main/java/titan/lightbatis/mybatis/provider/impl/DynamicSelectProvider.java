@@ -14,7 +14,7 @@ import org.apache.ibatis.session.Configuration;
 import titan.lightbatis.exception.LightbatisException;
 import titan.lightbatis.mapper.QueryMapperManger;
 import titan.lightbatis.mybatis.MapperBuilder;
-import titan.lightbatis.mybatis.MybatisSQLBuilder;
+import titan.lightbatis.mybatis.LightbatisSQLBuilder;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.provider.MapperProvider;
 
@@ -47,8 +47,8 @@ public class DynamicSelectProvider extends MapperProvider{
 		Class<?> entityClass = getEntityClass(mappedStatementId, method);
 		// 修改返回值类型为实体类型
 		StringBuilder sql = new StringBuilder();
-		sql.append(MybatisSQLBuilder.selectAllColumns(entityClass));
-		sql.append(MybatisSQLBuilder.fromTable(entityClass, tableName(entityClass)));
+		sql.append(LightbatisSQLBuilder.selectAllColumns(entityClass));
+		sql.append(LightbatisSQLBuilder.fromTable(entityClass, tableName(entityClass)));
 		//String whereSql = buildWhereSql();
 		//sql.append(whereSql);
 		// stmt.getBoundSql(parameterObject)
@@ -65,16 +65,16 @@ public class DynamicSelectProvider extends MapperProvider{
 		Class<?> entityClass = getEntityClass(msId, method);
 		String tableName = tableName(entityClass);
 		StringBuilder sql = new StringBuilder();
-		sql.append(MybatisSQLBuilder.selectAllColumns(tableName,entityClass));
-		sql.append(MybatisSQLBuilder.fromTable(entityClass, tableName(entityClass)));
+		sql.append(LightbatisSQLBuilder.selectAllColumns(tableName,entityClass));
+		sql.append(LightbatisSQLBuilder.fromTable(entityClass, tableName(entityClass)));
 		String[] names = parameterResolver.getNames();
 		if (names.length > 0) {
 			// sql.append("<trim prefix=\"WHERE\" prefixOverrides=\"AND |OR \">");
-			String whereSQL = MybatisSQLBuilder.whereColumns(entityClass, names);
+			String whereSQL = LightbatisSQLBuilder.whereColumns(entityClass, names);
 			sql.append(whereSQL);
 			// sql.append("</trim>");
 		}
-		String defaultOrderBy = MybatisSQLBuilder.orderByDefault(entityClass);
+		String defaultOrderBy = LightbatisSQLBuilder.orderByDefault(entityClass);
 		if (StringUtils.isNotEmpty(defaultOrderBy)) {
 			sql.append(" ").append(defaultOrderBy);
 		}

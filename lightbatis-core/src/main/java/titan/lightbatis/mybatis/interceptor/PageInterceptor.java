@@ -37,7 +37,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 import titan.lightbatis.mapper.MapperMeta;
 import titan.lightbatis.mapper.QueryMapperManger;
-import titan.lightbatis.mybatis.MybatisSQLBuilder;
+import titan.lightbatis.mybatis.LightbatisSQLBuilder;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
 import titan.lightbatis.mybatis.meta.EntityMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
@@ -171,7 +171,7 @@ public class PageInterceptor implements Interceptor {
 		Set<Object> values = getEntityValues(result, primaryColumn);
 
 		// 把从表的主键和相关涉及的列组成SQL
-		String sql = MybatisSQLBuilder.selectColumns(secondTable.getTableName(), secondTable.getPrimitiveColumns(),
+		String sql = LightbatisSQLBuilder.selectColumns(secondTable.getTableName(), secondTable.getPrimitiveColumns(),
 				pkCol.name());
 		StringBuffer sqlBuffer = new StringBuffer(sql);
 		sqlBuffer.append(" WHERE ").append(pkCol.name()).append(" IN (");
@@ -257,7 +257,7 @@ public class PageInterceptor implements Interceptor {
 		EntityMeta baseMeta = listColumn.getCollectionBaseType();
 		
 		// 把从表的主键和相关涉及的列组成SQL
-		String sql = MybatisSQLBuilder.selectColumns(baseMeta.getName(), baseMeta.getClassColumns(), null);
+		String sql = LightbatisSQLBuilder.selectColumns(baseMeta.getName(), baseMeta.getClassColumns(), null);
 		StringBuffer sqlBuffer = new StringBuffer(sql);
 		sqlBuffer.append(" WHERE ").append(pkCol.name()).append(" IN (");
 

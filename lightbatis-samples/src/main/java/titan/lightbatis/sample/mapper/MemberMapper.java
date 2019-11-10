@@ -13,5 +13,7 @@ import titan.lightbatis.sample.domain.Member;
 @Mapper
 public interface MemberMapper extends LightbatisMapper<Member> {
 	 public List<Member> listMember();
+	 
+	 Member getMember(Long id);
 }
 

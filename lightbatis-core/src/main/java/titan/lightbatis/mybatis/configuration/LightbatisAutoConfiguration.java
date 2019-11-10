@@ -44,7 +44,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import titan.lightbatis.mapper.LightbatisMapper;
 import titan.lightbatis.scan.ClassPathMapperScanner;
 import titan.lightbatis.mybatis.LightbatisProperties;
 import titan.lightbatis.table.DataSourceTableSchemaManager;

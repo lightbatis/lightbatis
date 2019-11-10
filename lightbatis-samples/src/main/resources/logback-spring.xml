@@ -89,7 +89,8 @@
 
     <logger name="org.springframework" level="INFO" />
     <logger name="org.hibernate" level="WARN" />
-    
+    <logger name="titan.lightbatis.mybatis.provider.impl" level="INFO"/>
+
     <logger name="simple" level="DEBUG">
         <appender-ref ref="console" />
     </logger>
