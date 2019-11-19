@@ -8,13 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
@@ -35,8 +29,8 @@ import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
-import titan.lightbatis.mapper.MapperMeta;
-import titan.lightbatis.mapper.QueryMapperManger;
+import titan.lightbatis.mybatis.meta.MapperMeta;
+import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.LightbatisSQLBuilder;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
 import titan.lightbatis.mybatis.meta.EntityMeta;
@@ -73,7 +67,7 @@ public class PageInterceptor implements Interceptor {
 			MetaObject metaHandler = SystemMetaObject.forObject(handler);
 			MappedStatement ms = (MappedStatement) metaHandler.getValue("mappedStatement");
 			String msId = ms.getId();
-			MapperMeta meta = QueryMapperManger.getMeta(msId);
+			MapperMeta meta = MapperMetaManger.getMeta(msId);
 			if (meta == null) {
 				return result;
 			}
@@ -167,7 +161,7 @@ public class PageInterceptor implements Interceptor {
 		// 主表的关键字
 		String primaryKeyField = pkCol.referencedColumnName();
 		// 获取主表的值的集合
-		ColumnMeta primaryColumn = entityMeta.findColumnByField(primaryKeyField);
+		ColumnMeta primaryColumn = entityMeta.findColumnByColumn(primaryKeyField);
 		Set<Object> values = getEntityValues(result, primaryColumn);
 
 		// 把从表的主键和相关涉及的列组成SQL
@@ -249,7 +243,7 @@ public class PageInterceptor implements Interceptor {
 		// 主表的关键字
 		String primaryKeyField = pkCol.referencedColumnName();
 		// 获取主表的值的集合
-		ColumnMeta primaryColumn = entityMeta.findColumnByField(primaryKeyField);
+		ColumnMeta primaryColumn = entityMeta.findColumnByColumn(primaryKeyField);
 		Set<Object> values = getEntityValues(result, primaryColumn);
 		
 		// 获取从表的数据
@@ -394,7 +388,7 @@ public class PageInterceptor implements Interceptor {
 		return values;
 	}
 
-	private int getCount(Connection connection, Statement stmt, BoundSql boundSql, MappedStatement mappedStatement) {
+	private int getCount(Connection connection, Statement stmt, BoundSql boundSql, MappedStatement mappedStatement) throws SQLException{
 		// 记录总记录数
 		String sql = boundSql.getSql();
 		String countSql = "select count(0) from (" + sql + ") temp";
@@ -404,6 +398,13 @@ public class PageInterceptor implements Interceptor {
 			countStmt = connection.prepareStatement(countSql);
 			BoundSql countBS = new BoundSql(mappedStatement.getConfiguration(), countSql,
 					boundSql.getParameterMappings(), boundSql.getParameterObject());
+
+			Object object;
+			MetaObject metaObject = mappedStatement.getConfiguration().newMetaObject(boundSql);
+			Map<String,Object> parameters = (Map<String, Object>) metaObject.getValue("additionalParameters");
+			for (Map.Entry<String,Object> entry : parameters.entrySet()) {
+				countBS.setAdditionalParameter(entry.getKey(), entry.getValue());
+			}
 			setParameters(countStmt, mappedStatement, countBS, boundSql.getParameterObject());
 			rs = countStmt.executeQuery();
 			int totalCount = 0;
@@ -411,7 +412,6 @@ public class PageInterceptor implements Interceptor {
 				totalCount = rs.getInt(1);
 			}
 			return totalCount;
-		} catch (SQLException e) {
 		} finally {
 			try {
 				rs.close();
@@ -422,7 +422,6 @@ public class PageInterceptor implements Interceptor {
 			} catch (SQLException e) {
 			}
 		}
-		return -1;
 	}
 
 	/**

@@ -74,7 +74,11 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.github.spullara.mustache.java</groupId>
+			<artifactId>compiler</artifactId>
+			<version>0.9.6</version>
+		</dependency>
 		<!-- tk.mybatis -->
 		<!-- <dependency> <groupId>tk.mybatis</groupId> <artifactId>mapper</artifactId> 
 			<version>3.4.3</version> </dependency> <dependency> <groupId>tk.mybatis</groupId> 

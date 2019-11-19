@@ -8,60 +8,56 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.ParamNameResolver;
 import org.apache.ibatis.session.Configuration;
 
 import titan.lightbatis.exception.LightbatisException;
-import titan.lightbatis.mapper.QueryMapperManger;
+import titan.lightbatis.mybatis.LightbatisSqlSource;
+import titan.lightbatis.mybatis.meta.MapperMeta;
+import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.MapperBuilder;
 import titan.lightbatis.mybatis.LightbatisSQLBuilder;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.provider.MapperProvider;
 
 public class DynamicSelectProvider extends MapperProvider{
-	
-	private ParamNameResolver parameterResolver = null;
 	private Method method = null;
-	
+	private MapperMeta mapperMate = null;
+	private Configuration configuration = null;
+	private ParamNameResolver parameterResolver = null;
 	public DynamicSelectProvider(Configuration config, Method method, Class<?> mapperClass, MapperBuilder mapperHelper) {
 		super(mapperClass, mapperHelper);
 		parameterResolver= new ParamNameResolver(config, method);
+		this.mapperMate =  MapperMetaManger.parse(method);
 		this.method = method;
+		this.configuration = config;
 	}
 
-	public String buildSQL(SqlCommandType sqlCommandType, String msId) {
-		if (sqlCommandType == SqlCommandType.SELECT) {
-			String sql;
-			try {
-				sql = buildSelectSQL(msId);
-				return sql;
-			} catch (Exception e) {
-				e.printStackTrace(System.err);
-			}
-		}
-		return null;
+	public MapperMeta getMapperMate () {
+		return this.mapperMate;
 	}
-	public String buildQuery(SqlCommandType sqlCommandType, String mappedStatementId) {
-		QueryMapperManger.addMapper(mappedStatementId, mapperClass);
-		
+	/**
+	 * 如果访问的方法中有 Path, OrderSpecifier 类型时，将使用动态的 SQL 进行访问。
+	 * @return
+	 * @param mappedStatementId
+	 */
+	public SqlSource buildDynamicSQL(String mappedStatementId) throws Exception{
+		//如果查询语句中出现了 Path, OrderSpecifier 类型时
+		LightbatisSqlSource sqlSource = new LightbatisSqlSource(this.configuration,mapperBuilder, mapperMate);
 		Class<?> entityClass = getEntityClass(mappedStatementId, method);
-		// 修改返回值类型为实体类型
-		StringBuilder sql = new StringBuilder();
-		sql.append(LightbatisSQLBuilder.selectAllColumns(entityClass));
-		sql.append(LightbatisSQLBuilder.fromTable(entityClass, tableName(entityClass)));
-		//String whereSql = buildWhereSql();
-		//sql.append(whereSql);
-		// stmt.getBoundSql(parameterObject)
-		return sql.toString();
+		sqlSource.setEntityClass(entityClass);
+		String tableName = tableName(entityClass);
+		sqlSource.setTableName(tableName);
+		return sqlSource;
 	}
-	private static String buildWhereSql() { 
-	      return "<where>\n" +
-	                "  <foreach collection=\"array\" item=\"predicate\" separator=\"and\">\n" +
-	                "		${predicate}" +
-	                "  </foreach>\n" +
-	                "</where>";
+
+	
+	public boolean isDynamicSQL() {
+		return mapperMate.isDynamicSQL();
 	}
-	protected String buildSelectSQL(String msId) throws Exception {
+
+	public String buildSelectSQL(String msId) throws Exception {
 		Class<?> entityClass = getEntityClass(msId, method);
 		String tableName = tableName(entityClass);
 		StringBuilder sql = new StringBuilder();
@@ -98,10 +94,6 @@ public class DynamicSelectProvider extends MapperProvider{
 		if (entityClassMap.containsKey(msId)) {
 			return entityClassMap.get(msId);
 		} else {
-			// Class<?> returnType = method.getReturnType();
-			// EntityHelper.initEntityNameMap(returnType, mapperHelper.getConfig());
-			// entityClassMap.put(msId, returnType);
-			// return returnType;
 			Class<?> entityClass = null;
 			Class<?> mClass = method.getReturnType(); // getMapperClass(msId);
 			if (List.class.isAssignableFrom(mClass)) {
@@ -141,5 +133,8 @@ public class DynamicSelectProvider extends MapperProvider{
 		}
 		throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
 	}
+
+	
+
 
 }

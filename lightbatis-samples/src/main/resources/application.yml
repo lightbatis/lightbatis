@@ -51,9 +51,9 @@ logging:
 snowflake:
   workerId: 1
   datacenterId: 1
-#mybatis:
-#    configuration:
-#      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+mybatis:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
       
 dal: 
   base-package: com.aeotrade.provider  

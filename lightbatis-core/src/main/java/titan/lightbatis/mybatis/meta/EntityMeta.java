@@ -1,15 +1,10 @@
 /**
- * 
+ * 记录访问数据库时，实体类到访问 Mapper 之间的映射关系。Entity -> Mapper 之间的关系。
  */
 package titan.lightbatis.mybatis.meta;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
@@ -163,10 +158,19 @@ public class EntityMeta implements Serializable {
      * @param field
      * @return
      */
-    public ColumnMeta findColumnByField(String field) {
+    public ColumnMeta findColumnByColumn(String field) {
     		return 	entityClassColumns.stream().filter( meta -> meta.getColumn().equals(field)).findFirst().get();
     }
-    
+
+    public ColumnMeta findColumnByProperty(String property) {
+        Optional<ColumnMeta> found = entityClassColumns.stream().filter(meta -> meta.getProperty().equals(property)).findFirst();
+        if (found.isPresent()) {
+            return found.get();
+        }
+        return null;
+    }
+
+
     public String getMappedStatementId() {
 		return mappedStatementId;
 	}

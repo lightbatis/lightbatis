@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.annotation.Generated;
 
 import lombok.Data;
+import titan.lightbatis.sample.annotations.Operator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

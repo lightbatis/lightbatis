@@ -14,7 +14,6 @@ import java.sql.Types;
 
 
 
-
 /**
  * QMember is a Querydsl query type for Member
  */

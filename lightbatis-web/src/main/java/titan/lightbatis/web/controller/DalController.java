@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import titan.lightbatis.mapper.MapperMeta;
 import titan.lightbatis.table.ITableSchemaManager;
 import titan.lightbatis.table.TableSchema;
 import titan.lightbatis.web.DalConfig;

@@ -22,6 +22,6 @@ import titan.lightbatis.web.config.DalWebConfig;
  */
 @Documented
 @Import({DalWebConfig.class})
-public @interface EnableDALWeb {
+public @interface EnableLightbatisWeb {
 
 }

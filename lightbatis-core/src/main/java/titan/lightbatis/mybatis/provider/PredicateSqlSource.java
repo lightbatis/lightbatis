@@ -22,6 +22,8 @@ import com.querydsl.sql.SQLTemplates;
 
 import titan.lightbatis.mybatis.MapperBuilder;
 
+// 使用 LightbatisSqlSource 了
+@Deprecated
 public class PredicateSqlSource implements SqlSource {
 
 	private final Configuration configuration;

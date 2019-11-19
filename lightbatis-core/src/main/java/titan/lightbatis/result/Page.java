@@ -10,7 +10,7 @@ import org.apache.ibatis.session.RowBounds;
  *
  */
 public class Page extends RowBounds {
-
+	public static final Integer DEFAULT_PAGE_SIZE = 10;
 	// 每页的条数
 	private int pageSize = 10;
 	// 当前的页
@@ -23,4 +23,7 @@ public class Page extends RowBounds {
 		super(((pageNo - 1) < 0 ? 0 : (pageNo - 1)) * pageSize, pageSize);
 	}
 
+	public static Page newPage( int pageNo) {
+		return  new Page(DEFAULT_PAGE_SIZE, pageNo);
+	}
 }

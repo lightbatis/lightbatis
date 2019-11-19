@@ -15,7 +15,13 @@ public class ColumnMeta implements Serializable {
 	 */
 	private static final long serialVersionUID = -7320815314485442411L;
 	private EntityMeta table;
+    /**
+     * 实体属性
+     */
     private String property;
+    /**
+     * 数据库的列名
+     */
     private String column;
     private Class<?> javaType;
     private JdbcType jdbcType;

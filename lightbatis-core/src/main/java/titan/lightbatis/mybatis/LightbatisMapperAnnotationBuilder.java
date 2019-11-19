@@ -28,8 +28,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 import titan.lightbatis.annotations.LightbatisQuery;
-import titan.lightbatis.mapper.MapperMeta;
-import titan.lightbatis.mapper.QueryMapperManger;
+import titan.lightbatis.mybatis.meta.MapperMeta;
+import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.provider.PredicateSqlSource;
 import titan.lightbatis.mybatis.provider.impl.DynamicSelectProvider;
 
@@ -237,15 +237,17 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         return null;
     }
 
-    void parseStatement(Method method) {
+    void parseStatement(Method method){
         Class<?> parameterTypeClass = getParameterType(method);
         LanguageDriver languageDriver = getLanguageDriver(method);
         SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
         //如果不为空，说明 MyBatis 已经处理过了，现在只处理没有注释的。
-        if (sqlSource != null) {
-
-        } else  {
-            parseDynaticStatement(method);
+        if (sqlSource == null) {
+            try {
+                parseDynaticStatement(method);
+            } catch (Exception e) {
+                configuration.addIncompleteMethod(new MethodResolver(this, method));
+            }
         }
     }
 
@@ -253,7 +255,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
      * 如果方法没有注释，则使用对普通的方法进行分析，解析出 MappedStatement
      * @param method
      */
-    void parseDynaticStatement (Method method) {
+    void parseDynaticStatement (Method method) throws Exception{
         Class<?> parameterTypeClass = getParameterType(method);
         LanguageDriver languageDriver = getLanguageDriver(method);
 
@@ -327,22 +329,19 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         //将当前的 MappedStatementId 放到 SQLSource 中去。
         //sqlSource.setMappedStatementId(mappedStatementId);
         //创建 SQL
-        MapperBuilder mapperHelper = new MapperBuilder();
-        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperHelper);
-        LightbatisQuery myQuery = method.getAnnotation(LightbatisQuery.class);
-        SqlSource sqlSource = null;
-        if (myQuery != null) {
-            String sql = provider.buildQuery(sqlCommandType,mappedStatementId);
-            //String script = "<script>\n\t" + sql + "</script>";
-            //SqlSource source = buildSqlSourceFromStrings(new String[] {script}, parameterTypeClass, languageDriver);
-            sqlSource = new PredicateSqlSource(configuration, mapperHelper,sql);
-        } else {
-            String sql = provider.buildSQL(sqlCommandType,mappedStatementId);
+        MapperBuilder mapperBuilder= new MapperBuilder();
+        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder);
+           SqlSource sqlSource = null;
+
+        if (provider.isDynamicSQL()) {
+        	//使用动态 SQL 进行查询
+        	sqlSource = provider.buildDynamicSQL(mappedStatementId);
+        }
+        else {
+            String sql = provider.buildSelectSQL(mappedStatementId);
             String script = "<script>\n\t" + sql + "</script>";
             sqlSource = buildSqlSourceFromStrings(new String[] {script}, parameterTypeClass, languageDriver);
         }
-
-        //DynamicMethodSqlSource sqlSource = new DynamicMethodSqlSource(configuration, parameterTypeClass, method, sql);
 
         MappedStatement mappedStatement = assistant.addMappedStatement(mappedStatementId, sqlSource, statementType, sqlCommandType, fetchSize,
                 timeout,
@@ -355,9 +354,14 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
                 // ResultSets
                 options != null ? nullOrEmpty(options.resultSets()) : null);
         provider.registeResultMap(mappedStatement);
-        MapperMeta meta = new MapperMeta();
+        MapperMeta meta = provider.getMapperMate();
+        if (meta == null) {
+            meta = new MapperMeta();
+        }
+        meta.setMappedStatementId(mappedStatementId);
         meta.setResultClz(method.getReturnType());
-        QueryMapperManger.addMeta(mappedStatementId, meta);
+        MapperMetaManger.addMeta(mappedStatementId, meta);
+        provider = null;
     }
 
     private LanguageDriver getLanguageDriver(Method method) {

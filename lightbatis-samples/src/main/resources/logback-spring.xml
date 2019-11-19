@@ -14,6 +14,7 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <!-- Minimum logging level to be presented in the console logs -->
             <level>INFO</level>
+            <level>DEBUG</level>
         </filter>
         <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
@@ -89,17 +90,20 @@
 
     <logger name="org.springframework" level="INFO" />
     <logger name="org.hibernate" level="WARN" />
-    <logger name="titan.lightbatis.mybatis.provider.impl" level="INFO"/>
+    <logger name="titan.lightbatis.mybatis" level="INFO"/>
 
     <logger name="simple" level="DEBUG">
         <appender-ref ref="console" />
     </logger>
-    ​
-    <root level="INFO">
-        <appender-ref ref="console"/>
-        <appender-ref ref="logstash"/>
-        <appender-ref ref="flatfile"/>
-        <!-- 生产环境将请stdout,testfile去掉 -->
+    ​<logger name="titan.lightbatis.mybatis" level="DEBUG">
         <appender-ref ref="STDOUT" />
+    </logger>
+
+    <root level="debug">
+<!--        <appender-ref ref="console"/>-->
+<!--        <appender-ref ref="logstash"/>-->
+<!--        <appender-ref ref="flatfile"/>-->
+        <!-- 生产环境将请stdout,testfile去掉 -->
+            <appender-ref ref="STDOUT" />
     </root>
 </configuration>
