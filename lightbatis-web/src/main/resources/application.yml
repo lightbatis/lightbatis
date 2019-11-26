@@ -33,17 +33,9 @@ springfox:
     swagger:
       v2:
         path: /apidoc
-#mybatis: 
-#   configuration: org.apache.ibatis.session.Configuration
-
-#lightbatis:
-#  mappers: titan.common.dal.mapper.QueryMapper
 
 logging:
   config: classpath:log4j2-spring.xml 
-
-#dal: 
-#  base-package: titan.common.dal.web.provider
 
 mybatis:
     configuration:
