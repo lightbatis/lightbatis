@@ -35,6 +35,24 @@
               "chnname": "审核状态"
             },
             {
+              "name": "staff_id",
+              "type": "BigInt",
+              "remark": "",
+              "chnname": "企业联系人"
+            },
+            {
+              "name": "staff_name",
+              "type": "DefaultString",
+              "remark": "",
+              "chnname": "企业联系人名称"
+            },
+            {
+              "name": "status",
+              "type": "Integer",
+              "remark": "",
+              "chnname": "数据状态"
+            },
+            {
               "name": "REVISION",
               "type": "Integer",
               "remark": "",
@@ -106,12 +124,16 @@
             {
               "fieldName": "relationNoShow",
               "relationNoShow": true
+            },
+            {
+              "fieldName": "uiHint",
+              "relationNoShow": true
             }
           ],
           "chnname": "企业表"
         },
         {
-          "title": "企业员工表",
+          "title": "staff",
           "fields": [
             {
               "name": "ID",
@@ -136,8 +158,8 @@
             },
             {
               "name": "status",
-              "type": "DefaultString",
-              "remark": "",
+              "type": "Integer",
+              "remark": "数据状态，逻辑删除字段 1 = 删除， 0 = 没有删除",
               "chnname": "状态"
             },
             {
@@ -215,6 +237,10 @@
             {
               "fieldName": "relationNoShow",
               "relationNoShow": true
+            },
+            {
+              "fieldName": "uiHint",
+              "relationNoShow": true
             }
           ],
           "chnname": "企业员工表"
@@ -232,7 +258,7 @@
           },
           {
             "shape": "table",
-            "title": "企业员工表",
+            "title": "staff",
             "moduleName": false,
             "x": 190,
             "y": 190,
@@ -252,8 +278,8 @@
                 "y": 142.27380952380952
               },
               {
-                "x": 439.3466796875,
-                "y": 132.17857142857144
+                "x": 421.3466796875,
+                "y": 102.13888888888889
               }
             ],
             "sourceAnchor": 3,
@@ -265,7 +291,7 @@
         {
           "relation": "0,n:1",
           "from": {
-            "entity": "企业员工表",
+            "entity": "staff",
             "field": "member_id"
           },
           "to": {
