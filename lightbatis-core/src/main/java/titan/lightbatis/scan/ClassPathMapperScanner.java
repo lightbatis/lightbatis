@@ -18,11 +18,10 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.StringUtils;
-
 import titan.lightbatis.configuration.MapperConfig;
 import titan.lightbatis.exception.LightbatisException;
-import titan.lightbatis.mybatis.LightbatisFactoryBean;
 import titan.lightbatis.mapper.SpringBootBindUtil;
+import titan.lightbatis.mybatis.LightbatisFactoryBean;
 import titan.lightbatis.mybatis.MapperBuilder;
 
 import java.io.IOException;

@@ -3,13 +3,11 @@
  */
 package titan.lightbatis.mybatis.meta;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.querydsl.core.types.OrderSpecifier;
-
-import lombok.Data;
 
 /**
  * 用来记录 Mapper 的基本信息，仅记录 Mapper 的信息。

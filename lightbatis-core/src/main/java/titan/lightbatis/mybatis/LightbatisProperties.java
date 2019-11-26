@@ -1,13 +1,12 @@
 package titan.lightbatis.mybatis;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-import lombok.Data;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @ConfigurationProperties(prefix = LightbatisProperties.LIGHTBATIS_PREFIX)

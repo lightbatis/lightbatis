@@ -3,16 +3,6 @@
  */
 package titan.lightbatis.mybatis.provider;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -24,14 +14,22 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
-
 import titan.lightbatis.configuration.MapperConfig;
 import titan.lightbatis.exception.LightbatisException;
 import titan.lightbatis.mybatis.MapperBuilder;
-import titan.lightbatis.mybatis.keygen.SnowflakeIdKeyGenerator;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
 import titan.lightbatis.mybatis.meta.EntityMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**

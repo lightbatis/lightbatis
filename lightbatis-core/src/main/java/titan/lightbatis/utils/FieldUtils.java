@@ -3,27 +3,16 @@
  */
 package titan.lightbatis.utils;
 
+import titan.lightbatis.exception.LightbatisException;
+import titan.lightbatis.mybatis.meta.FieldMeta;
+
+import javax.persistence.Entity;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.Entity;
-
-import titan.lightbatis.exception.LightbatisException;
-import titan.lightbatis.mybatis.meta.FieldMeta;
+import java.lang.reflect.*;
+import java.util.*;
 
 
 /**

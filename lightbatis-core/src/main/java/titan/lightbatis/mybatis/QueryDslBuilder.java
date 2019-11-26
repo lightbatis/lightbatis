@@ -5,7 +5,6 @@ package titan.lightbatis.mybatis;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.*;
-import com.querydsl.sql.PostgreSQLTemplates;
 import com.querydsl.sql.SQLSerializer;
 import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.SQLTemplatesRegistry;
@@ -16,7 +15,6 @@ import org.apache.ibatis.session.Configuration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -42,7 +40,6 @@ public class QueryDslBuilder {
 			Connection connection = ds.getConnection();
 			sqlTemplates = templatesRegistry.getTemplates(connection.getMetaData());
 			connection.close();
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

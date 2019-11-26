@@ -1,4 +1,4 @@
-package titan.lightbatis.mybatis.meta;
+package titan.lightbatis.generator;
 
 /**
  * @author lifei114@126.com

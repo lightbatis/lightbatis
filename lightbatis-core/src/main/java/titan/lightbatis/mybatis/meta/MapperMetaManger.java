@@ -4,22 +4,15 @@
 package titan.lightbatis.mybatis.meta;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.DefaultParameterNameDiscoverer;
-
-import com.querydsl.core.types.Path;
-
-import titan.lightbatis.mapper.SpringBootBindUtil;
 import titan.lightbatis.result.Page;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * 用来管理和记录 使用 QueryMapper 进行的查询
@@ -66,6 +59,7 @@ public class MapperMetaManger {
 			if (Path.class.isAssignableFrom(param.getType()) || Path[].class.isAssignableFrom(param.getType())) {
 				meta.addProjection(param);
 				meta.setDynamicSQL(true);
+				log.debug("要查询的字段 " + param.getName());
 				//排序字段
 			} else if (OrderSpecifier.class.isAssignableFrom(param.getType())) {
 				meta.addOrder(param);
@@ -74,6 +68,7 @@ public class MapperMetaManger {
 
 			}
 			else {
+				log.debug("条件字段 ");
 				//条件字段
 				meta.addPredicate(param);
 				if (Predicate.class.isAssignableFrom(param.getType()) || Predicate[].class.isAssignableFrom(param.getType())) {

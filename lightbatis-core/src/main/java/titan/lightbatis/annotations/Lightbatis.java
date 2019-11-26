@@ -3,19 +3,18 @@
  */
 package titan.lightbatis.annotations;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.context.annotation.Import;
+import titan.lightbatis.mapper.LightbatisMapper;
+import titan.lightbatis.mybatis.LightbatisFactoryBean;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.context.annotation.Import;
-
-import titan.lightbatis.mapper.LightbatisMapper;
-import titan.lightbatis.mybatis.LightbatisFactoryBean;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
 @Retention(RUNTIME)

@@ -3,24 +3,24 @@
  */
 package titan.lightbatis.mybatis.meta;
 
-import java.io.Serializable;
-import java.util.*;
-
-import javax.persistence.SecondaryTable;
-import javax.persistence.Table;
-
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.session.Configuration;
-
 import titan.lightbatis.exception.LightbatisException;
+
+import javax.persistence.SecondaryTable;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * @author lifei
  *
  */
+@Data
 public class EntityMeta implements Serializable {
 
 	/**
@@ -35,6 +35,10 @@ public class EntityMeta implements Serializable {
     private String schema;
     private String orderByClause;
     private String baseSelect;
+    /**
+     * 是否存在需要自动生成的例
+     */
+    private boolean existGeneratedColumn = false;
     //实体类 => 全部列属性
     private Set<ColumnMeta> entityClassColumns = new LinkedHashSet<>();
     //实体类 => 主键信息
@@ -56,7 +60,7 @@ public class EntityMeta implements Serializable {
     private String mappedStatementId = null;
     //从表的映射关系
     private List<SecondaryTable> secondaryTables = new ArrayList<>();
-    
+
     public EntityMeta(Class<?> entityClass) {
         this.entityClass = entityClass;
     }
@@ -71,53 +75,6 @@ public class EntityMeta implements Serializable {
         this.schema = table.schema();
     }
 
-    public void setKeyColumns(List<String> keyColumns) {
-        this.keyColumns = keyColumns;
-    }
-
-    public void setKeyProperties(List<String> keyProperties) {
-        this.keyProperties = keyProperties;
-    }
-
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCatalog() {
-        return catalog;
-    }
-
-    public void setCatalog(String catalog) {
-        this.catalog = catalog;
-    }
-
-    public String getSchema() {
-        return schema;
-    }
-
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
-
-    public String getBaseSelect() {
-        return baseSelect;
-    }
-
-    public void setBaseSelect(String baseSelect) {
-        this.baseSelect = baseSelect;
-    }
 
     public String getPrefix() {
         if (StringUtils.isNotEmpty(catalog)) {

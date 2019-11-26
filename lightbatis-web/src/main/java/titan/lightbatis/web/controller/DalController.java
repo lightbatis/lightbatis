@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
@@ -38,6 +39,7 @@ import titan.lightbatis.web.service.GenerateService;
 @RestController
 @RequestMapping("/dal")
 @Api("数据层管理")
+@Slf4j
 public class DalController {
 
 	@Autowired
@@ -62,15 +64,7 @@ public class DalController {
 		List<TableSchema> tables = tableSchemaManager.listTables();
 		List<TableEntitySchema> entites = new ArrayList<TableEntitySchema>();
 		for (TableSchema table : tables) {
-			TableEntitySchema entitySchema = new TableEntitySchema();
-			BeanUtils.copyProperties(table, entitySchema);
-			entitySchema.setMapperClzName(table.getEntityName() + "Mapper");
-			entitySchema.setControllerClzName(table.getEntityName() + "Controller");
-			entitySchema.setServiceClzName(table.getEntityName() + "Service");
-			entitySchema.setEntityPackageName(dalConfig.getBasePackage() + ".model.entity");
-			entitySchema.setMapperPackageName(dalConfig.getBasePackage() + ".mapper");
-			entitySchema.setControllerPackageName(dalConfig.getBasePackage() + ".web");
-			entitySchema.setServicePackageName(dalConfig.getBasePackage() + ".service");
+			TableEntitySchema entitySchema = toEntitySchema(table);
 			entites.add(entitySchema);
 		}
 		return entites;
@@ -93,6 +87,7 @@ public class DalController {
 			}
 			setting.setOutDir(outDir);
 			setting.setOutPackage(dalConfig.getBasePackage());
+			setting.setOverwrite(true);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -133,6 +128,14 @@ public class DalController {
 		return result;
 	}
 
+	@ApiOperation(value = "批量生成 Entity, Mapper, Service")
+	@PostMapping("generated/batch")
+	public Object batchGenerated(@RequestBody List<TableSchema> tableSchemas) {
+		log.debug(tableSchemas.toString());
+
+		return null;
+	}
+
 	@ApiOperation(value = "获取当前生成的实体类情况", response = EntityMeta.class, responseContainer = "list")
 	@GetMapping("list/entities")
 	public List<EntityMeta> listEntities() {
@@ -169,5 +172,18 @@ public class DalController {
 			ex.printStackTrace(System.err);
 		}
 		return meta;
+	}
+
+	private TableEntitySchema toEntitySchema(TableSchema table) {
+		TableEntitySchema entitySchema = new TableEntitySchema();
+		BeanUtils.copyProperties(table, entitySchema);
+		entitySchema.setMapperClzName(table.getEntityName() + "Mapper");
+		entitySchema.setControllerClzName(table.getEntityName() + "Controller");
+		entitySchema.setServiceClzName(table.getEntityName() + "Service");
+		entitySchema.setEntityPackageName(dalConfig.getBasePackage() + ".model.entity");
+		entitySchema.setMapperPackageName(dalConfig.getBasePackage() + ".mapper");
+		entitySchema.setControllerPackageName(dalConfig.getBasePackage() + ".web");
+		entitySchema.setServicePackageName(dalConfig.getBasePackage() + ".service");
+		return entitySchema;
 	}
 }

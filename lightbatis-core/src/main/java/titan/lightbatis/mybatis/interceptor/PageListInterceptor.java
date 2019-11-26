@@ -3,40 +3,24 @@
  */
 package titan.lightbatis.mybatis.interceptor;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.*;
-
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-
-import titan.lightbatis.mybatis.meta.MapperMeta;
-import titan.lightbatis.mybatis.meta.MapperMetaManger;
-import titan.lightbatis.mybatis.LightbatisSQLBuilder;
-import titan.lightbatis.mybatis.meta.ColumnMeta;
-import titan.lightbatis.mybatis.meta.EntityMeta;
-import titan.lightbatis.mybatis.meta.EntityMetaManager;
-import titan.lightbatis.mybatis.meta.SecondTableMeta;
+import titan.lightbatis.mybatis.meta.*;
 import titan.lightbatis.result.PageList;
+
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
+import java.sql.*;
+import java.util.*;
 
 /**
  * 分页的处理
@@ -46,8 +30,8 @@ import titan.lightbatis.result.PageList;
  */
 
 @Intercepts({ @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = { Statement.class }) })
-public class PageInterceptor implements Interceptor {
-	//private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PageInterceptor.class);
+public class PageListInterceptor implements Interceptor {
+	//private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PageListInterceptor.class);
 
 	/*
 	 * （非 Javadoc）
@@ -165,8 +149,7 @@ public class PageInterceptor implements Interceptor {
 		Set<Object> values = getEntityValues(result, primaryColumn);
 
 		// 把从表的主键和相关涉及的列组成SQL
-		String sql = LightbatisSQLBuilder.selectColumns(secondTable.getTableName(), secondTable.getPrimitiveColumns(),
-				pkCol.name());
+		String sql =null;//TODO LightbatisSQLBuilder.selectColumns(secondTable.getTableName(), secondTable.getPrimitiveColumns(),pkCol.name());
 		StringBuffer sqlBuffer = new StringBuffer(sql);
 		sqlBuffer.append(" WHERE ").append(pkCol.name()).append(" IN (");
 
@@ -251,7 +234,7 @@ public class PageInterceptor implements Interceptor {
 		EntityMeta baseMeta = listColumn.getCollectionBaseType();
 		
 		// 把从表的主键和相关涉及的列组成SQL
-		String sql = LightbatisSQLBuilder.selectColumns(baseMeta.getName(), baseMeta.getClassColumns(), null);
+		String sql = null;//TODO LightbatisSQLBuilder.selectColumns(baseMeta.getName(), baseMeta.getClassColumns(), null);
 		StringBuffer sqlBuffer = new StringBuffer(sql);
 		sqlBuffer.append(" WHERE ").append(pkCol.name()).append(" IN (");
 

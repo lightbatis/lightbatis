@@ -6,13 +6,13 @@
 
 package titan.lightbatis.table;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *<p>Title:表的描述</p>

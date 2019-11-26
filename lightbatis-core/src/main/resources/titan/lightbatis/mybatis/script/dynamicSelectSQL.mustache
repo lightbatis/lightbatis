@@ -1,0 +1,14 @@
+SELECT
+<if test='@titan.lightbatis.mybatis.provider.impl.SelectHelper@hasProjection(_parameter,"{{mappedStatementId}}")'>
+    <bind name="projectionColumns" value='@titan.lightbatis.mybatis.provider.impl.SelectHelper@projectionColumns(_parameter,"{{mappedStatementId}}")'/>
+    <foreach collection="projectionColumns" item="projection" separator=",">
+        ${projection.column}
+    </foreach>
+</if>
+FROM  {{table}}
+<where>
+    {{#columns}}
+       AND {{column}} = {{>columnHolder}}
+    {{/columns}}
+    {{#each orderColumns}}{{#eq @index 0}}ORDER BY {{/eq}} {{#gt @index 0}},{{/gt}} {{column}} {{orderBy}}{{/each}}
+</where>

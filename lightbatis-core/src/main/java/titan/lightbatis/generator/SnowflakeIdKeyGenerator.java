@@ -1,9 +1,7 @@
 /**
  * 
  */
-package titan.lightbatis.mybatis.keygen;
-
-import java.sql.Statement;
+package titan.lightbatis.generator;
 
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.ExecutorException;
@@ -11,10 +9,13 @@ import org.apache.ibatis.executor.keygen.KeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
-
 import titan.lightbatis.table.ITableSchemaManager;
 
+import java.sql.Statement;
+
 /**
+ *
+ * 使用 SnowflakeId 的算法生成自动增长的值。
  * @author lifei114@126.com
  *
  */
@@ -23,8 +24,6 @@ public class SnowflakeIdKeyGenerator implements KeyGenerator {
 	@Override
 	public void processBefore(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
 		// do nothing
-//		System.out.println(" MappedStatement = " + ms);
-//		System.out.println(" parameter = " + parameter);
 		processGeneratedKeys(executor, ms, parameter);
 	}
 

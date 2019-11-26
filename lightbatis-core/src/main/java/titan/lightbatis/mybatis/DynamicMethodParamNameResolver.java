@@ -3,13 +3,6 @@
  */
 package titan.lightbatis.mybatis;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.reflection.Jdk;
@@ -18,6 +11,13 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.core.DefaultParameterNameDiscoverer;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @author lifei

@@ -19,11 +19,7 @@ import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
 import titan.lightbatis.mybatis.meta.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.apache.ibatis.mapping.ParameterMapping.Builder;
 

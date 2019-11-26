@@ -1,5 +1,10 @@
 package titan.lightbatis.table;
 
+import com.google.common.collect.ImmutableSet;
+import com.mysema.commons.lang.Pair;
+import com.querydsl.sql.types.Null;
+
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
@@ -9,11 +14,6 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.Nullable;
-import com.google.common.collect.ImmutableSet;
-import com.mysema.commons.lang.Pair;
-import com.querydsl.sql.types.Null;
 
 public class JDBCTypeMapping {
 

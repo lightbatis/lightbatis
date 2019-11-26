@@ -1,7 +1,7 @@
 package titan.lightbatis.mybatis;
 
-import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.ResultMap;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.builder.BuilderException;
@@ -27,10 +27,8 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
-import titan.lightbatis.annotations.LightbatisQuery;
 import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
-import titan.lightbatis.mybatis.provider.PredicateSqlSource;
 import titan.lightbatis.mybatis.provider.impl.DynamicSelectProvider;
 
 import java.io.IOException;
@@ -69,7 +67,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
     @Override
     public void parse() {
         String resource = type.toString();
-        //如果已经被MyBatis 处理过,此时只处理，Mybatis 没有处理过的方法就可以了，具体的就是方法上没有任何的注释。
+        //如果已经被MyBatis 处理过,此时只处 Mybatis 没有处理过的方法就可以了，具体的就是方法上没有任何的注释。
         if (!configuration.isResourceLoaded(resource)) {
             loadXmlResource();
             configuration.addLoadedResource(resource);
@@ -237,7 +235,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         return null;
     }
 
-    void parseStatement(Method method){
+	void parseStatement(Method method){
         Class<?> parameterTypeClass = getParameterType(method);
         LanguageDriver languageDriver = getLanguageDriver(method);
         SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
@@ -258,7 +256,12 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
     void parseDynaticStatement (Method method) throws Exception{
         Class<?> parameterTypeClass = getParameterType(method);
         LanguageDriver languageDriver = getLanguageDriver(method);
-
+        MapperBuilder mapperBuilder= new MapperBuilder();
+        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder);
+        MapperMeta meta = provider.getMapperMate();
+        if (meta == null) {
+            meta = new MapperMeta();
+        }
         //DynamicMethodSqlSource sqlSource = createDynaticSqlSource(method, parameterTypeClass, languageDriver);
 
         Options options = method.getAnnotation(Options.class);
@@ -329,15 +332,15 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         //将当前的 MappedStatementId 放到 SQLSource 中去。
         //sqlSource.setMappedStatementId(mappedStatementId);
         //创建 SQL
-        MapperBuilder mapperBuilder= new MapperBuilder();
-        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder);
-           SqlSource sqlSource = null;
+        SqlSource sqlSource = null;
 
         if (provider.isDynamicSQL()) {
         	//使用动态 SQL 进行查询
         	sqlSource = provider.buildDynamicSQL(mappedStatementId);
         }
         else {
+            // 查询条件是固定的，使用静态的查询。
+
             String sql = provider.buildSelectSQL(mappedStatementId);
             String script = "<script>\n\t" + sql + "</script>";
             sqlSource = buildSqlSourceFromStrings(new String[] {script}, parameterTypeClass, languageDriver);
@@ -354,10 +357,6 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
                 // ResultSets
                 options != null ? nullOrEmpty(options.resultSets()) : null);
         provider.registeResultMap(mappedStatement);
-        MapperMeta meta = provider.getMapperMate();
-        if (meta == null) {
-            meta = new MapperMeta();
-        }
         meta.setMappedStatementId(mappedStatementId);
         meta.setResultClz(method.getReturnType());
         MapperMetaManger.addMeta(mappedStatementId, meta);

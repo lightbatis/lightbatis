@@ -3,14 +3,14 @@
  */
 package titan.lightbatis.mybatis.meta;
 
+import lombok.Data;
+
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import lombok.Data;
 
 /**
  * @author lifei114@126.com

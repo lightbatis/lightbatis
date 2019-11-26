@@ -1,0 +1,6 @@
+delete from {{table}}
+<where>
+    {{#pkColumns}}
+        AND {{column}} = {{>columnHolder}}
+    {{/pkColumns}}
+</where>

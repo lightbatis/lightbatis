@@ -1,2 +1,0 @@
-org.springframework.context.ApplicationListener=\
-titan.lightbatis.web.DalApplicationListener

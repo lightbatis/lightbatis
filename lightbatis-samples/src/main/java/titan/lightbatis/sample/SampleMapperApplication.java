@@ -1,5 +1,6 @@
 package titan.lightbatis.sample;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.querydsl.core.types.Predicate;
@@ -10,6 +11,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import titan.lightbatis.annotations.Lightbatis;
+import titan.lightbatis.configuration.MapperConfig;
+import titan.lightbatis.mybatis.MapperBuilder;
+import titan.lightbatis.mybatis.meta.EntityMetaManager;
+import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.sample.domain.Member;
@@ -17,7 +22,7 @@ import titan.lightbatis.sample.domain.QMember;
 import titan.lightbatis.sample.mapper.MemberMapper;
 import titan.lightbatis.web.annotations.EnableLightbatisWeb;
 
-@Lightbatis()//basePackages = "titan.lightbatis.sample.mapper"
+@Lightbatis()
 @EnableLightbatisWeb()
 @SpringBootApplication
 public class SampleMapperApplication implements CommandLineRunner {
@@ -31,9 +36,10 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+
 		//insertMember();
 		//updateMember();
-		//listMember();
+		listMember();
 		//insertMemberWithId();
 		//Member member = getMember();
 		//deleteMember();
@@ -41,9 +47,15 @@ public class SampleMapperApplication implements CommandLineRunner {
 		//listMembers();
 		//listAllMembers();
 		//listPredicatesMembers();
-		listMemberFields();
+		//listMemberFields();
+		//testUpdateByPrimaryKey();
+		//listMemberByKindId();
 	}
 
+	private void listMemberByKindId() {
+		List<Member> memberList = memberMapper.listMemberByKindId((short)1);
+		printMembers(memberList);
+	}
 	private void queryMember() {
 		QMember query = QMember.member;
 		List<Member> members = memberMapper.query(query.kindId.eq(new Short((short) 1)));
@@ -113,7 +125,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void listMembers() {
 		QMember member = QMember.member;
-		List<Member> members =memberMapper.listMembers(member.id, member.memberName, (short)2, member.id.asc(), new Page(1,10));
+		List<Member> members =memberMapper.listMembers(member.id, member.memberName, (short)1, member.id.asc(), new Page(5,1));
 		for (Member m : members) {
 			System.out.println(m);
 		}
@@ -151,4 +163,16 @@ public class SampleMapperApplication implements CommandLineRunner {
 			System.out.println("=========== total size = " + pageList.getTotalSize());
 		}
 	}
+
+
+	public void testUpdateByPrimaryKey () throws IOException {
+		MapperConfig config = new MapperConfig();
+		EntityMetaManager.initEntityNameMap(Member.class,config,"");
+		MapperBuilder mapperBuilder = new MapperBuilder();
+		BaseMapperProvider provider = new BaseMapperProvider(MemberMapper.class, mapperBuilder);
+		String sql= provider.updateEntityByPrimaryKey(Member.class);
+		System.out.println("sql = ========");
+		System.out.println(sql);
+	}
+
 }

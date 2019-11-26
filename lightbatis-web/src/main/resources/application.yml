@@ -11,10 +11,10 @@ spring:
       exclude: WEB-INF/**
   datasource:
     #type: com.alibaba.druid.pool.DruidDataSource
-    username: odoo
-    password: hzst123!@#
+    username: demo
+    password: 123456
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://39.107.157.29:5432/atfs_db
+    url: jdbc:postgresql://localhost:5432/demo
 #    driver-class-name: com.mysql.jdbc.Driver
 #    url: jdbc:mysql://localhost:3306/vrcodedb?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
     #方言
@@ -48,4 +48,7 @@ logging:
 mybatis:
     configuration:
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-   
+
+snowflake:
+  workerId: 1
+  datacenterId: 1

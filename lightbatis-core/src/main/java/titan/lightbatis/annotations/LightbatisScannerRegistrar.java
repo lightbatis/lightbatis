@@ -3,10 +3,6 @@
  */
 package titan.lightbatis.annotations;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
@@ -22,10 +18,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-
 import titan.lightbatis.mybatis.LightbatisFactoryBean;
 import titan.lightbatis.scan.ClassPathMapperScanner;
 import titan.lightbatis.utils.MapperUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lifei114@126.com

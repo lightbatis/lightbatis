@@ -3,7 +3,6 @@ package titan.lightbatis.mapper;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
-
 import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 
 /**

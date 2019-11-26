@@ -1,13 +1,13 @@
 package titan.lightbatis.table;
 
+import com.google.common.primitives.Primitives;
+import com.querydsl.core.util.ReflectionUtils;
+import com.querydsl.sql.types.*;
+
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.primitives.Primitives;
-import com.querydsl.core.util.ReflectionUtils;
-import com.querydsl.sql.types.*;
 
 public class JavaTypeMapping {
 

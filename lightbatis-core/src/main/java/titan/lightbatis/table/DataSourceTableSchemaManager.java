@@ -3,45 +3,25 @@
  */
 package titan.lightbatis.table;
 
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.sql.DataSource;
-
+import com.google.common.primitives.Primitives;
+import com.querydsl.sql.codegen.DefaultNamingStrategy;
+import com.querydsl.sql.types.Type;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationContextException;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.MessageSourceAware;
-import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.google.common.primitives.Primitives;
-import com.querydsl.sql.codegen.DefaultNamingStrategy;
-import com.querydsl.sql.types.Type;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.*;
 
 /**
  * 获取当前 DataSource 下相关的所有的表结构
@@ -243,6 +223,7 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 						col.setLength(length);
 						col.setPropertyName(namingStrategy.getPropertyName(field, null));
 						// col.setPrimary(key.equalsIgnoreCase("PRI"));
+						col.setType(dataType);
 						col.setTypeName(type);
 						col.setColumnClz(JDBCTypeMapping.defaultTypes.get(dataType));
 						schema.addColumn(col);

@@ -3,11 +3,6 @@
  */
 package titan.lightbatis.mybatis.configuration;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -43,11 +38,14 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-
-import titan.lightbatis.scan.ClassPathMapperScanner;
 import titan.lightbatis.mybatis.LightbatisProperties;
+import titan.lightbatis.scan.ClassPathMapperScanner;
 import titan.lightbatis.table.DataSourceTableSchemaManager;
 import titan.lightbatis.table.ITableSchemaManager;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * @author lifei

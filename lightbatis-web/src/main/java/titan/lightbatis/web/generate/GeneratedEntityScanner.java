@@ -32,11 +32,13 @@ public class GeneratedEntityScanner{
 	
 	@Autowired
 	private EntityRespository entityRepository = null;
-	
+
+	@Autowired
+	private DalConfig dalConfig = null;
 	public void doScan() {
 		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
 		provider.addIncludeFilter(new AnnotationTypeFilter(DalEntity.class));
-		Set<BeanDefinition> beanDefinitionSet = provider.findCandidateComponents(DalConfig.startupPackage);
+		Set<BeanDefinition> beanDefinitionSet = provider.findCandidateComponents(dalConfig.getStartupPackage());
 		for (BeanDefinition bd: beanDefinitionSet) {
 			String clzName = bd.getBeanClassName();
 			AnnotatedBeanDefinition abd = (AnnotatedBeanDefinition)bd;

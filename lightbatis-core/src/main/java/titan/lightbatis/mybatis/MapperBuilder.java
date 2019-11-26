@@ -3,15 +3,7 @@
  */
 package titan.lightbatis.mybatis;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
@@ -20,20 +12,20 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
-
-import lombok.extern.slf4j.Slf4j;
 import titan.lightbatis.configuration.MapperConfig;
 import titan.lightbatis.exception.LightbatisException;
 import titan.lightbatis.mapper.LightbatisMapper;
 import titan.lightbatis.mybatis.provider.EmptyProvider;
 import titan.lightbatis.mybatis.provider.MapperProvider;
-import titan.lightbatis.mybatis.provider.impl.QueryMapperProvider;
+
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static titan.lightbatis.utils.MapperUtils.getMapperClass;
 
 /**
  * 重新构建 SqlSource
- * 
  * @author lifei114@126.com
  *
  */
@@ -73,7 +65,7 @@ public class MapperBuilder {
 		Class<?> templateClass = null;
 		Class<?> tempClass = null;
 		Set<String> methodSet = new HashSet<String>();
-		MapperProvider defaultProvider = new QueryMapperProvider(mapperClass, this);
+		//MapperProvider defaultProvider = new QueryMapperProvider(mapperClass, this);
 		for (Method method : methods) {
 			if (method.isAnnotationPresent(SelectProvider.class)) {
 				SelectProvider provider = method.getAnnotation(SelectProvider.class);
@@ -92,7 +84,7 @@ public class MapperBuilder {
 				tempClass = provider.type();
 				methodSet.add(method.getName());
 			} else {
-				defaultProvider.addMethodMap(method.getName(), method);
+				//defaultProvider.addMethodMap(method.getName(), method);
 			}
 
 			if (templateClass == null) {

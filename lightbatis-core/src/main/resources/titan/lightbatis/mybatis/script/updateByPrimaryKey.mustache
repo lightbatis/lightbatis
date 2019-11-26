@@ -1,0 +1,15 @@
+UPDATE {{table}}
+<set>
+    {{#columns}}
+        {{^identity}}
+            <if test="{{property}} != null">
+                {{column}} = {{>columnHolder}} ,
+             </if>
+        {{/identity}}
+    {{/columns}}
+</set>
+<where>
+    {{#pkColumns}}
+       AND {{column}} = {{>columnHolder}}
+    {{/pkColumns}}
+</where>
