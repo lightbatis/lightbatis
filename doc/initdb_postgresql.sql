@@ -1,16 +1,16 @@
-
+drop table member ;
 /*==============================================================*/
 /* Table: member                                                */
 /*==============================================================*/
 create table member (
                         id                   int8                 not null,
                         member_name          varchar(128)         null,
-                        kind_id              int2                 null,
+                        kind_id              int4                 null,
                         staff_id             int8                 null,
                         staff_name           varchar(32)          null,
                         verify_status        varchar(32)          null,
-                        status               int2         null,
-                        revision             int2                 null,
+                        status               int4         null,
+                        revision             int4                 null,
                         created_by           int8                 null,
                         created_time         timestamp            null,
                         updated_by           int8                 null,
@@ -58,16 +58,18 @@ comment on column member.updated_time is
     '更新时间';
 
 
+drop table  staff;
+
 CREATE TABLE staff(
                       ID int8 NOT NULL,
                       member_id int8,
                       staff_name varchar(32),
-                      status int2,
-                      REVISION int2,
+                      status int4,
+                      REVISION int4,
                       CREATED_BY varchar(32),
-                      CREATED_TIME DATE,
+                      CREATED_TIME timestamp,
                       UPDATED_BY varchar(32),
-                      UPDATED_TIME DATE,
+                      UPDATED_TIME timestamp,
                       PRIMARY KEY (ID)
 );
 

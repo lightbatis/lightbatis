@@ -34,15 +34,6 @@ public class TitanDalApplication {
     }
 
 
-    @Bean
-    public ApplicationRunner createApplication() {
-        return new ApplicationRunner() {
-            @Override
-            public void run(ApplicationArguments args) throws Exception {
-                System.out.println("=================== application runner ========== ");
-            }
-        };
-    }
 
 
 }

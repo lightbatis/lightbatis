@@ -33,4 +33,14 @@ public class TableEntitySchema extends TableSchema {
 	private String controllerPackageName = null;
 	@ApiModelProperty("Service 类包名")
 	private String servicePackageName = null;
+
+	@ApiModelProperty("默认逻辑删除字段")
+	private String logicDelteColumn = "status";
+
+	@ApiModelProperty("默认乐观锁字段")
+	private String revisionColumn = "revision";
+	@ApiModelProperty("默认创建时间字段")
+	private String createdTimeColumn = "created_time";
+	@ApiModelProperty("默认更新时间字段")
+	private String updatedTimeColumn = "updated_time";
 }

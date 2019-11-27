@@ -1,7 +1,7 @@
 /**
  * 
  */
-package titan.common.mybatis.test;
+package titan.lightbatis.test;
 
 import titan.lightbatis.table.SnowflakeIdWorker;
 

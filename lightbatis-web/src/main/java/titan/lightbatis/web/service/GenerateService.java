@@ -132,4 +132,15 @@ public class GenerateService {
 		String script = writer.toString();
 		return script;
 	}
+
+	public void genertedTables(OutputSetting setting, List<TableEntitySchema> tableSchemas) throws Throwable {
+		for (TableEntitySchema table: tableSchemas) {
+			//生成实体类
+			generateEntity(setting, table);
+			//生成 Mapper 类
+			generateMapper(setting, table);
+			//生成 Service 类
+			generateService(setting, table);
+		}
+	}
 }

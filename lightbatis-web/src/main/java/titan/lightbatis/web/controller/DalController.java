@@ -25,10 +25,7 @@ import titan.lightbatis.table.TableSchema;
 import titan.lightbatis.web.DalConfig;
 import titan.lightbatis.web.EntityMeta;
 import titan.lightbatis.web.EntityRespository;
-import titan.lightbatis.web.entity.GenerateSettingVo;
-import titan.lightbatis.web.entity.MapperMetaVO;
-import titan.lightbatis.web.entity.OutputSetting;
-import titan.lightbatis.web.entity.TableEntitySchema;
+import titan.lightbatis.web.entity.*;
 import titan.lightbatis.web.generate.mapper.MethodMeta;
 import titan.lightbatis.web.service.GenerateService;
 
@@ -40,7 +37,7 @@ import titan.lightbatis.web.service.GenerateService;
 @RequestMapping("/dal")
 @Api("数据层管理")
 @Slf4j
-public class DalController {
+public class DalController{
 
 	@Autowired
 	private ITableSchemaManager tableSchemaManager = null;
@@ -73,25 +70,7 @@ public class DalController {
 	@ApiOperation(value = "当前的默认的输出配置", response = OutputSetting.class)
 	@GetMapping("generate/setting")
 	public Object generateSetting() {
-		OutputSetting setting = new OutputSetting();
-		// 获取当前输出的文件夹。
-		try {
-			ApplicationHome appHome = new ApplicationHome();
-			String outDir = null;
-			File dir = appHome.getDir();
-			if (dir == null) {
-				dir = ResourceUtils.getFile("src/main/java");
-				outDir = dir.getAbsolutePath();
-			} else {
-				outDir = dir.getAbsolutePath() + "/src/main/java";
-			}
-			setting.setOutDir(outDir);
-			setting.setOutPackage(dalConfig.getBasePackage());
-			setting.setOverwrite(true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
+		OutputSetting setting = getDefaultSetting();
 		return setting;
 	}
 
@@ -130,10 +109,17 @@ public class DalController {
 
 	@ApiOperation(value = "批量生成 Entity, Mapper, Service")
 	@PostMapping("generated/batch")
-	public Object batchGenerated(@RequestBody List<TableSchema> tableSchemas) {
-		log.debug(tableSchemas.toString());
-
-		return null;
+	public Object batchGenerated(@RequestBody BatchGenerateVO generateSetting) {
+		log.debug(generateSetting.toString());
+		OutputSetting setting = generateSetting.getSetting();
+		try {
+			List<TableEntitySchema> tableSchemas = generateSetting.getTableSchemas();
+			generateService.genertedTables(setting, tableSchemas);
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
+			return "fail";
+		}
+		return "ok";
 	}
 
 	@ApiOperation(value = "获取当前生成的实体类情况", response = EntityMeta.class, responseContainer = "list")
@@ -185,5 +171,28 @@ public class DalController {
 		entitySchema.setControllerPackageName(dalConfig.getBasePackage() + ".web");
 		entitySchema.setServicePackageName(dalConfig.getBasePackage() + ".service");
 		return entitySchema;
+	}
+
+	private OutputSetting getDefaultSetting() {
+		OutputSetting setting = new OutputSetting();
+		// 获取当前输出的文件夹。
+		try {
+			ApplicationHome appHome = new ApplicationHome();
+			String outDir = null;
+			File dir = appHome.getDir();
+			if (dir == null) {
+				dir = ResourceUtils.getFile("src/main/java");
+				outDir = dir.getAbsolutePath();
+			} else {
+				outDir = dir.getAbsolutePath() + "/src/main/java";
+			}
+			setting.setOutDir(outDir);
+			setting.setOutPackage(dalConfig.getBasePackage());
+			setting.setOverwrite(true);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return setting;
 	}
 }

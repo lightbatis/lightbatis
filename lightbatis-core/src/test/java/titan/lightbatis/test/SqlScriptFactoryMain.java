@@ -24,7 +24,7 @@
  *
  * 基于 MyBatis 扩展的数据访问统一层
  */
-package titan.common.mybatis.test;
+package titan.lightbatis.test;
 
 import titan.lightbatis.generator.GeneratorHelper;
 import titan.lightbatis.mybatis.script.MybatisScriptFactory;

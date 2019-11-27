@@ -43,7 +43,6 @@ public class DalConfig implements ApplicationContextAware {
 				this.applicationPackage = basePackage;
 				this.startupPackage = basePackage;
 				this.basePackage = basePackage;
-				System.out.println("==================== applicationPackage");
 			}
 		}
 	}
