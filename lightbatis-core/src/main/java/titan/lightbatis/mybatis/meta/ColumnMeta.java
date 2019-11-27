@@ -89,6 +89,8 @@ public class ColumnMeta implements Serializable {
     private boolean updatable = true;
     //逻辑删除字段
     private boolean logicDelete = false;
+    //乐观锁字段
+    private boolean revision = false;
     public ColumnMeta() {
     }
 
