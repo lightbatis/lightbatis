@@ -29,8 +29,6 @@ package titan.lightbatis.generator;
 import org.apache.commons.lang3.StringUtils;
 import titan.lightbatis.utils.SpringContextUtil;
 
-import java.sql.Timestamp;
-
 /**
  * @author lifei114@126.com
  *

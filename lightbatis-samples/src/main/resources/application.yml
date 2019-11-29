@@ -55,6 +55,6 @@ mybatis:
     configuration:
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
       
-dal: 
-  base-package: com.aeotrade.provider  
+#dal:
+#  base-package: com.aeotrade.provider
    

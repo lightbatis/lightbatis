@@ -28,9 +28,7 @@ package titan.lightbatis.mybatis.script;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.helper.ConditionalHelpers;
-import com.github.jknack.handlebars.helper.EachHelper;
-import com.github.jknack.handlebars.helper.IfHelper;
+import com.github.jknack.handlebars.helper.*;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
 
 import java.io.IOException;
@@ -50,7 +48,10 @@ public class MybatisScriptFactory {
 		handlebars.registerHelper(IfHelper.NAME ,IfHelper.INSTANCE);
 		handlebars.registerHelper(ConditionalHelpers.eq.name(), ConditionalHelpers.eq);
 		handlebars.registerHelper(ConditionalHelpers.gt.name(), ConditionalHelpers.gt);
+		handlebars.registerHelper(ConditionalHelpers.neq.name(), ConditionalHelpers.neq);
+		handlebars.registerHelper(UnlessHelper.NAME, UnlessHelper.INSTANCE);
 		handlebars.registerHelper(EachHelper.NAME, EachHelper.INSTANCE);
+		handlebars.registerHelper(LogHelper.NAME, LogHelper.INSTANCE);
 	}
 	/**
 	 * 
@@ -115,6 +116,16 @@ public class MybatisScriptFactory {
 		return script;
 	}
 
+	public static String removeByPrimaryKey(String table, ColumnMeta logicColumn, Set<ColumnMeta> pkColumns)  throws IOException {
+		Map<String, Object> param = new HashMap<>();
+		param.put("table", table);
+		param.put("logicColumn", logicColumn);
+		param.put("pkColumns", pkColumns);
+		Template template = handlebars.compile("removeByPrimaryKey");
+		String script = template.apply(param);
+		return script;
+	}
+
 	public static String buildInsert (String table, Set<ColumnMeta> columns, Set values) throws IOException {
 		Map<String, Object> param = new HashMap<>();
 		param.put("table", table);
@@ -125,27 +136,5 @@ public class MybatisScriptFactory {
 		return script;
 	}
 
-
-	public static void testFunction() throws IOException {
-		Template template = handlebars.compile("testFun");
-
-		Map<String, Object> param = new HashMap<>();
-		param.put("javaType",Long.class);
-		List<ColumnMeta> orderBy = new ArrayList<>();
-		ColumnMeta col = new ColumnMeta();
-		col.setColumn("col1");
-		col.setOrderBy("DESC");
-		orderBy.add(col);
-
-		col = new ColumnMeta();
-		col.setColumn("col2");
-		col.setOrderBy("ASC");
-		orderBy.add(col);
-		param.put("orderColumns", orderBy);
-
-		String result = template.apply(param);
-		System.out.println(result);
-
-	}
 
 }

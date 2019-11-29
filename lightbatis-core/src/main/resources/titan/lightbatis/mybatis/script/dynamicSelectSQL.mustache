@@ -6,9 +6,9 @@ SELECT
     </foreach>
 </if>
 FROM  {{table}}
-<where>
+<trim prefix="WHERE" prefixOverrides="AND |OR ">
     {{#columns}}
        AND {{column}} = {{>columnHolder}}
     {{/columns}}
-    {{#each orderColumns}}{{#eq @index 0}}ORDER BY {{/eq}} {{#gt @index 0}},{{/gt}} {{column}} {{orderBy}}{{/each}}
-</where>
+</trim>
+{{#each orderColumns}}{{#eq @index 0}}ORDER BY {{/eq}} {{#gt @index 0}},{{/gt}} {{column}} {{orderBy}}{{/each}}

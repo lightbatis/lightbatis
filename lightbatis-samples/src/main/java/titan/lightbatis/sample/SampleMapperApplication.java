@@ -17,8 +17,8 @@ import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
-import titan.lightbatis.sample.domain.Member;
-import titan.lightbatis.sample.domain.QMember;
+import titan.lightbatis.sample.model.entity.Member;
+import titan.lightbatis.sample.model.entity.query.QMember;
 import titan.lightbatis.sample.mapper.MemberMapper;
 import titan.lightbatis.web.annotations.EnableLightbatisWeb;
 
@@ -37,28 +37,28 @@ public class SampleMapperApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		//insertMember();
-		//updateMember();
-		listMember();
-		//insertMemberWithId();
-		//Member member = getMember();
-		//deleteMember();
-		//queryMember();
-		//listMembers();
-		//listAllMembers();
-		//listPredicatesMembers();
-		//listMemberFields();
-		//testUpdateByPrimaryKey();
-		//listMemberByKindId();
+//		insertMember();
+//		insertMemberWithId();
+//		updateMember();
+//		listMember();
+//
+//		Member member = getMember();
+//		deleteMember();
+//		queryMember();
+//		listMembers();
+//		listAllMembers();
+//		listPredicatesMembers();
+//		listMemberFields();
+		listMemberByKindId();
 	}
 
 	private void listMemberByKindId() {
-		List<Member> memberList = memberMapper.listMemberByKindId((short)1);
+		List<Member> memberList = memberMapper.listMemberByKindId(1);
 		printMembers(memberList);
 	}
 	private void queryMember() {
 		QMember query = QMember.member;
-		List<Member> members = memberMapper.query(query.kindId.eq(new Short((short) 1)));
+		List<Member> members = memberMapper.query(query.kindId.eq(1));
 		for (Member member : members) {
 			System.out.println(member);
 		}
@@ -73,6 +73,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 		for (int i=0;i < count; i++ ){
 			//member.setId(new Long(250 + i));
 			member.setMemberName("慧 20191110 " + i);
+			member.setKindId(1);
 			memberMapper.insert(member);
 			System.out.println(" insert id " + member.getId());
 		}
@@ -95,8 +96,9 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void updateMember() {
 		Long id = 643173508322426880L;
-		Member member = new Member();
+		Member member = memberMapper.getMember(id);
 		member.setId(id);
+		member.setKindId(1);
 		member.setMemberName("修改 慧 20191110 AT " + System.currentTimeMillis());
 
 		memberMapper.updateByPrimaryKey(member);
@@ -114,6 +116,10 @@ public class SampleMapperApplication implements CommandLineRunner {
 		member.setId(id);
 		int delCount = memberMapper.deleteByPrimaryKey(member);
 		System.out.println("delete count = " + delCount);
+
+		member = memberMapper.getMember(id);
+		System.out.println(" member is null " + member);
+
 	}
 
 	private void listMember () {
@@ -144,7 +150,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 	private  void listPredicatesMembers() {
 
 		QMember member = QMember.member;
-		PageList<Member> members = memberMapper.listPredicatesMembers(member.id.asc(), member.memberName.like("%慧慧慧%"), member.kindId.eq((short)1));//
+		PageList<Member> members = memberMapper.listPredicatesMembers(member.id.asc(), member.memberName.like("%慧%"), member.kindId.eq(1));//
 		printMembers(members);
 	}
 
@@ -164,15 +170,5 @@ public class SampleMapperApplication implements CommandLineRunner {
 		}
 	}
 
-
-	public void testUpdateByPrimaryKey () throws IOException {
-		MapperConfig config = new MapperConfig();
-		EntityMetaManager.initEntityNameMap(Member.class,config,"");
-		MapperBuilder mapperBuilder = new MapperBuilder();
-		BaseMapperProvider provider = new BaseMapperProvider(MemberMapper.class, mapperBuilder);
-		String sql= provider.updateEntityByPrimaryKey(Member.class);
-		System.out.println("sql = ========");
-		System.out.println(sql);
-	}
 
 }

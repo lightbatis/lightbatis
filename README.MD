@@ -168,3 +168,9 @@ public class SampleMapperApplication
 ## 简便易用的可视化代码生成控制台
 
 ## 相关工程结构
+
+
+## 相关技术点
+### 使用 handlebars 用来动态生成 MyBatis SQL  
+
+![Handlebars](https://handlebarsjs.com/guide/) https://handlebarsjs.com/guide/

@@ -75,8 +75,7 @@ public class DynamicSelectProvider extends MapperProvider{
 		//如果查询语句中出现了 Path, OrderSpecifier 类型时
 		Class<?> entityClass = getEntityClass(mappedStatementId, method);
 		String tableName = tableName(entityClass);
-
-		LightbatisSqlSource sqlSource = new LightbatisSqlSource(this.configuration,mapperBuilder, mapperMate);
+		LightbatisSqlSource sqlSource = new LightbatisSqlSource(this.configuration, mapperMate);
 		sqlSource.setEntityClass(entityClass);
 		sqlSource.setTableName(tableName);
 		return sqlSource;
@@ -92,6 +91,13 @@ public class DynamicSelectProvider extends MapperProvider{
 		String tableName = tableName(entityClass);
 		String[] names = parameterResolver.getNames();
 		Set<ColumnMeta> columns = EntityMetaManager.getColumns(entityClass, names);
+		Set<ColumnMeta> allcolumns = EntityMetaManager.getColumns(entityClass);
+		for(ColumnMeta column: allcolumns) {
+			if (column.isLogicDelete()) {
+				columns.add(column);
+				break;
+			}
+		}
 		Set<ColumnMeta> orderColumns = EntityMetaManager.getOrderbyColumns(entityClass);
 		String sql = MybatisScriptFactory.buildSelectSQL(msId, tableName,columns,orderColumns);
 		return sql;

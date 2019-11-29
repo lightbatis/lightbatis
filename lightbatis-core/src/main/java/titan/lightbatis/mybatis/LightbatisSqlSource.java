@@ -30,7 +30,6 @@ import static org.apache.ibatis.mapping.ParameterMapping.Builder;
 @Slf4j
 public class LightbatisSqlSource implements SqlSource {
 	private final Configuration configuration;
-	private final MapperBuilder mapperBuilder;
 	private final MapperMeta mapperMeta;
 	private Class<?> entityClass;
 	@Getter
@@ -39,12 +38,10 @@ public class LightbatisSqlSource implements SqlSource {
 
 	private QueryDslBuilder dslBuilder = null;
 	/**
-	 * @param mapperBuilder 
-	 * 
+	 *
 	 */
-	public LightbatisSqlSource(Configuration configuration, MapperBuilder mapperBuilder, MapperMeta mapperMeta) {
+	public LightbatisSqlSource(Configuration configuration, MapperMeta mapperMeta) {
 		this.configuration = configuration;
-		this.mapperBuilder = mapperBuilder;
 		this.mapperMeta = mapperMeta;
 		this.dslBuilder = new QueryDslBuilder(configuration);
 	}
@@ -97,9 +94,10 @@ public class LightbatisSqlSource implements SqlSource {
 		log.debug("拼接 查询条件 WHERE ");
 		List<ParameterMapping> parameterMappings = new ArrayList<>();
 		Set<ParamMeta> predicateParams = mapperMeta.getPredicateParams();
+		EntityMeta entityMeta = EntityMetaManager.getEntityMeta(entityClass);
 		if (!predicateParams.isEmpty()) {
 			context.appendSql(" where ");
-			EntityMeta entityMeta = EntityMetaManager.getEntityMeta(entityClass);
+
 			boolean appendAnd = false;
 			for (ParamMeta param: predicateParams) {
 				if (appendAnd) {
@@ -132,6 +130,27 @@ public class LightbatisSqlSource implements SqlSource {
 					} else {
 						throw new RuntimeException(mapperMeta.getMappedStatementId() +  " param = " + param.getName() + " 没有找到该数据列");
 					}
+				}
+			}
+			Set<ColumnMeta> columns = entityMeta.getClassColumns();
+			for(ColumnMeta column: columns) {
+				if (column.isLogicDelete()) {
+					if (appendAnd) {
+						context.appendSql(" and (");
+					}
+					context.appendSql(column.getColumn());
+					context.appendSql(" != 1)");
+					break;
+				}
+			}
+		}else {
+			Set<ColumnMeta> columns = entityMeta.getClassColumns();
+			for(ColumnMeta column: columns) {
+				if (column.isLogicDelete()) {
+					context.appendSql(" where ");
+					context.appendSql(column.getColumn());
+					context.appendSql(" != 1");
+					break;
 				}
 			}
 		}

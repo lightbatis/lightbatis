@@ -1,1 +1,0 @@
-package titan.lightbatis.sample.domain;

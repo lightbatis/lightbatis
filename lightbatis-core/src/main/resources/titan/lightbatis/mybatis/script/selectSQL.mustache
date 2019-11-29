@@ -1,7 +1,13 @@
 SELECT * FROM  {{table}}
 <where>
     {{#columns}}
-       AND {{column}} = {{>columnHolder}}
+        AND
+        {{#if logicDelete}}
+            {{column}} != 1
+        {{/if}}
+        {{#unless logicDelete}}
+            {{column}} = {{>columnHolder}}
+        {{/unless}}
     {{/columns}}
     {{#each orderColumns}}{{#eq @index 0}}ORDER BY {{/eq}} {{#gt @index 0}},{{/gt}} {{column}} {{orderBy}}{{/each}}
 </where>

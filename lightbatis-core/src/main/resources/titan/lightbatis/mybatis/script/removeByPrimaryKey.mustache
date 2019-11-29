@@ -1,0 +1,11 @@
+UPDATE {{table}}
+<set>
+    {{#logicColumn}}
+        {{column}} = 1,
+    {{/logicColumn}}
+</set>
+<where>
+    {{#pkColumns}}
+        AND {{column}} = {{>columnHolder}}
+    {{/pkColumns}}
+</where>

@@ -9,4 +9,10 @@ public class MustacheHelper {
         }
         return null;
     }
+
+    public String println(Object context) {
+        System.out.println(context);
+
+        return null;
+    }
 }

@@ -47,8 +47,21 @@ public class BaseMapperProvider extends MapperProvider {
 	}
     public String deleteByPrimaryKey(MappedStatement ms) throws IOException {
         Class<?> entityClass = getEntityClass(ms);
-		String deleteSql = MybatisScriptFactory.deleteByPrimaryKey(tableName(entityClass),EntityMetaManager.getPKColumns(entityClass));
-		return deleteSql;
+		Set<ColumnMeta> columns = EntityMetaManager.getColumns(entityClass);
+		ColumnMeta logicColumn = null;
+		for(ColumnMeta column: columns) {
+			if (column.isLogicDelete()) {
+				logicColumn = column;
+				break;
+			}
+		}
+		if (logicColumn == null) {
+			String deleteSql = MybatisScriptFactory.deleteByPrimaryKey(tableName(entityClass),EntityMetaManager.getPKColumns(entityClass));
+			return deleteSql;
+		} else {
+			String removeSql = MybatisScriptFactory.removeByPrimaryKey(tableName(entityClass), logicColumn,EntityMetaManager.getPKColumns(entityClass));
+			return removeSql;
+		}
     }
     
 	public String insert(MappedStatement ms) {
@@ -60,6 +73,9 @@ public class BaseMapperProvider extends MapperProvider {
 		try {
 			String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
 			sql.append(insertSQL);
+			log.debug("==========");
+			//System.out.println(insertSQL);
+			log.debug(insertSQL);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

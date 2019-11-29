@@ -3,12 +3,13 @@ package titan.lightbatis.sample.mapper;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
-import titan.lightbatis.mapper.LightbatisMapper;
-import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
-import titan.lightbatis.sample.domain.Member;
+import titan.lightbatis.result.Page;
+import titan.lightbatis.mapper.LightbatisMapper;
+import titan.lightbatis.sample.model.entity.Member;
 
 import java.util.List;
+
 
 /**
  * MemberMapper 企业表 Mapper
@@ -29,7 +30,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @param kindId
      * @return
      */
-    List<Member> listMemberByKindId(Short kindId);
+    List<Member> listMemberByKindId(Integer kindId);
 
     /**
      * 列出所有的企业
@@ -73,4 +74,3 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      */
     public List<Member> listMemberFields(Path... paths);
 }
-

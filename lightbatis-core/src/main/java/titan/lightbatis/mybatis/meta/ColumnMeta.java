@@ -71,7 +71,7 @@ public class ColumnMeta implements Serializable {
     /**
      * 如果可以自动，生成的时机是什么，可能是 insert, update .
      */
-    private GeneratedEvent generatedEvent = null;
+    private String generatedEvent = null;
     /**
      * Key 自动生成的处理器，这个值可能会包括
      * 1. MyBatis 本身对自动增长的列设置的值，包括： UUID, JDBC, 也包括 Lightbatis 扩展的值 SNOWFLAKE。

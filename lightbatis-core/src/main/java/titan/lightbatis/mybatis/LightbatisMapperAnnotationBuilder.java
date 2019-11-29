@@ -333,7 +333,6 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         //sqlSource.setMappedStatementId(mappedStatementId);
         //创建 SQL
         SqlSource sqlSource = null;
-
         if (provider.isDynamicSQL()) {
         	//使用动态 SQL 进行查询
         	sqlSource = provider.buildDynamicSQL(mappedStatementId);

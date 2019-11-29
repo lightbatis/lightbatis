@@ -103,6 +103,7 @@
     <logger name="simple" level="DEBUG">
         <appender-ref ref="console" />
     </logger>
+    <logger name="titan.lightbatis.mybatis.provider.impl" level="INFO"/>
     ​<logger name="titan.lightbatis.mybatis" level="DEBUG">
         <appender-ref ref="STDOUT" />
     </logger>
