@@ -50,6 +50,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		listPredicatesMembers();
 //		listMemberFields();
 		listMemberByKindId();
+		listMembersWithName();
 	}
 
 	private void listMemberByKindId() {
@@ -65,7 +66,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 	}
 	private void selectMember() {
 		QMember member = QMember.member;
-		memberMapper.listMembers(member.id, member.memberName, (short)1, member.id.asc(),new Page(1,10));
+		memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(),new Page(1,10));
 	}
 	private void insertMember() {
 		Member member = new Member();
@@ -131,7 +132,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void listMembers() {
 		QMember member = QMember.member;
-		List<Member> members =memberMapper.listMembers(member.id, member.memberName, (short)1, member.id.asc(), new Page(5,1));
+		List<Member> members =memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(), new Page(5,1));
 		for (Member m : members) {
 			System.out.println(m);
 		}
@@ -139,7 +140,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void listAllMembers() {
 		QMember member = QMember.member;
-		PageList<Member> members = memberMapper.listAllMembers((short)1, member.id.gt(1L).and(member.memberName.like("%慧慧慧%")), member.id.asc(),new Page(5,1));
+		PageList<Member> members = memberMapper.listAllMembers(1, member.id.gt(1L).and(member.memberName.like("%慧慧慧%")), member.id.asc(),new Page(5,1));
 		for (Member m : members) {
 			System.out.println(m);
 		}
@@ -159,7 +160,11 @@ public class SampleMapperApplication implements CommandLineRunner {
 		List<Member> members = memberMapper.listMemberFields(member.id, member.memberName, member.kindId);
 		printMembers(members);
 	}
-
+	private void listMembersWithName() {
+		QMember member = QMember.member;
+		PageList<Member> members = memberMapper.listMembersWithName(member.id, member.memberName,1,member.memberName.like("%慧%"), member.id.desc(),Page.newPage(1));
+		printMembers(members);
+	}
 	private void printMembers(List<Member> members) {
 		for (Member m : members) {
 			System.out.println(m);

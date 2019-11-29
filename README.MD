@@ -33,12 +33,18 @@
     通过分析我们得到以下结论：  
     **基于驼峰命名的规范通过属性、参数的名称建立表、实体类、Mapper 类的关联关系。** 以上图为例
     3处的 listMemberByKindId 方法 kindId 参数 = Member 属性 kindId = member 表 kind_id 列。
+
+Mapper 的执行过程 
+
+![类型的约定](./doc/mapper_invoke.png)  
+
 代码：
 ``` List<Member> listMemberByKindId(Short kindId)``` 所表达的意思就是
 ``` select * from member where kind_id = ? ``` 其中 kind_id = kindId, kindId 的值就是方法中 kindId 的值。基于此我们可以做  
 以下的约定：  
 
-一、SQL 查询条件约定  
+
+一、**SQL 查询条件约定**  
     a) 简单类型  
         1. 作用在 Mapper 方法的参数上.     
         2. 类型为Java 的普通类型。（int,long,Integer,Long,String,Date等）   
@@ -50,14 +56,17 @@
         1. 作用在 Mapper 方法的参数上  
         2. 可以是以上 a,b 两处的参数。  
          
-二、 SQL 查询字段约定  
+二、 **SQL 查询字段约定**  
     类型为 com.querydsl.core.types.Path 的方法参数
 
-三、 SQL 排序字段约定  
+三、 **SQL 排序字段约定**  
      类型为 com.querydsl.core.types.OrderSpecifier 的方法参数
+
+![约定总结](./lightbatis.png)  
 
 Mapper 的定义示例：
 ```java
+
 /**
  * MemberMapper 企业表 Mapper
  */
@@ -77,7 +86,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @param kindId
      * @return
      */
-    List<Member> listMemberByKindId(Short kindId);
+    List<Member> listMemberByKindId(Integer kindId);
 
     /**
      * 列出所有的企业
@@ -95,6 +104,16 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @return
      */
     public PageList<Member> listMembers(Path id, Path memberName, Short kindId, OrderSpecifier id_asc, Page page);
+
+    /**
+     * SELECT id,member_name FROM member where kindId = ? and {predicate} ORDER BY id asc OFFSET ? LIMIT ?
+     *
+     * @param kindId
+     * @param id
+     * @param memberName
+     * @return
+     */
+    public PageList<Member> listMembersWithName(Path id, Path memberName, Short kindId , Predicate predicate, OrderSpecifier id_asc, Page page);
 
     /**
      * select * from member where kindId = ? and ${predicate} order by id asc OFFSET ? LIMIT ?
@@ -121,7 +140,165 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      */
     public List<Member> listMemberFields(Path... paths);
 }
+```
+调用时的代码:
+```java
 
+@Lightbatis()
+@EnableLightbatisWeb()
+@SpringBootApplication
+public class SampleMapperApplication implements CommandLineRunner {
+
+	@Autowired
+	private MemberMapper memberMapper = null;
+
+	public static void main(String[] args) {
+		SpringApplication.run(SampleMapperApplication.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+
+//		insertMember();
+//		insertMemberWithId();
+//		updateMember();
+//		listMember();
+//
+//		Member member = getMember();
+//		deleteMember();
+//		queryMember();
+//		listMembers();
+//		listAllMembers();
+//		listPredicatesMembers();
+//		listMemberFields();
+		listMemberByKindId();
+		listMembersWithName();
+	}
+
+	private void listMemberByKindId() {
+		List<Member> memberList = memberMapper.listMemberByKindId(1);
+		printMembers(memberList);
+	}
+	private void queryMember() {
+		QMember query = QMember.member;
+		List<Member> members = memberMapper.query(query.kindId.eq(1));
+		for (Member member : members) {
+			System.out.println(member);
+		}
+	}
+	private void selectMember() {
+		QMember member = QMember.member;
+		memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(),new Page(1,10));
+	}
+	private void insertMember() {
+		Member member = new Member();
+		int count = 1;
+		for (int i=0;i < count; i++ ){
+			//member.setId(new Long(250 + i));
+			member.setMemberName("慧 20191110 " + i);
+			member.setKindId(1);
+			memberMapper.insert(member);
+			System.out.println(" insert id " + member.getId());
+		}
+	}
+
+	private void insertMemberWithId() {
+		Long id = 643173508322426880L;
+		Member member = memberMapper.getMember(id);
+		if (member == null) {
+			member = new Member();
+		} else {
+			return;
+		}
+
+		member.setId(id);
+		member.setMemberName("INSERT 慧 20191110 AT " + System.currentTimeMillis());
+
+		memberMapper.insert(member);
+	}
+
+	private void updateMember() {
+		Long id = 643173508322426880L;
+		Member member = memberMapper.getMember(id);
+		member.setId(id);
+		member.setKindId(1);
+		member.setMemberName("修改 慧 20191110 AT " + System.currentTimeMillis());
+
+		memberMapper.updateByPrimaryKey(member);
+	}
+
+	private Member getMember() {
+		Long id = 643173508322426880L;
+		Member member = memberMapper.getMember(id);
+		return member;
+	}
+
+	private void deleteMember () {
+		Long id = 643173508322426880L;
+		Member member = new Member();
+		member.setId(id);
+		int delCount = memberMapper.deleteByPrimaryKey(member);
+		System.out.println("delete count = " + delCount);
+
+		member = memberMapper.getMember(id);
+		System.out.println(" member is null " + member);
+
+	}
+
+	private void listMember () {
+		List<Member> members = memberMapper.listMember();
+		for (Member member : members) {
+			System.out.println(member);
+		}
+	}
+
+	private void listMembers() {
+		QMember member = QMember.member;
+		List<Member> members =memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(), new Page(5,1));
+		for (Member m : members) {
+			System.out.println(m);
+		}
+	}
+
+	private void listAllMembers() {
+		QMember member = QMember.member;
+		PageList<Member> members = memberMapper.listAllMembers(1, member.id.gt(1L).and(member.memberName.like("%慧慧慧%")), member.id.asc(),new Page(5,1));
+		for (Member m : members) {
+			System.out.println(m);
+		}
+
+		System.out.println("============= total size = " + members.getTotalSize());
+	}
+
+	private  void listPredicatesMembers() {
+
+		QMember member = QMember.member;
+		PageList<Member> members = memberMapper.listPredicatesMembers(member.id.asc(), member.memberName.like("%慧%"), member.kindId.eq(1));//
+		printMembers(members);
+	}
+
+	private void listMemberFields() {
+		QMember member = QMember.member;
+		List<Member> members = memberMapper.listMemberFields(member.id, member.memberName, member.kindId);
+		printMembers(members);
+	}
+	private void listMembersWithName() {
+		QMember member = QMember.member;
+		PageList<Member> members = memberMapper.listMembersWithName(member.id, member.memberName,1,member.memberName.like("%慧%"), member.id.desc(),Page.newPage(1));
+		printMembers(members);
+	}
+	private void printMembers(List<Member> members) {
+		for (Member m : members) {
+			System.out.println(m);
+		}
+		if (members instanceof  PageList) {
+			PageList pageList = (PageList)members;
+			System.out.println("=========== total size = " + pageList.getTotalSize());
+		}
+	}
+
+
+}
 ```
 
 
@@ -173,4 +350,4 @@ public class SampleMapperApplication
 ## 相关技术点
 ### 使用 handlebars 用来动态生成 MyBatis SQL  
 
-![Handlebars](https://handlebarsjs.com/guide/) https://handlebarsjs.com/guide/
+Handlebars https://handlebarsjs.com/guide/

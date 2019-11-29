@@ -47,7 +47,17 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @param memberName
      * @return
      */
-    public PageList<Member> listMembers(Path id, Path memberName, Short kindId, OrderSpecifier id_asc, Page page);
+    public PageList<Member> listMembers(Path id, Path memberName, Integer kindId, OrderSpecifier id_asc, Page page);
+
+    /**
+     * SELECT id,member_name FROM member where kindId = ? and {predicate} ORDER BY id asc OFFSET ? LIMIT ?
+     *
+     * @param kindId
+     * @param id
+     * @param memberName
+     * @return
+     */
+    public PageList<Member> listMembersWithName(Path id, Path memberName, Integer kindId , Predicate predicate, OrderSpecifier id_asc, Page page);
 
     /**
      * select * from member where kindId = ? and ${predicate} order by id asc OFFSET ? LIMIT ?
@@ -57,7 +67,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @param page
      * @return
      */
-    public PageList<Member> listAllMembers(Short kindId, Predicate predicate, OrderSpecifier id_asc, Page page);
+    public PageList<Member> listAllMembers(Integer kindId, Predicate predicate, OrderSpecifier id_asc, Page page);
 
     /**
      * select * from member where ${predicates} order by id asc
