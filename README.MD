@@ -19,20 +19,63 @@
 █████████████████████████████████████  
 █████████████████████████████████████ 
 ``` 
+# Lightbatis 是什么 ?
 
-# lightbatis 的设计理念
-    lightbatis 是基于约定的命名规范和类型规范在 Mybatis 的基础上开发的，快速的、简洁的数据层访问工具包。
-## 关于命名规范
-    在日常的数据库访问的操作中，我们经常遇到三个对象，分别是： 数据库表、实体类、 数据访问的 Mapper 类，以下图：  
+    lightbatis 是基于约定的命名规范和类型规范在 Mybatis 的基础上开发的，快速的、简洁的数据持久层工具包。
+
+# 为什么会有 Lightbatis ?
+传统的基于 Mybatis 的数据持久层，有以下的规律，先定义实体类，实体类有三分部分组成，XML 定义， Entity Bean 和表结构，如下图：  
+![关系图](./doc/6.jpeg)  
+进行数据访问的操作，也有三部分组成， Mapper XML 定义，Mapper 接口定义， Mapper 接口的实现，如下图：  
+![关系图](./doc/7.jpeg)    
+其流程是，定义XML，Entity, 定义接口，实现接口，如下图：  
+![关系图](./doc/8.jpeg)  
+
+我们真实需要什么呢？ 其实无非我们需要一个"存数据的地方" 和一个"访问数据的方法"，如下图：
+
+![关系图](./doc/12.jpeg)  
+
+我们希望我们的程序员更多关注在数据库设计、应用设计和架构设计上，为应用创造更多价值，少去做重复的工作，生活其实可以更美好，我们大胆地去掉了XML,和接口实现这两步，使用 Proxy 去代理，于是就有了以下：  
+
+![关系图](./doc/13.jpeg)  
+之前是这样的：  
+![关系图](./doc/17.jpeg)
+
+去掉 XML的定义 和 实现后，是这样的，如下图只有 Entity 和接口 ：  
+  
+![关系图](./doc/18.jpg)  
+
+# lightbatis 的设计理念是什么?
+    命名规范和类型规范
+## 什么是类型规范的编程
+在使用 MyBatis 时已经使用了类型规范，基于类型的不同，便执行不同的操作，如 MyBatis 的 Mapper 方法中，如果方法参数是 ```org.apache.ibatis.session.RowBounds``` 类型，MyBatis 在执行过程中便自动执行逻辑分页的操作，这里就是使用不同的类型，执行不同的操作，在这里 数据类型也是一种规范，也是一种标记。**我们放大了这种操作，让他在更多的地方出现**，于是就有了 Lightbatis。            
+如以下方法的定义：
+```java
+/**
+* 根据参数 id 获取单个 Member 对象。
+* 相当于执行的SQL 是 select * from member where id = ?
+*/
+Member getMember(Long id);
+```
+从以上方法的定义中，我们分析可知：方法的参数``` Long id ``` 可以表达这几个意思。1、参数的类型 Long。 2、 参数的名称 id。 3、 参数的值。   
+如果我们做以下约定：1、参数类型是 Long 类型，只能出现在查询条件里。 2、参数名称 id 等于数据库列名称。 3、参数的值等于本次查询的约束条件。如果本次操作 id 输入值是 5，那么可以表达的意思是 ``` id = 5 ```  
+基于此我们可以把返回值、查询条件、排序条件、分页条件等都定义起来。使用程序员最熟悉的方法来定义方法。  
+![基于类型规范的编程](./lightbatis-types.png)  
+
+# Lightbats 的使用步骤是什么？
+    1. 根据规范定义接口。
+    2. 使用接口。
+    
+## 关于表 -> 实体类 -> Mapper 之间的关联关系  
+在日常的数据库访问的操作中，我们经常遇到三个对象，分别是： 数据库表、实体类、 数据访问的 Mapper 类，以下图：  
 ![关系图](./doc/lightbatis_members.png)  
 
-    图中1处的表结构中的列名 kind_id , 第2处的实体类Member 的属性 kindId 是通过驼峰命名转化过来的，同时@Column 的注释也指定了列名
-    为 kind_id, 第3处的 listMemberByKindId 方法中的参数 kindId 与 Member 类的属性 kindId 同名且同类型。由此分析他们三者之间存
-    在着一系列的关联关系。我们就是把这种关联关系通过规范规定下来，形成默认的开发规则，基于这种常见的规则，便形成了统一数据访问的应用工具。
+图中：1处的表结构中的列名 kind_id , 第2处的实体类Member 的属性 kindId 是通过驼峰命名转化过来的，同时@Column 的注释也指定了列名为 kind_id, 第3处的 listMemberByKindId 方法中的参数 kindId 与 Member 类的属性 kindId 同名且同类型。  
+由此他们三者之间存在着一系列的关联关系。我们就是把这种关联关系通过规范规定下来，形成默认的开发规则，基于这种常见的规则，便形成了统一数据访问的应用工具。
     
-    通过分析我们得到以下结论：  
-    **基于驼峰命名的规范通过属性、参数的名称建立表、实体类、Mapper 类的关联关系。** 以上图为例
-    3处的 listMemberByKindId 方法 kindId 参数 = Member 属性 kindId = member 表 kind_id 列。
+通过分析我们得到以下结论：  
+    **基于驼峰命名的规范通过属性、参数的名称形成表、实体类、Mapper 之间的关联关系。** 以上图为例
+    3处的 listMemberByKindId 方法 {kindId 参数} = {Member 属性 kindId} = {member 表 kind_id 列}。
 
 Mapper 的执行过程 
 
@@ -61,6 +104,8 @@ Mapper 的执行过程
 
 三、 **SQL 排序字段约定**  
      类型为 com.querydsl.core.types.OrderSpecifier 的方法参数
+
+# lightbatis 执行过程全貌  
 
 ![约定总结](./lightbatis.png)  
 
@@ -318,7 +363,7 @@ lightbatis 统一数据层访问工具包，是在 Mybatis 的基础上，基于
     6. LightbatisFactoryBean 的 checkDaoConfig 方法中，如果有 Mybatis 没有实现的方法，由 Lightbatis 来实现。
     7. Lightbatis 实现的方法是，将没有系统默认注释(@Select, @Insert, @Update, @Delete, @SelectProvider, @InsertProvider, @UpdateProvider, @DeleteProvider )的方法，转化成 MappedStatement 并注册到 MyBatis 的 Configuration 中去。
     
-## 如何读懂代码
+## Lightbatis
 
 ![lightbatis 导图](./lightbatis.png)  
 
