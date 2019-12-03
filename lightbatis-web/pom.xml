@@ -3,13 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>titan.lightbatis</groupId>
+		<groupId>com.github.lightbatis</groupId>
 		<artifactId>lightbatis-master</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>titan.lightbatis</groupId>
 	<artifactId>lightbatis-web</artifactId>
-	<version>${lightbatis-version}</version>
 	<name>lightbatis web 控制台</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,9 +26,9 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>titan.lightbatis</groupId>
+			<groupId>com.github.lightbatis</groupId>
 			<artifactId>lightbatis-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${lightbatis.version}</version>
 		</dependency>
 		<!--使用默认tomcat -->
 		<dependency>

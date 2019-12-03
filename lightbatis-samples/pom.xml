@@ -3,12 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>titan.lightbatis</groupId>
+		<groupId>com.github.lightbatis</groupId>
 		<artifactId>lightbatis-master</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>lightbatis-samples</artifactId>
-	<version>${lightbatis-version}</version>
 	<description>lightbatis 示例</description>
 	<name>lightbatis 示例</name>
 
@@ -75,14 +74,14 @@
 			<version>0.9.6</version>
 		</dependency>
 		<dependency>
-			<groupId>titan.lightbatis</groupId>
+			<groupId>com.github.lightbatis</groupId>
 			<artifactId>lightbatis-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${lightbatis.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>titan.lightbatis</groupId>
+			<groupId>com.github.lightbatis</groupId>
 			<artifactId>lightbatis-web</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${lightbatis.version}</version>
 		</dependency>
 	</dependencies>
 </project>
