@@ -5,7 +5,7 @@
     <springProperty scope="context" name="springAppName" source="spring.application.name"/>
 
     <!-- Example for logging into the build folder of your project -->
-    <property name="LOG_FILE" value="./logs/aeotrade/${springAppName}/${springAppName}"/>
+    <property name="LOG_FILE" value="./logs/lightbatis/${springAppName}/${springAppName}"/>
     ​<!-- 彩色日志 -->
     <!-- 彩色日志依赖的渲染类 -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />

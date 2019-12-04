@@ -408,9 +408,26 @@ public class SampleMapperApplication
 
 ### select 操作
 
-## 基于代码的约定
-
 ## 简便易用的可视化代码生成控制台
+lightbatis 自带可视化的代码生成控制台，可以快速地生成 Entity, Mapper, Service 等代码。  
+在你的工程使用 Maven 加入以下依赖：
+```xml
+
+```
+启动你的 SpringBoot 应用，和你应用同一个端口下可以直接访问，如 application.yml 中定义接口为 8082, 可以直接 http://localhost:8082/dal.html 访问  ：
+```yml
+server:
+  port: 8082
+```
+会出现以下界面   
+![控制台首页](./doc/lightbatis-web-01.png)  
+生成 Mapper 类代码  
+![控制台 Mapper 生成](./doc/lightbatis-web-mapper.png)  
+生成 Service 类代码  
+![控制台 Service 生成](./doc/lightbatis-web-service.png)  
+批量生成  
+![控制台首页](./doc/lightbatis-web-batch.png)  
+
 
 ## 相关工程结构
 
