@@ -76,10 +76,6 @@
 								<goals>
 									<goal>jar</goal>
 								</goals>
-								<!-- java8版本导致javadoc打包编译失败时候，添加 -->
-								<configuration>
-									<additionalparam>${javadoc.opts}</additionalparam>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
