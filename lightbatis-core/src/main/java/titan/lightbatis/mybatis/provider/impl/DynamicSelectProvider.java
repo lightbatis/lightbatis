@@ -149,9 +149,15 @@ public class DynamicSelectProvider extends MapperProvider{
 			}
 			if (entityClass != null) {
 				// 获取该类型后，第一次对该类型进行初始化
-				EntityMetaManager.initEntityNameMap(entityClass, mapperBuilder.getConfig(),msId);
-				entityClassMap.put(msId, entityClass);
-				return entityClass;
+				try {
+					EntityMetaManager.initEntityNameMap(entityClass, mapperBuilder.getConfig(),msId);
+					entityClassMap.put(msId, entityClass);
+					return entityClass;
+				} catch (Exception e) {
+					e.printStackTrace(System.err);
+					throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
+				}
+
 			}
 		}
 		throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);

@@ -34,7 +34,6 @@ public class EntityMeta implements Serializable {
     private String catalog;
     private String schema;
     private String orderByClause;
-    private String baseSelect;
     /**
      * 是否存在需要自动生成的例
      */

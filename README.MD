@@ -109,6 +109,25 @@ Mapper 的执行过程
 
 ![约定总结](./lightbatis.png)  
 
+
+# 使用 Lightbatis, 使用 Maven 加入以下配置
+```mxml
+<dependency>
+  <groupId>com.github.lightbatis</groupId>
+  <artifactId>lightbatis-core</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+</dependency>
+```
+如果使用控制台，加入以下配置
+```mxml
+<dependency>
+  <groupId>com.github.lightbatis</groupId>
+  <artifactId>lightbatis-web</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+
 # Mapper 的定义
 1. 定义你自己的 Mapper 的接口 并且 扩展 LightbatisMapper 接口。
 2. Mapper 接口必须指定泛型类型为本接口要操作的实体类。
@@ -412,7 +431,11 @@ public class SampleMapperApplication
 lightbatis 自带可视化的代码生成控制台，可以快速地生成 Entity, Mapper, Service 等代码。  
 在你的工程使用 Maven 加入以下依赖：
 ```xml
-
+<dependency>
+  <groupId>com.github.lightbatis</groupId>
+  <artifactId>lightbatis-web</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+</dependency>
 ```
 启动你的 SpringBoot 应用，和你应用同一个端口下可以直接访问，如 application.yml 中定义接口为 8082, 可以直接 http://localhost:8082/dal.html 访问  ：
 ```yml

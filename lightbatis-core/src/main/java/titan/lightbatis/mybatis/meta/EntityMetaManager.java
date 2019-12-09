@@ -18,6 +18,7 @@ import titan.lightbatis.table.ColumnSchema;
 import titan.lightbatis.table.ITableSchemaManager;
 import titan.lightbatis.table.TableSchema;
 import titan.lightbatis.utils.FieldUtils;
+import static  titan.lightbatis.utils.NameUtils.*;
 
 import javax.persistence.*;
 import java.lang.reflect.*;
@@ -151,44 +152,13 @@ public class EntityMetaManager {
 
 
 	/**
-	 * 获取查询的Select
-	 *
-	 * @param entityClass
-	 * @return
-	 */
-	public static String getSelectColumns(Class<?> entityClass) {
-		EntityMeta entityTable = getEntityMeta(entityClass);
-		if (entityTable.getBaseSelect() != null) {
-			return entityTable.getBaseSelect();
-		}
-		Set<ColumnMeta> columnList = getColumns(entityClass);
-		StringBuilder selectBuilder = new StringBuilder();
-		boolean skipAlias = Map.class.isAssignableFrom(entityClass);
-		for (ColumnMeta entityColumn : columnList) {
-			selectBuilder.append(entityColumn.getColumn());
-			if (!skipAlias && !entityColumn.getColumn().equalsIgnoreCase(entityColumn.getProperty())) {
-				// 不等的时候分几种情况，例如`DESC`
-				if (entityColumn.getColumn().substring(1, entityColumn.getColumn().length() - 1)
-						.equalsIgnoreCase(entityColumn.getProperty())) {
-					selectBuilder.append(",");
-				} else {
-					selectBuilder.append(" AS ").append(entityColumn.getProperty()).append(",");
-				}
-			} else {
-				selectBuilder.append(",");
-			}
-		}
-		entityTable.setBaseSelect(selectBuilder.substring(0, selectBuilder.length() - 1));
-		return entityTable.getBaseSelect();
-	}
-
-	/**
 	 * 初始化实体属性
 	 *
 	 * @param entityClass
 	 * @param config
+	 * @throws Exception 
 	 */
-	public static synchronized EntityMeta initEntityNameMap(Class<?> entityClass, MapperConfig config, String msId) {
+	public static synchronized EntityMeta initEntityNameMap(Class<?> entityClass, MapperConfig config, String msId) throws Exception {
 		if (entityMetas.containsKey(msId) ) {
 			return entityMetas.get(msId);
 		}
@@ -201,7 +171,7 @@ public class EntityMetaManager {
 		return entityTable;
 	}
 
-	private static EntityMeta processEntity(Class<?> entityClass, MapperConfig config) {
+	private static EntityMeta processEntity(Class<?> entityClass, MapperConfig config) throws Exception{
 		// 创建并缓存EntityTable
 		EntityMeta entityMeta = null;
 
@@ -250,18 +220,22 @@ public class EntityMetaManager {
 			//if (config.isUseSimpleType() && !SimpleTypeRegistry.isSimpleType(field.getJavaType())) {
 			//	continue;
 			//}
-			ColumnMeta colMeta = processField(entityMeta, tableSchema , field);
-			if (List.class.isAssignableFrom(colMeta.getJavaType())) {
-				Field colField = fieldMap.get(colMeta.getProperty());
-				Type fieldType = colField.getGenericType();
-				Class<?> fieldClz = getReturnType(fieldType);
-				//分析元素的类型
-				EntityMeta innerEntity = processEntity(fieldClz, config);
-				colMeta.setCollectionBaseType(innerEntity);
-				innerEntity.setMappedStatementId("");
-				entityTableMap.put(fieldClz, innerEntity);
+			try {
+				ColumnMeta colMeta = processField(entityMeta, tableSchema , field);
+				if (List.class.isAssignableFrom(colMeta.getJavaType())) {
+					Field colField = fieldMap.get(colMeta.getProperty());
+					Type fieldType = colField.getGenericType();
+					Class<?> fieldClz = getReturnType(fieldType);
+					//分析元素的类型
+					EntityMeta innerEntity = processEntity(fieldClz, config);
+					colMeta.setCollectionBaseType(innerEntity);
+					innerEntity.setMappedStatementId("");
+					entityTableMap.put(fieldClz, innerEntity);
+				}
+			}catch (Exception ex) {
+				log.error(field.getName() + " 发生了异常", ex);
+				throw ex;
 			}
-
 		}
 		// 当pk.size=0的时候使用所有列作为主键
 		if (entityMeta.getEntityClassPKColumns().size() == 0) {
@@ -277,7 +251,7 @@ public class EntityMetaManager {
 	 * @param entityMeta
 	 * @param field
 	 */
-	private static ColumnMeta processField(EntityMeta entityMeta, TableSchema tableSchema, FieldMeta field) {
+	private static ColumnMeta processField(EntityMeta entityMeta, TableSchema tableSchema, FieldMeta field) throws Exception{
 		// 排除字段
 		if (field.isAnnotationPresent(Transient.class)) {
 			return null;
@@ -301,6 +275,15 @@ public class EntityMetaManager {
 			} else {
 				entityColumn.setTableName(entityMeta.getName());
 			}
+			
+		}
+		
+		//如果没有 Column 的注释，通过驼峰命名去推测。
+		if (StringUtils.isEmpty(columnName)) {
+			columnName =camelhumpToUnderline(field.getName() ); 
+		}
+		if (StringUtils.isEmpty(columnName)) {
+			log.warn(field.getName() + " 没有找到对应的列名，请按 @Column 注释添加！");
 		}
 		if (StringUtils.isEmpty(entityColumn.getTableName())) {
 			entityColumn.setTableName(entityMeta.getName());
@@ -310,14 +293,10 @@ public class EntityMetaManager {
 		if (colSchema != null) {
 			entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
 		}
-		// 表名
-		if (StringUtils.isEmpty(columnName)) {
-			columnName =field.getName();// StringUtils.convertByStyle(field.getName(), style);
-		}
+
 		entityColumn.setProperty(field.getName());
 		entityColumn.setColumn(columnName);
 		entityColumn.setJavaType(field.getJavaType());
-		entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
 		// OrderBy
 		if (field.isAnnotationPresent(OrderBy.class)) {
 			OrderBy orderBy = field.getAnnotation(OrderBy.class);

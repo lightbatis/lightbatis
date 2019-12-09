@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.lightbatis</groupId>
 		<artifactId>lightbatis-master</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>${lightbatis.version}</version>
 	</parent>
 	<artifactId>lightbatis-web</artifactId>
 	<name>lightbatis web 控制台</name>
@@ -26,7 +26,6 @@
 				<!-- java8版本导致javadoc打包编译失败时候，添加 -->
 		<javadoc.opts>-Xdoclint:none</javadoc.opts>
 		<maven.test.skip>true</maven.test.skip>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -103,21 +102,6 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>snapshots</id>
-			<name>Snapshots</name>
-			<url>http://39.107.229.137:7794/repository/maven-public/</url>
-			<releases>
-				<enabled>true</enabled>
-				
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				
-			</snapshots>
-		</repository>
-	</repositories>
 
 	<build>
 		<plugins>

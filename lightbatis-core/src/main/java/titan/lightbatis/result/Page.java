@@ -16,9 +16,7 @@ public class Page extends RowBounds {
 	// 当前的页
 	private int pageNo = 1;
 
-	/**
-	 * 
-	 */
+
 	public Page(int pageSize, int pageNo) {
 		super(((pageNo - 1) < 0 ? 0 : (pageNo - 1)) * pageSize, pageSize);
 	}

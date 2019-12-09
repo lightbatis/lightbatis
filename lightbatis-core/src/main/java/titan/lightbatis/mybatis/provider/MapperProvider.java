@@ -221,9 +221,15 @@ public class MapperProvider {
                     if (t.getRawType() == this.mapperClass || this.mapperClass.isAssignableFrom((Class<?>) t.getRawType())) {
                         Class<?> returnType = (Class<?>) t.getActualTypeArguments()[0];
                         //获取该类型后，第一次对该类型进行初始化
-                        EntityMetaManager.initEntityNameMap(returnType, mapperBuilder.getConfig(), msId);
-                        entityClassMap.put(msId, returnType);
-                        return returnType;
+                        try {
+							EntityMetaManager.initEntityNameMap(returnType, mapperBuilder.getConfig(), msId);
+	                        entityClassMap.put(msId, returnType);
+	                        return returnType;
+						} catch (Exception e) {
+							e.printStackTrace(System.err);
+							throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
+						}
+
                     }
                 }
             }

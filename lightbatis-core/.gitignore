@@ -4,3 +4,5 @@
 /logs/
 *.class
 /.idea/
+/.settings/
+/.springBeans
