@@ -158,7 +158,7 @@ public class LightbatisSqlSource implements SqlSource {
 		//处理 OrderBy 排序
 		Set<ParamMeta> orderSet = mapperMeta.getOrders();
 		if (!orderSet.isEmpty()) {
-			context.appendSql(" order by ");
+			//context.appendSql(" order by ");
 			boolean appendComma = false;
 			for (ParamMeta param: orderSet) {
 				if (appendComma) {

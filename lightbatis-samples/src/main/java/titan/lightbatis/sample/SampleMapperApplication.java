@@ -46,11 +46,11 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		deleteMember();
 //		queryMember();
 //		listMembers();
-//		listAllMembers();
+		listAllMembers();
 //		listPredicatesMembers();
 //		listMemberFields();
-		listMemberByKindId();
-		listMembersWithName();
+//		listMemberByKindId();
+//		listMembersWithName();
 	}
 
 	private void listMemberByKindId() {
@@ -140,7 +140,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void listAllMembers() {
 		QMember member = QMember.member;
-		PageList<Member> members = memberMapper.listAllMembers(1, member.id.gt(1L).and(member.memberName.like("%慧慧慧%")), member.id.asc(),new Page(5,1));
+		PageList<Member> members = memberMapper.listAllMembers(1, member.id.gt(1L).and(member.memberName.like("%慧慧慧%")), member.createdTime.desc(),new Page(5,1));
 		for (Member m : members) {
 			System.out.println(m);
 		}

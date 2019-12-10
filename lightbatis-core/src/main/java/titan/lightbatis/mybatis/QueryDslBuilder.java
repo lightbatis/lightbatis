@@ -4,6 +4,7 @@
 package titan.lightbatis.mybatis;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.DefaultQueryMetadata;
 import com.querydsl.core.types.*;
 import com.querydsl.sql.SQLSerializer;
 import com.querydsl.sql.SQLTemplates;
@@ -51,11 +52,18 @@ public class QueryDslBuilder {
 	 * @param orderSpecifier
 	 */
 	public void buildOrder(DynamicContext context, OrderSpecifier<?> orderSpecifier) {
-		Expression<?> target = orderSpecifier.getTarget();
-		PathImpl<?> path = (PathImpl<?>) target;
-		context.appendSql(path.getMetadata().getElement().toString());
-		context.appendSql(" ");
-		context.appendSql(orderSpecifier.getOrder().name());
+		SQLSerializer sqlSerializer = new SQLSerializer(new com.querydsl.sql.Configuration(sqlTemplates));
+		DefaultQueryMetadata queryMetadata =new  DefaultQueryMetadata();
+		queryMetadata.addOrderBy(orderSpecifier);
+		sqlSerializer.serialize(queryMetadata,false);
+		String sql = sqlSerializer.toString();
+
+//		Expression<?> target = orderSpecifier.getTarget();
+//		PathImpl<?> path = (PathImpl<?>) target;
+//		context.appendSql(path.getMetadata().getElement().toString());
+//		context.appendSql(" ");
+//		context.appendSql(orderSpecifier.getOrder().name());
+		context.appendSql(sql);
 		log.debug(context.getSql());
 	}
 
