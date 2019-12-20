@@ -56,6 +56,15 @@ public class MapperMeta implements Serializable {
 	 */
 	private int paramCount = 0;
 	/**
+	 * 是否可以分页
+	 */
+	private boolean pageable = false;
+
+	/**
+	 * 是否统计总数
+	 */
+	private boolean coutable = false;
+	/**
 	 * 添加查询字段
 	 * @param meta
 	 */

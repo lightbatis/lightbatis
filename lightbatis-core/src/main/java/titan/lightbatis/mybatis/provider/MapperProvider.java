@@ -240,10 +240,12 @@ public class MapperProvider {
     protected void setKeyGenerator(MappedStatement ms, ColumnMeta column, KeyGenerator keyGenerator) {
         //keyGenerator
         try {
+            String table = column.getTableName();
+            EntityMeta entityMeta = EntityMetaManager.getEntityMetaByTable(table);
             MetaObject msObject = SystemMetaObject.forObject(ms);
             msObject.setValue("keyGenerator", keyGenerator);
-            msObject.setValue("keyProperties", column.getTable().getKeyProperties());
-            msObject.setValue("keyColumns", column.getTable().getKeyColumns());
+            msObject.setValue("keyProperties", entityMeta.getKeyProperties());
+            msObject.setValue("keyColumns", entityMeta.getKeyColumns());
         } catch (Exception e) {
             //ignore
             log.warn(e.getMessage());

@@ -9,6 +9,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import titan.lightbatis.result.Page;
+import titan.lightbatis.result.PageList;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -30,13 +31,13 @@ public class MapperMetaManger {
 	 */
 	public static final Map<String, MapperMeta> metaMapper = new HashMap<>();
 
-	public static void addMapper(String mapperId, Class<?> mapperClz) {
-		queryMapper.put(mapperId, mapperClz);
-	}
-
-	public static boolean isQueryMapper(String mapperId) {
-		return queryMapper.containsKey(mapperId);
-	}
+//	public static void addMapper(String mapperId, Class<?> mapperClz) {
+//		queryMapper.put(mapperId, mapperClz);
+//	}
+//
+//	public static boolean isQueryMapper(String mapperId) {
+//		return queryMapper.containsKey(mapperId);
+//	}
 
 	public static void addMeta(String mapperId, MapperMeta meta) {
 		metaMapper.put(mapperId, meta);
@@ -65,7 +66,7 @@ public class MapperMetaManger {
 				meta.addOrder(param);
 				meta.setDynamicSQL(true);
 			} else if (Page.class.isAssignableFrom(param.getType())){
-
+				meta.setPageable(true);
 			}
 			else {
 				log.debug("条件字段 ");
@@ -75,6 +76,10 @@ public class MapperMetaManger {
 					meta.setDynamicSQL(true);
 				}
 			}
+		}
+		Class<?> returnType = method.getReturnType();
+		if (PageList.class.isAssignableFrom(returnType)) {
+			meta.setCoutable(true);
 		}
 		return meta;
 	}

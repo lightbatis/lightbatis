@@ -30,7 +30,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import titan.lightbatis.annotations.GeneratedEvent;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class ColumnMeta implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -7320815314485442411L;
-	private EntityMeta table;
+	//private EntityMeta table;
     /**
      * 实体属性
      */
@@ -92,10 +91,6 @@ public class ColumnMeta implements Serializable {
     //乐观锁字段
     private boolean revision = false;
     public ColumnMeta() {
-    }
-
-    public ColumnMeta(EntityMeta table) {
-        this.table = table;
     }
 
     /**
@@ -223,7 +218,6 @@ public class ColumnMeta implements Serializable {
         if (id != that.id) return false;
         if (uuid != that.uuid) return false;
         if (identity != that.identity) return false;
-        if (table != null ? !table.equals(that.table) : that.table != null) return false;
         if (property != null ? !property.equals(that.property) : that.property != null) return false;
         if (column != null ? !column.equals(that.column) : that.column != null) return false;
         if (javaType != null ? !javaType.equals(that.javaType) : that.javaType != null) return false;

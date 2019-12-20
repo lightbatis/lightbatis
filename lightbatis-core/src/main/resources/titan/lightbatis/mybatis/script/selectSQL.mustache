@@ -6,7 +6,9 @@ SELECT * FROM  {{table}}
             {{column}} != 1
         {{/if}}
         {{#unless logicDelete}}
-            {{column}} = {{>columnHolder}}
+        	<if test="{{property}} != null">
+            	{{column}} = {{>columnHolder}}
+            </if>
         {{/unless}}
     {{/columns}}
     {{#each orderColumns}}{{#eq @index 0}}ORDER BY {{/eq}} {{#gt @index 0}},{{/gt}} {{column}} {{orderBy}}{{/each}}

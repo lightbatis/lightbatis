@@ -26,7 +26,7 @@ public class MemberService {
      * @return 返回主键对应的对象
      */
     public Member get(Long id) {
-        return memberMapper.getMember(id);
+        return memberMapper.get(id);
     }
 
 }

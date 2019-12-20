@@ -23,6 +23,8 @@ import static  titan.lightbatis.utils.NameUtils.*;
 import javax.persistence.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 实体类相关的辅助类
@@ -34,12 +36,21 @@ import java.util.*;
 public class EntityMetaManager {
 
 	//private static final Logger log = LoggerFactory.getLogger(EntityMetaManager.class);
-
 	/**
 	 * 实体类 => 表对象
 	 */
 	private static final Map<Class<?>, EntityMeta> entityTableMap = new HashMap<Class<?>, EntityMeta>();
 	private static final Map<String, EntityMeta> entityMetas = new HashMap<>();
+
+	/**
+	 * 实体类 -> Q 类
+	 */
+	private static final Map<Class<?>, QEntity> entityQuery = new HashMap<>();
+	/**
+	 * 表名到实体类型的映射。
+	 */
+	private static final Map<String, EntityMeta>  tableMetas = new HashMap<>();
+
 	/**
 	 * 获取表对象
 	 * @TODO 需要修改，存在一个类中如果有多个返回的实体类是一样的，以 实体类为Key 会出现，后面的类覆盖前面的类。
@@ -53,9 +64,22 @@ public class EntityMetaManager {
 		}
 		return entityTable;
 	}
-	public static EntityMeta findEntityMeta(Class<?> entityClass) {
-		EntityMeta entityTable = entityTableMap.get(entityClass);
-		return entityTable;
+//	public static EntityMeta findEntityMeta(Class<?> entityClass) {
+//		EntityMeta entityTable = entityTableMap.get(entityClass);
+//		return entityTable;
+//	}
+
+	/**
+	 * 根据 TableName 来获取对应表 EntityMeta 的信息。
+	 * @param tableName
+	 * @return
+	 */
+	public static EntityMeta getEntityMetaByTable (String tableName){
+		if (tableMetas.containsKey(tableName)) {
+			EntityMeta entityMeta = tableMetas.get(tableName);
+			return entityMeta;
+		}
+		return null;
 	}
 
 	public static EntityMeta getEntityMeta(String mapperStatementId) {
@@ -66,6 +90,19 @@ public class EntityMetaManager {
 //		}
 		if (entityMetas.containsKey(mapperStatementId)) {
 			return entityMetas.get(mapperStatementId);
+		}
+		return null;
+	}
+	public static QEntity getQueryEntity(Class<?> entityClass) {
+		if (entityQuery.containsKey(entityClass)) {
+			return entityQuery.get(entityClass);
+		} else {
+			if (entityTableMap.containsKey(entityClass)) {
+				EntityMeta entityTable = entityTableMap.get(entityClass);
+				QEntity queryEntity = new QEntity(entityTable);
+				entityQuery.put(entityClass, queryEntity);
+				return queryEntity;
+			}
 		}
 		return null;
 	}
@@ -129,16 +166,6 @@ public class EntityMetaManager {
 		return getEntityMeta(entityClass).getClassColumns();
 	}
 
-	public static Set<ColumnMeta> getColumns(String tableName, Class<?> entityClass) {
-		Set<ColumnMeta> colSet = getEntityMeta(entityClass).getClassColumns();
-		HashSet<ColumnMeta> tableSet = new HashSet<>();
-		colSet.forEach((meta) -> {
-			if (meta.getTableName().equals(tableName)) {
-				tableSet.add(meta);
-			}
-		});
-		return tableSet;
-	}
 
 	/**
 	 * 获取主键信息
@@ -158,7 +185,7 @@ public class EntityMetaManager {
 	 * @param config
 	 * @throws Exception 
 	 */
-	public static synchronized EntityMeta initEntityNameMap(Class<?> entityClass, MapperConfig config, String msId) throws Exception {
+	public static EntityMeta initEntityNameMap(Class<?> entityClass, MapperConfig config, String msId) throws Exception {
 		if (entityMetas.containsKey(msId) ) {
 			return entityMetas.get(msId);
 		}
@@ -168,8 +195,14 @@ public class EntityMetaManager {
 		entityTable.setMappedStatementId(msId);
 		entityMetas.put(msId, entityTable);
 		entityTableMap.put(entityClass, entityTable);
+		if (tableMetas.containsKey(entityTable.getName())) {
+			tableMetas.put(entityTable.getName(), entityTable);
+		} else {
+			log.warn( entityTable.getName() + " 表已经存在！");
+		}
 		return entityTable;
 	}
+
 
 	private static EntityMeta processEntity(Class<?> entityClass, MapperConfig config) throws Exception{
 		// 创建并缓存EntityTable
@@ -242,6 +275,8 @@ public class EntityMetaManager {
 			entityMeta.setEntityClassPKColumns(entityMeta.getClassColumns());
 		}
 		entityMeta.initPropertyMap();
+		QEntity entity = new QEntity(entityMeta);
+		entityQuery.put(entityClass, entity);
 		return entityMeta;
 	}
 
@@ -257,7 +292,7 @@ public class EntityMetaManager {
 			return null;
 		}
 		// Id 是否是ID 字段
-		ColumnMeta entityColumn = new ColumnMeta(entityMeta);
+		ColumnMeta entityColumn = new ColumnMeta();
 		if (field.isAnnotationPresent(Id.class)) {
 			entityColumn.setId(true);
 			entityColumn.setIdentity(true);

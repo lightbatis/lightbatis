@@ -3,7 +3,10 @@
  */
 package titan.lightbatis.mybatis.interceptor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -12,6 +15,8 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import titan.lightbatis.mybatis.meta.*;
@@ -29,8 +34,17 @@ import java.util.*;
  *
  */
 
-@Intercepts({ @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = { Statement.class }) })
+//@Intercepts({ @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = { Statement.class }) })
+@Intercepts(
+		{
+				@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+				@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+		}
+)
+@Slf4j
 public class PageListInterceptor implements Interceptor {
+	public static final String ROW_ROUNDS_KEY = "__RowBounds";
+	public static final String COUNT_MSID_KEY = "_COUNT";
 	//private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PageListInterceptor.class);
 
 	/*
@@ -42,44 +56,101 @@ public class PageListInterceptor implements Interceptor {
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
 
-		Object[] args = invocation.getArgs();
-		Object result = invocation.proceed();
-		Object target = invocation.getTarget();
+//		Object[] args = invocation.getArgs();
+//		Object result = invocation.proceed();
+//		Object target = invocation.getTarget();
+//
+//		if (target instanceof ResultSetHandler) {
+//			ResultSetHandler handler = (ResultSetHandler) target;
+//			MetaObject metaHandler = SystemMetaObject.forObject(handler);
+//			MappedStatement ms = (MappedStatement) metaHandler.getValue("mappedStatement");
+//			String msId = ms.getId();
+//			MapperMeta meta = MapperMetaManger.getMeta(msId);
+//			if (meta == null) {
+//				return result;
+//			}
+//			EntityMeta entityMeta = EntityMetaManager.getEntityMeta(msId);
+//			if (entityMeta != null) {
+//				// 如果涉及到多表操作
+//				if (entityMeta.isMultiTable()) {
+//					//log.debug("多表操作");
+//					Statement stmt = (Statement) args[0];
+//					entityPlus(result, entityMeta, stmt.getConnection(), ms);
+//				}
+//			}
+//			Class<?> clz = meta.getResultClz();
+//			if (PageList.class.isAssignableFrom(clz)) {
+//				BoundSql boundSql = (BoundSql) metaHandler.getValue("boundSql");
+//				Statement stmt = (Statement) args[0];
+//				int count = getCount(stmt.getConnection(), stmt, boundSql, ms);
+//				if (result instanceof List) {
+//					List list = (List) result;
+//					PageList pList = new PageList<>();
+//					pList.setTotalSize(count);
+//					pList.addAll(list);
+//					return pList;
+//				}
+//			}
+//		}
+//
+//		return result;
 
-		if (target instanceof ResultSetHandler) {
-			ResultSetHandler handler = (ResultSetHandler) target;
-			MetaObject metaHandler = SystemMetaObject.forObject(handler);
-			MappedStatement ms = (MappedStatement) metaHandler.getValue("mappedStatement");
-			String msId = ms.getId();
-			MapperMeta meta = MapperMetaManger.getMeta(msId);
-			if (meta == null) {
-				return result;
-			}
-			EntityMeta entityMeta = EntityMetaManager.getEntityMeta(msId);
-			if (entityMeta != null) {
-				// 如果涉及到多表操作
-				if (entityMeta.isMultiTable()) {
-					//log.debug("多表操作");
-					Statement stmt = (Statement) args[0];
-					entityPlus(result, entityMeta, stmt.getConnection(), ms);
+		//
+		Object[] args = invocation.getArgs();
+		MappedStatement ms = (MappedStatement) args[0];
+		Object parameter = args[1];
+
+		RowBounds rowBounds = (RowBounds) args[2];
+		ResultHandler resultHandler = (ResultHandler) args[3];
+		Executor executor = (Executor) invocation.getTarget();
+		CacheKey cacheKey;
+		BoundSql boundSql;
+
+
+
+		//由于逻辑关系，只会进入一次
+		if(args.length == 4){
+			//4 个参数时
+			if (rowBounds != RowBounds.DEFAULT) {
+				if (parameter instanceof Map) {
+					Map paramMap = (Map) parameter;
+					paramMap.put(ROW_ROUNDS_KEY, rowBounds);
 				}
 			}
-			Class<?> clz = meta.getResultClz();
-			if (PageList.class.isAssignableFrom(clz)) {
-				BoundSql boundSql = (BoundSql) metaHandler.getValue("boundSql");
-				Statement stmt = (Statement) args[0];
-				int count = getCount(stmt.getConnection(), stmt, boundSql, ms);
-				if (result instanceof List) {
-					List list = (List) result;
-					PageList pList = new PageList<>();
-					pList.setTotalSize(count);
-					pList.addAll(list);
-					return pList;
-				}
-			}
+			boundSql = ms.getBoundSql(parameter);
+			//boundSql.setAdditionalParameter("_LIMIT",10);
+			cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
+		} else {
+			//6 个参数时
+			cacheKey = (CacheKey) args[4];
+			boundSql = (BoundSql) args[5];
+			//boundSql.setAdditionalParameter("_LIMIT",10);
 		}
 
-		return result;
+		//检查是否需要分页
+		//rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
+		String msId = ms.getId();
+		MapperMeta meta = MapperMetaManger.getMeta(msId);
+		if (meta == null) {
+			List resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
+			return resultList;
+		}
+		List resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
+		Class<?> clz = meta.getResultClz();
+		if (PageList.class.isAssignableFrom(clz)) {
+			PageList pList = new PageList<>();
+			//如果需要查询总条数
+			if (meta.isCoutable()) {
+				String countMsId = ms.getId()+ COUNT_MSID_KEY;
+				MappedStatement countMs = ms.getConfiguration().getMappedStatement(countMsId);
+				BoundSql countBoundSql = countMs.getBoundSql(parameter);
+				long count = queryCount(executor, countMs, parameter, countBoundSql, rowBounds, resultHandler);
+				pList.setTotalSize(new Long(count).intValue());
+			}
+			pList.addAll(resultList);
+			return pList;
+		}
+		return resultList;
 	}
 
 	/*
@@ -101,7 +172,17 @@ public class PageListInterceptor implements Interceptor {
 	public void setProperties(Properties properties) {
 
 	}
+	private Long queryCount(Executor executor, MappedStatement countMs,
+								  Object parameter, BoundSql countBoundSql,
+								  RowBounds rowBounds, ResultHandler resultHandler) throws IllegalAccessException, SQLException {
 
+		//创建 count 查询的缓存 key
+		CacheKey countKey = executor.createCacheKey(countMs, parameter, RowBounds.DEFAULT, countBoundSql);
+		//执行 count 查询
+		Object countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
+		Long count = (Long) ((List) countResultList).get(0);
+		return count;
+	}
 	/**
 	 * 
 	 * 基于数据的附加操作，多表的操作

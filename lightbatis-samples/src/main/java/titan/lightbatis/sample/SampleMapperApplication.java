@@ -1,8 +1,11 @@
 package titan.lightbatis.sample;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.List;
 
+//import com.github.pagehelper.PageInterceptor;
 import com.querydsl.core.types.Predicate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.sample.model.entity.Member;
+import titan.lightbatis.sample.model.entity.MemberName;
 import titan.lightbatis.sample.model.entity.query.QMember;
 import titan.lightbatis.sample.mapper.MemberMapper;
 import titan.lightbatis.web.annotations.EnableLightbatisWeb;
@@ -36,7 +40,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-
+		//PageInterceptor pageInterceptor = null;
 //		insertMember();
 //		insertMemberWithId();
 //		updateMember();
@@ -46,15 +50,21 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		deleteMember();
 //		queryMember();
 //		listMembers();
-		listAllMembers();
+//		listAllMembers();
 //		listPredicatesMembers();
 //		listMemberFields();
 //		listMemberByKindId();
 //		listMembersWithName();
+//		listMemberNames();
+//		listAllMemberNames();
+//		getMember();
+//		listMemberByPredicate();
+		listMemberByPredicates();
+//		listMembersWithIn();
 	}
 
 	private void listMemberByKindId() {
-		List<Member> memberList = memberMapper.listMemberByKindId(1);
+		List<Member> memberList = memberMapper.listMemberByKindId(null, Page.newPage(1));
 		printMembers(memberList);
 	}
 	private void queryMember() {
@@ -82,7 +92,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void insertMemberWithId() {
 		Long id = 643173508322426880L;
-		Member member = memberMapper.getMember(id);
+		Member member = memberMapper.get(id);
 		if (member == null) {
 			member = new Member();
 		} else {
@@ -97,7 +107,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void updateMember() {
 		Long id = 643173508322426880L;
-		Member member = memberMapper.getMember(id);
+		Member member = memberMapper.get(id);
 		member.setId(id);
 		member.setKindId(1);
 		member.setMemberName("修改 慧 20191110 AT " + System.currentTimeMillis());
@@ -107,7 +117,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private Member getMember() {
 		Long id = 643173508322426880L;
-		Member member = memberMapper.getMember(id);
+		Member member = memberMapper.get(id);
 		return member;
 	}
 
@@ -118,7 +128,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 		int delCount = memberMapper.deleteByPrimaryKey(member);
 		System.out.println("delete count = " + delCount);
 
-		member = memberMapper.getMember(id);
+		member = memberMapper.get(id);
 		System.out.println(" member is null " + member);
 
 	}
@@ -175,5 +185,41 @@ public class SampleMapperApplication implements CommandLineRunner {
 		}
 	}
 
+	private void listMemberNames() {
+		List<String> names = memberMapper.listMemberNames(1);
+		for (String name: names) {
+			System.out.println(name);
+		}
+	}
 
+	public void listAllMemberNames () {
+		List<MemberName> memberNames = memberMapper.listAllMemberNames(1);
+		for (MemberName mname: memberNames) {
+			System.out.println(mname);
+		}
+	}
+
+	public void listMemberByPredicate() {
+		QMember member = QMember.member;
+		Predicate where = member.id.gt(1).and( member.id.lt(643173508322426880L + 1000000000L));
+		List<Member> members = memberMapper.listMemberByPredicate(where);
+		printMembers(members);
+	}
+
+	public void listMemberByPredicates () {
+		QMember member = QMember.member;
+		PageList<Member> members = memberMapper.listMemberByPredicates(Page.newPage(1));
+		printMembers(members);
+		System.out.println(members.getTotalSize());
+	}
+
+	public void listMembersWithIn() {
+		QMember member = QMember.member;
+		// in 的查询
+		PageList<Member> members = memberMapper.listMembersWithIn(member.id.in(1,643173508322426880L, 2,3 ));
+		printMembers(members);
+		// between 的查询
+//		PageList<Member> memberList = memberMapper.listMembersWithIn(member.createdTime.between(new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis())));
+//		printMembers(memberList);
+	}
 }

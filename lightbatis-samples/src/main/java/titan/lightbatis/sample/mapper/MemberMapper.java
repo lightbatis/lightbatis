@@ -3,12 +3,16 @@ package titan.lightbatis.sample.mapper;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.mapper.LightbatisMapper;
 import titan.lightbatis.sample.model.entity.Member;
+import titan.lightbatis.sample.model.entity.MemberName;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -22,7 +26,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @param id
      * @return
      */
-    Member getMember(Long id);
+    Member get( Long id);
 
     /**
      * 根据 kindId 获取指定类型的企业。
@@ -30,7 +34,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      * @param kindId
      * @return
      */
-    List<Member> listMemberByKindId(Integer kindId);
+    List<Member> listMemberByKindId(Integer kindId, Page page);
 
     /**
      * 列出所有的企业
@@ -38,7 +42,9 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      */
     public List<Member> listMember();
 
+    public List<Member> listMemberByPredicate(Predicate predicate);
 
+    public PageList<Member> listMemberByPredicates(Page page, Predicate... predicates);
     /**
      * SELECT id,member_name FROM member where kindId = ? ORDER BY id asc OFFSET ? LIMIT ?
      *
@@ -77,10 +83,22 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      */
     public PageList<Member> listPredicatesMembers(OrderSpecifier id_asc, Predicate... predicates);//
 
+    public PageList<Member> listMembersWithIn(Predicate predicate);
     /**
      * select {paths} from member
      * @param paths
      * @return
      */
     public List<Member> listMemberFields(Path... paths);
+
+    @Select("select member_name from member where kind_id=#{kindId}")
+    public List<String> listMemberNames(Integer kindId);
+
+    /**
+     *
+     * @param kindId
+     * @return
+     */
+    @Select("select id, member_name as memberName from member where kind_id=#{kindId}")
+    public List<MemberName> listAllMemberNames(Integer kindId);
 }

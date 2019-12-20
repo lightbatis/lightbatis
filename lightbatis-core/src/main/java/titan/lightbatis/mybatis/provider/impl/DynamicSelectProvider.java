@@ -39,6 +39,7 @@ import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.provider.MapperProvider;
 import titan.lightbatis.mybatis.script.MybatisScriptFactory;
+import titan.lightbatis.result.Page;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -55,6 +56,7 @@ public class DynamicSelectProvider extends MapperProvider{
 	private MapperMeta mapperMate = null;
 	private Configuration configuration = null;
 	private ParamNameResolver parameterResolver = null;
+	private boolean pageable = false;
 	public DynamicSelectProvider(Configuration config, Method method, Class<?> mapperClass, MapperBuilder mapperHelper) {
 		super(mapperClass, mapperHelper);
 		parameterResolver= new ParamNameResolver(config, method);
@@ -71,11 +73,11 @@ public class DynamicSelectProvider extends MapperProvider{
 	 * @return
 	 * @param mappedStatementId
 	 */
-	public SqlSource buildDynamicSQL(String mappedStatementId) throws Exception{
+	public SqlSource buildDynamicSQL(String mappedStatementId, boolean forCountRow) throws Exception{
 		//如果查询语句中出现了 Path, OrderSpecifier 类型时
 		Class<?> entityClass = getEntityClass(mappedStatementId, method);
 		String tableName = tableName(entityClass);
-		LightbatisSqlSource sqlSource = new LightbatisSqlSource(this.configuration, mapperMate);
+		LightbatisSqlSource sqlSource = new LightbatisSqlSource(this.configuration, mapperMate, forCountRow);
 		sqlSource.setEntityClass(entityClass);
 		sqlSource.setTableName(tableName);
 		return sqlSource;
@@ -86,22 +88,22 @@ public class DynamicSelectProvider extends MapperProvider{
 		return mapperMate.isDynamicSQL();
 	}
 
-	public String buildSelectSQL(String msId) throws Exception {
-		Class<?> entityClass = getEntityClass(msId, method);
-		String tableName = tableName(entityClass);
-		String[] names = parameterResolver.getNames();
-		Set<ColumnMeta> columns = EntityMetaManager.getColumns(entityClass, names);
-		Set<ColumnMeta> allcolumns = EntityMetaManager.getColumns(entityClass);
-		for(ColumnMeta column: allcolumns) {
-			if (column.isLogicDelete()) {
-				columns.add(column);
-				break;
-			}
-		}
-		Set<ColumnMeta> orderColumns = EntityMetaManager.getOrderbyColumns(entityClass);
-		String sql = MybatisScriptFactory.buildSelectSQL(msId, tableName,columns,orderColumns);
-		return sql;
-	}
+//	public String buildSelectSQL(String msId) throws Exception {
+//		Class<?> entityClass = getEntityClass(msId, method);
+//		String tableName = tableName(entityClass);
+//		String[] names = parameterResolver.getNames();
+//		Set<ColumnMeta> columns = EntityMetaManager.getColumns(entityClass, names);
+//		Set<ColumnMeta> allcolumns = EntityMetaManager.getColumns(entityClass);
+//		for(ColumnMeta column: allcolumns) {
+//			if (column.isLogicDelete()) {
+//				columns.add(column);
+//				break;
+//			}
+//		}
+//		Set<ColumnMeta> orderColumns = EntityMetaManager.getOrderbyColumns(entityClass);
+//		String sql = MybatisScriptFactory.buildSelectSQL(msId, tableName,columns,orderColumns);
+//		return sql;
+//	}
 
 	/**
 	 * 将返回值的类型，注册到 MappedStatement 中去

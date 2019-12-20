@@ -1,7 +1,7 @@
 package titan.lightbatis.mybatis;
 
-import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.builder.BuilderException;
@@ -27,9 +27,13 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
+import titan.lightbatis.mybatis.interceptor.PageListInterceptor;
 import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.provider.impl.DynamicSelectProvider;
+
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultMapping;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +42,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
-
+    private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
     private final Set<Class<? extends Annotation>> sqlAnnotationTypes = new HashSet<Class<? extends Annotation>>();
     private final Set<Class<? extends Annotation>> sqlProviderAnnotationTypes = new HashSet<Class<? extends Annotation>>();
 
@@ -332,18 +336,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         //将当前的 MappedStatementId 放到 SQLSource 中去。
         //sqlSource.setMappedStatementId(mappedStatementId);
         //创建 SQL
-        SqlSource sqlSource = null;
-        if (provider.isDynamicSQL()) {
-        	//使用动态 SQL 进行查询
-        	sqlSource = provider.buildDynamicSQL(mappedStatementId);
-        }
-        else {
-            // 查询条件是固定的，使用静态的查询。
-
-            String sql = provider.buildSelectSQL(mappedStatementId);
-            String script = "<script>\n\t" + sql + "</script>";
-            sqlSource = buildSqlSourceFromStrings(new String[] {script}, parameterTypeClass, languageDriver);
-        }
+        SqlSource sqlSource = provider.buildDynamicSQL(mappedStatementId, false);
 
         MappedStatement mappedStatement = assistant.addMappedStatement(mappedStatementId, sqlSource, statementType, sqlCommandType, fetchSize,
                 timeout,
@@ -359,7 +352,57 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         meta.setMappedStatementId(mappedStatementId);
         meta.setResultClz(method.getReturnType());
         MapperMetaManger.addMeta(mappedStatementId, meta);
-        provider = null;
+
+        //检查是否要查询总条数
+        if (meta.isCoutable()) {
+            sqlSource = provider.buildDynamicSQL(mappedStatementId, true);
+            String countMsId = mappedStatementId + PageListInterceptor.COUNT_MSID_KEY;
+            //count查询返回值int
+//            List<ResultMap> resultMaps = new ArrayList<ResultMap>();
+//            ResultMap resultMap = new ResultMap.Builder(ms.getConfiguration(), ms.getId(), Long.class, EMPTY_RESULTMAPPING).build();
+//            resultMaps.add(resultMap);
+            MappedStatement countMs = newCountMappedStatement(mappedStatement, countMsId, sqlSource);
+            mappedStatement.getConfiguration().addMappedStatement(countMs);
+        }
+
+       // provider = null;
+
+
+    }
+    /**
+     * 新建count查询的MappedStatement
+     *
+     * @param ms
+     * @param newMsId
+     * @return
+     */
+    private MappedStatement newCountMappedStatement(MappedStatement ms, String newMsId, SqlSource countSQLSource) {
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), newMsId, countSQLSource, ms.getSqlCommandType());
+        builder.resource(ms.getResource());
+        builder.fetchSize(ms.getFetchSize());
+        builder.statementType(ms.getStatementType());
+        builder.keyGenerator(ms.getKeyGenerator());
+        if (ms.getKeyProperties() != null && ms.getKeyProperties().length != 0) {
+            StringBuilder keyProperties = new StringBuilder();
+            for (String keyProperty : ms.getKeyProperties()) {
+                keyProperties.append(keyProperty).append(",");
+            }
+            keyProperties.delete(keyProperties.length() - 1, keyProperties.length());
+            builder.keyProperty(keyProperties.toString());
+        }
+        builder.timeout(ms.getTimeout());
+        builder.parameterMap(ms.getParameterMap());
+        //count查询返回值int
+        List<org.apache.ibatis.mapping.ResultMap> resultMaps = new ArrayList<org.apache.ibatis.mapping.ResultMap>();
+        org.apache.ibatis.mapping.ResultMap resultMap = new org.apache.ibatis.mapping.ResultMap.Builder(ms.getConfiguration(), ms.getId(), Long.class, EMPTY_RESULTMAPPING).build();
+        resultMaps.add(resultMap);
+        builder.resultMaps(resultMaps);
+        builder.resultSetType(ms.getResultSetType());
+        builder.cache(ms.getCache());
+        builder.flushCacheRequired(ms.isFlushCacheRequired());
+        builder.useCache(ms.isUseCache());
+
+        return builder.build();
     }
 
     private LanguageDriver getLanguageDriver(Method method) {

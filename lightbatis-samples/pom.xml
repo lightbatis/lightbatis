@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.lightbatis</groupId>
 		<artifactId>lightbatis-master</artifactId>
-		<version>${lightbatis.version}</version>
+		<version>1.0.11-SNAPSHOT</version>
 	</parent>
 	<artifactId>lightbatis-samples</artifactId>
 	<description>lightbatis 示例</description>
@@ -73,15 +73,20 @@
 			<artifactId>compiler</artifactId>
 			<version>0.9.6</version>
 		</dependency>
+<!--				<dependency>-->
+<!--					<groupId>com.github.pagehelper</groupId>-->
+<!--					<artifactId>pagehelper-spring-boot-starter</artifactId>-->
+<!--					<version>1.2.3</version>-->
+<!--				</dependency>-->
 		<dependency>
 			<groupId>com.github.lightbatis</groupId>
 			<artifactId>lightbatis-core</artifactId>
-			<version>${lightbatis.version}</version>
+			<version>1.0.11-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.lightbatis</groupId>
 			<artifactId>lightbatis-web</artifactId>
-			<version>${lightbatis.version}</version>
+			<version>1.0.11-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
