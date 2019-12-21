@@ -328,7 +328,8 @@ public class EntityMetaManager {
 		if (colSchema != null) {
 			entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
 		} else {
-			log.warn(colSchema.getColumnName() + " JDBC TYPE IS NULL");
+			log.error(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
+			throw new NullPointerException(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
 		}
 
 		entityColumn.setProperty(field.getName());
