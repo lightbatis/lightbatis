@@ -115,7 +115,7 @@ Mapper 的执行过程
 <dependency>
   <groupId>com.github.lightbatis</groupId>
   <artifactId>lightbatis-core</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.11-SNAPSHOT</version>
 </dependency>
 ```
 如果使用控制台，加入以下配置
@@ -123,7 +123,7 @@ Mapper 的执行过程
 <dependency>
   <groupId>com.github.lightbatis</groupId>
   <artifactId>lightbatis-web</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.11-SNAPSHOT</version>
 </dependency>
 ```
 

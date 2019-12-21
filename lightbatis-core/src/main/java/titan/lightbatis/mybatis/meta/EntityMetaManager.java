@@ -327,6 +327,8 @@ public class EntityMetaManager {
 		ColumnSchema colSchema = tableSchema.getColumn(columnName);
 		if (colSchema != null) {
 			entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
+		} else {
+			log.warn(colSchema.getColumnName() + " JDBC TYPE IS NULL");
 		}
 
 		entityColumn.setProperty(field.getName());

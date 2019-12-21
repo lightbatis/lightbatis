@@ -4,6 +4,7 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.sql.ColumnMetadata;
 import com.querydsl.sql.RelationalPathBase;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.type.ClassMetadata;
 
 import java.sql.Date;
@@ -39,6 +40,7 @@ import java.util.Set;
  *
  * @Author lifei114@126.com
  */
+@Slf4j
 public class QEntity extends RelationalPathBase {
     private Set<Path<?>> paths = new HashSet<>();
 
@@ -50,7 +52,12 @@ public class QEntity extends RelationalPathBase {
     protected void initColumns(EntityMeta entityMeta) {
         Set<ColumnMeta> columns = entityMeta.getClassColumns();
         for (ColumnMeta column : columns) {
-            addColumn(column);
+            try {
+                addColumn(column);
+            }catch (NullPointerException npe) {
+                log.error(column.getColumn() + " is NULL");
+                throw npe;
+            }
         }
     }
 
