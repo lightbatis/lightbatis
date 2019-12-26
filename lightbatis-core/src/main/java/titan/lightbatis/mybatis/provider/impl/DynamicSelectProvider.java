@@ -133,6 +133,7 @@ public class DynamicSelectProvider extends MapperProvider{
 					entityClassMap.put(msId, entityClass);
 					return entityClass;
 				} catch (Exception e) {
+					System.err.println(msId + " = " + method + " 加载失败！");
 					e.printStackTrace(System.err);
 					throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
 				}
