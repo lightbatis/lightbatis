@@ -34,3 +34,4 @@ hs_err_pid*
 *.iml
 
 classpath-data.json
+/.metadata/

@@ -135,7 +135,7 @@ public class PageListInterceptor implements Interceptor {
 			List resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
 			return resultList;
 		}
-		List resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
+		List resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
 		Class<?> clz = meta.getResultClz();
 		if (PageList.class.isAssignableFrom(clz)) {
 			PageList pList = new PageList<>();

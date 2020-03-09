@@ -19,6 +19,8 @@ public class Page extends RowBounds {
 
 	public Page(int pageSize, int pageNo) {
 		super(((pageNo - 1) < 0 ? 0 : (pageNo - 1)) * pageSize, pageSize);
+		this.pageSize = pageSize;
+		this.pageNo = pageNo;
 	}
 
 	public static Page newPage( int pageNo) {
