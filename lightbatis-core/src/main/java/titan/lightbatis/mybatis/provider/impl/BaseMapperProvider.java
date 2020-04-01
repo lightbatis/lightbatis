@@ -77,7 +77,7 @@ public class BaseMapperProvider extends MapperProvider {
 			//System.out.println(insertSQL);
 			log.debug(insertSQL);
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.err);
 		}
 		return sql.toString();
 	}
