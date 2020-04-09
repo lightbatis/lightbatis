@@ -178,13 +178,13 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 		Statement stmt = null;
 		try {
 			String dbschema = null;
-			System.out.println("dbschema======== " + dbschema);
-			DatabaseMetaData metaData = conn.getMetaData();
 
+			DatabaseMetaData metaData = conn.getMetaData();
+			String catalog = conn.getCatalog();
 			String dbtype = metaData.getDatabaseProductName();
-			if (StringUtils.equalsIgnoreCase(dbtype, "PostgreSQL")) {
+			//if (StringUtils.equalsIgnoreCase(dbtype, "PostgreSQL")) {
 				// 获取所有的表名
-				rs = metaData.getTables(null, dbschema, null, new String[] { "TABLE"});
+				rs = metaData.getTables(catalog, dbschema, null, new String[] { "TABLE"});
 				while (rs.next()) {
 					String tableType = rs.getString("TABLE_TYPE");
 					if (!tableType.equals("TABLE")) {
@@ -194,6 +194,7 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 					schema.setDs(dsname);
 
 					String tableName = rs.getString("TABLE_NAME");
+					//System.out.println("tableName = " + tableName);
 					String clzName = namingStrategy.getClassName(tableName);
 					String schemaName = "";
 					schema.setEntityName(clzName);
@@ -245,78 +246,78 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 					tables.add(schema);
 
 				}
-			} else {
-				ITableSchemaSQLBuilder tableSchemaSQLBuilder = getSchemaSQLBuilder(dataSource);
-				String queryTableSql = tableSchemaSQLBuilder.buildTableSQL();
-				// String queryTableColumns = tableSchemaSQLBuilder.buildColumsSQL();
-				stmt = conn.createStatement();
-				rs = stmt.executeQuery(queryTableSql);
-				while (rs.next()) {
-					TableSchema schema = new TableSchema();
-					schema.setDs(dsname);
-					String tableName = rs.getString("name");
-					String schemaName = "";
-
-					String tmpName = dsname + tableName.toLowerCase();
-					if (tableSet.contains(tmpName)) {
-						String msg = dsname + "系统中已经存在一个以上表名为 " + tmpName + "的数据表，但又没有为这个表指定数据的读写路由规则，请确认.";
-						System.err.println(msg);
-						throw new RuntimeException(msg);
-					}
-					tableSet.add(tmpName);
-					String common = rs.getString("Comment");
-					schema.setCommon(common);
-					schema.setDbSchema(schemaName);
-					schema.setTableName(tableName);
-					String clzName = namingStrategy.getClassName(tableName);
-					schema.setEntityName(clzName);
-
-
-					///////////////////////////// 加载Column 的信息
-					ResultSet colRs = metaData.getColumns(null, "%", tableName, "%");
-					while (colRs.next()) {
-
-						String field = colRs.getString("COLUMN_NAME");
-						int dataType = colRs.getInt("DATA_TYPE");
-						String type = colRs.getString("TYPE_NAME");
-						int nullable = colRs.getInt("NULLABLE");
-						int length = colRs.getInt("COLUMN_SIZE");
-						// String key = rs.getString("Key");
-						String comment = colRs.getString("REMARKS");
-
-						ColumnSchema col = new ColumnSchema(field);
-						col.setCommon(comment);
-						col.setNullable(nullable);
-						col.setLength(length);
-						col.setPropertyName(namingStrategy.getPropertyName(field, null));
-						// col.setPrimary(key.equalsIgnoreCase("PRI"));
-						col.setType(dataType);
-						col.setTypeName(type);
-						col.setColumnClz(JDBCTypeMapping.defaultTypes.get(dataType));
-						schema.addColumn(col);
-					}
-					colRs.close();
-					// 获取表的主键字段
-					ResultSet keyRes = null;
-					try{
-						 keyRes = metaData.getPrimaryKeys(null, null, tableName);
-						while (keyRes.next()) {
-							String field = keyRes.getString("COLUMN_NAME");
-							schema.addPrimaryKey(field);
-							schema.setPrimaryField(field, true);
-						}
-
-					} catch (Exception ex) {
-
-					} finally {
-						if (keyRes != null)
-							keyRes.close();
-					}
-
-					//loadTableColumns(schema, conn, tableName, tableSchemaSQLBuilder);
-					tables.add(schema);
-				}
-			}
+//			} else {
+//				ITableSchemaSQLBuilder tableSchemaSQLBuilder = getSchemaSQLBuilder(dataSource);
+//				String queryTableSql = tableSchemaSQLBuilder.buildTableSQL();
+//				// String queryTableColumns = tableSchemaSQLBuilder.buildColumsSQL();
+//				stmt = conn.createStatement();
+//				rs = stmt.executeQuery(queryTableSql);
+//				while (rs.next()) {
+//					TableSchema schema = new TableSchema();
+//					schema.setDs(dsname);
+//					String tableName = rs.getString("name");
+//					String schemaName = "";
+//
+//					String tmpName = dsname + tableName.toLowerCase();
+//					if (tableSet.contains(tmpName)) {
+//						String msg = dsname + "系统中已经存在一个以上表名为 " + tmpName + "的数据表，但又没有为这个表指定数据的读写路由规则，请确认.";
+//						System.err.println(msg);
+//						throw new RuntimeException(msg);
+//					}
+//					tableSet.add(tmpName);
+//					String common = rs.getString("Comment");
+//					schema.setCommon(common);
+//					schema.setDbSchema(schemaName);
+//					schema.setTableName(tableName);
+//					String clzName = namingStrategy.getClassName(tableName);
+//					schema.setEntityName(clzName);
+//
+//
+//					///////////////////////////// 加载Column 的信息
+//					ResultSet colRs = metaData.getColumns(null, "%", tableName, "%");
+//					while (colRs.next()) {
+//
+//						String field = colRs.getString("COLUMN_NAME");
+//						int dataType = colRs.getInt("DATA_TYPE");
+//						String type = colRs.getString("TYPE_NAME");
+//						int nullable = colRs.getInt("NULLABLE");
+//						int length = colRs.getInt("COLUMN_SIZE");
+//						// String key = rs.getString("Key");
+//						String comment = colRs.getString("REMARKS");
+//
+//						ColumnSchema col = new ColumnSchema(field);
+//						col.setCommon(comment);
+//						col.setNullable(nullable);
+//						col.setLength(length);
+//						col.setPropertyName(namingStrategy.getPropertyName(field, null));
+//						// col.setPrimary(key.equalsIgnoreCase("PRI"));
+//						col.setType(dataType);
+//						col.setTypeName(type);
+//						col.setColumnClz(JDBCTypeMapping.defaultTypes.get(dataType));
+//						schema.addColumn(col);
+//					}
+//					colRs.close();
+//					// 获取表的主键字段
+//					ResultSet keyRes = null;
+//					try{
+//						 keyRes = metaData.getPrimaryKeys(null, null, tableName);
+//						while (keyRes.next()) {
+//							String field = keyRes.getString("COLUMN_NAME");
+//							schema.addPrimaryKey(field);
+//							schema.setPrimaryField(field, true);
+//						}
+//
+//					} catch (Exception ex) {
+//
+//					} finally {
+//						if (keyRes != null)
+//							keyRes.close();
+//					}
+//
+//					//loadTableColumns(schema, conn, tableName, tableSchemaSQLBuilder);
+//					tables.add(schema);
+//				}
+//			}
 
 		} finally
 
