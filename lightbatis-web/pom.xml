@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.lightbatis</groupId>
 		<artifactId>lightbatis-master</artifactId>
-		<version>1.0.12</version>
+		<version>1.0.12-SNAPSHOT</version>
 	</parent>
 	<artifactId>lightbatis-web</artifactId>
 	<name>lightbatis web 控制台</name>
@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>com.github.lightbatis</groupId>
 			<artifactId>lightbatis-core</artifactId>
-			<version>1.0.11</version>
+			<version>1.0.12-SNAPSHOT</version>
 		</dependency>
 		<!--使用默认tomcat -->
 		<dependency>
@@ -55,6 +55,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.15</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity -->

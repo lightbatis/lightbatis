@@ -263,8 +263,52 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 					schema.setCommon(common);
 					schema.setDbSchema(schemaName);
 					schema.setTableName(tableName);
+					String clzName = namingStrategy.getClassName(tableName);
+					schema.setEntityName(clzName);
 
-					loadTableColumns(schema, conn, tableName, tableSchemaSQLBuilder);
+
+					///////////////////////////// 加载Column 的信息
+					ResultSet colRs = metaData.getColumns(null, "%", tableName, "%");
+					while (colRs.next()) {
+
+						String field = colRs.getString("COLUMN_NAME");
+						int dataType = colRs.getInt("DATA_TYPE");
+						String type = colRs.getString("TYPE_NAME");
+						int nullable = colRs.getInt("NULLABLE");
+						int length = colRs.getInt("COLUMN_SIZE");
+						// String key = rs.getString("Key");
+						String comment = colRs.getString("REMARKS");
+
+						ColumnSchema col = new ColumnSchema(field);
+						col.setCommon(comment);
+						col.setNullable(nullable);
+						col.setLength(length);
+						col.setPropertyName(namingStrategy.getPropertyName(field, null));
+						// col.setPrimary(key.equalsIgnoreCase("PRI"));
+						col.setType(dataType);
+						col.setTypeName(type);
+						col.setColumnClz(JDBCTypeMapping.defaultTypes.get(dataType));
+						schema.addColumn(col);
+					}
+					colRs.close();
+					// 获取表的主键字段
+					ResultSet keyRes = null;
+					try{
+						 keyRes = metaData.getPrimaryKeys(null, null, tableName);
+						while (keyRes.next()) {
+							String field = keyRes.getString("COLUMN_NAME");
+							schema.addPrimaryKey(field);
+							schema.setPrimaryField(field, true);
+						}
+
+					} catch (Exception ex) {
+
+					} finally {
+						if (keyRes != null)
+							keyRes.close();
+					}
+
+					//loadTableColumns(schema, conn, tableName, tableSchemaSQLBuilder);
 					tables.add(schema);
 				}
 			}
@@ -296,11 +340,16 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 				String key = rs.getString("Key");
 				String comment = rs.getString("comment");
 
+				int length = rs.getInt("COLUMN_SIZE");
+
 				ColumnSchema col = new ColumnSchema(field);
 				col.setCommon(comment);
+				col.setLength(length);
 				col.setNullable(nullStr.equalsIgnoreCase("YES") ? 1 : 0);
 				col.setPrimary(key.equalsIgnoreCase("PRI"));
 				col.setTypeName(type);
+				col.setPropertyName(namingStrategy.getPropertyName(field, null));
+
 				String columnClz = col.getTypeName().split("\\(")[0].toUpperCase();
 				if (columnClz.equals("DATETIME")) {
 					columnClz = "TIMESTAMP";
@@ -317,7 +366,8 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 				schema.addColumn(col);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println("=============== tableName = " + tableName);
+			e.printStackTrace(System.err);
 		} finally {
 			stmt.close();
 			rs.close();

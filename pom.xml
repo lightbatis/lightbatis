@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.lightbatis</groupId>
     <artifactId>lightbatis-master</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>统一数据访问层根工程</name>
 
@@ -27,7 +27,7 @@
         <querydsl.version>4.2.1</querydsl.version>
         <commons-lang3-version>3.8.1</commons-lang3-version>
         <springframework.version>5.1.3.RELEASE</springframework.version>
-        <lightbatis.version>1.0.6</lightbatis.version>
+        <lightbatis.version>1.0.12-SNAPSHOT</lightbatis.version>
         <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
         <!-- java8版本导致javadoc打包编译失败时候，添加 -->
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
