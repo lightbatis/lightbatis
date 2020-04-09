@@ -178,13 +178,18 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 		Statement stmt = null;
 		try {
 			String dbschema = null;
-
+			System.out.println("dbschema======== " + dbschema);
 			DatabaseMetaData metaData = conn.getMetaData();
+
 			String dbtype = metaData.getDatabaseProductName();
 			if (StringUtils.equalsIgnoreCase(dbtype, "PostgreSQL")) {
 				// 获取所有的表名
-				rs = metaData.getTables(null, dbschema, null, new String[] { "TABLE", "VIEW" });
+				rs = metaData.getTables(null, dbschema, null, new String[] { "TABLE"});
 				while (rs.next()) {
+					String tableType = rs.getString("TABLE_TYPE");
+					if (!tableType.equals("TABLE")) {
+						continue;
+					}
 					TableSchema schema = new TableSchema();
 					schema.setDs(dsname);
 
