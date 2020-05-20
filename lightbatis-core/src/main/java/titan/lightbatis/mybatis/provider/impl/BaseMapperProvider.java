@@ -73,9 +73,9 @@ public class BaseMapperProvider extends MapperProvider {
 		try {
 			String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
 			sql.append(insertSQL);
-			log.debug("==========");
+			//log.debug("==========");
 			//System.out.println(insertSQL);
-			log.debug(insertSQL);
+			//log.debug(insertSQL);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		}

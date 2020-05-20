@@ -11,12 +11,12 @@ spring:
       exclude: WEB-INF/**
   datasource:
     #type: com.alibaba.druid.pool.DruidDataSource
-    username: demo
+    username: root
     password: 123456
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/demo
-#    driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/vrcodedb?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/demo
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mall?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
     #方言
     #dialect: postgresql
     hikari: 

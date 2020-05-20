@@ -175,10 +175,16 @@ public class MapperProvider {
             }
             //第三种，返回xml形式的sql字符串
             else if (String.class.equals(method.getReturnType())) {
-                String xmlSql = (String) method.invoke(this, ms);
-                SqlSource sqlSource = createSqlSource(ms, xmlSql);
-                //替换原有的SqlSource
-                setSqlSource(ms, sqlSource);
+                try{
+                    String xmlSql = (String) method.invoke(this, ms);
+                    SqlSource sqlSource = createSqlSource(ms, xmlSql);
+                    //替换原有的SqlSource
+                    setSqlSource(ms, sqlSource);
+                } catch (Exception ex) {
+                    ex.printStackTrace(System.err);
+                    //throw new LightbatisException(ex);
+                }
+
             } else {
                 throw new LightbatisException("自定义Mapper方法返回类型错误,可选的返回类型为void,SqlNode,String三种!");
             }
