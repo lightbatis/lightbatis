@@ -234,7 +234,11 @@ public class EntityMetaManager {
 			}
 		}
 		TableSchema tableSchema = ITableSchemaManager.getInstance().getTable(entityMeta.getName());
-		
+		if (tableSchema == null) {
+			System.err.println("table is null " + entityMeta.getName());
+			log.error("table is null " + entityMeta.getName());
+			throw new LightbatisException(entityMeta.getName() + " 没有找到！");
+		}
 		// 处理所有列
 		List<FieldMeta> fields = null;
 		if (config.isEnableMethodAnnotation()) {
@@ -255,6 +259,10 @@ public class EntityMetaManager {
 			//}
 			try {
 				ColumnMeta colMeta = processField(entityMeta, tableSchema , field);
+				if (colMeta == null) {
+					log.warn(field.getName() + " 为 Null, 已经跳过！");
+					continue;
+				}
 				if (List.class.isAssignableFrom(colMeta.getJavaType())) {
 					Field colField = fieldMap.get(colMeta.getProperty());
 					Type fieldType = colField.getGenericType();
