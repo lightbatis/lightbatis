@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.lightbatis</groupId>
     <artifactId>lightbatis-master</artifactId>
-    <version>1.0.14</version>
+    <version>1.0.15</version>
     <packaging>pom</packaging>
     <name>统一数据访问层根工程</name>
 
@@ -18,7 +18,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <mapper.version>3.4.0</mapper.version>
-        <mysql.version>8.0.15</mysql.version>
+        <mysql.version>5.1.39</mysql.version>
         <springfox.version>2.9.2</springfox.version>
         <druid.version>1.1.2</druid.version>
         <mybatis.version>3.4.6</mybatis.version>
