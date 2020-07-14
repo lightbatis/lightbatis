@@ -5,7 +5,6 @@ import titan.lightbatis.table.TableSchema;
 import titan.lightbatis.web.entity.OutputSetting;
 
 import java.io.Serializable;
-import java.util.Map;
 @Data
 public class GenerateConfig implements Serializable {
     /*模板名称*/

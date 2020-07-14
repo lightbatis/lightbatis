@@ -11,6 +11,8 @@ import com.querydsl.core.types.dsl.NumberPath;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
@@ -18,6 +20,7 @@ import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.SimpleTypeRegistry;
+import org.springframework.beans.BeanUtils;
 import titan.lightbatis.mybatis.interceptor.PageListInterceptor;
 import titan.lightbatis.mybatis.meta.*;
 
@@ -31,7 +34,7 @@ import java.util.*;
 public class LightbatisSqlSource implements SqlSource {
 	private final Configuration configuration;
 	private final MapperMeta mapperMeta;
-	private Class<?> entityClass;
+	protected Class<?> entityClass;
 	private QEntity queryEntity ;
 	@Getter
 	@Setter
@@ -96,10 +99,47 @@ public class LightbatisSqlSource implements SqlSource {
 						}
 					}
 					dslBuilder.where(predicates);
-				} else {
+				}
+				else if (param.getType().equals(Object.class) && entityClass.isAssignableFrom(parameterObject.getClass())) {
+					// 如果输入的是实体对象类型本身，按值不空的方式进行查询。
+					BeanMap bean = new BeanMap(parameterObject);
+					Set<ColumnMeta> columnMetaSet = entityMeta.getClassColumns();
+					for(ColumnMeta col: columnMetaSet) {
+						String property = col.getProperty();
+						Object value = bean.get(property);
+						//将值不为 null 的添加到查询条件
+						if (value != null) {
+							Path path = this.queryEntity.getPath(property);
+							ComparableExpressionBase comparablePath = (ComparableExpressionBase)path;
+							dslBuilder.where(comparablePath.eq(value));
+						}
+					}
+				}
+				else {
 					ColumnMeta columnMeta = entityMeta.findColumnByProperty(param.getName());
-					//如果值为空，不进行查询。
-					if (columnMeta != null) {
+//					Object paramValue = null;
+//					if (paramMap.containsKey(param.getName())) {
+//						paramValue = paramMap.get(param.getName());
+//					}
+//					if (paramValue != null && columnMeta == null) {
+//						System.out.println(paramValue.getClass());
+//					}
+					//如果 没有找到这一列，录入的值有，且类型是 实体类型，则说明输入是一个实体对象。
+					if (columnMeta == null && paramMap.containsKey(param.getName()) && ( entityClass.isAssignableFrom(paramMap.get(param.getName()).getClass()))) {
+						Object entityObject = paramMap.get(param.getName());
+						BeanMap bean = new BeanMap(entityObject);
+						Set<ColumnMeta> columnMetaSet = entityMeta.getClassColumns();
+						for(ColumnMeta col: columnMetaSet) {
+							String property = col.getProperty();
+							Object value = bean.get(property);
+							//将值不为 null 的添加到查询条件
+							if (value != null) {
+								Path path = this.queryEntity.getPath(property);
+								ComparableExpressionBase comparablePath = (ComparableExpressionBase)path;
+								dslBuilder.where(comparablePath.eq(value));
+							}
+						}
+					} else if (columnMeta != null) {//如果值为空，不进行查询。
 						// && paramMap.get(param.getName()) != null
 						if (paramMap != null && paramMap.get(param.getName()) != null) {
 							Path path = this.queryEntity.getPath(columnMeta.getProperty());

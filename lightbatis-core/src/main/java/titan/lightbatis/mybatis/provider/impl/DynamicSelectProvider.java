@@ -30,22 +30,20 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.ParamNameResolver;
 import org.apache.ibatis.session.Configuration;
+import org.springframework.core.annotation.AnnotationUtils;
 import titan.lightbatis.exception.LightbatisException;
+import titan.lightbatis.mybatis.GenericsUtils;
 import titan.lightbatis.mybatis.LightbatisSqlSource;
 import titan.lightbatis.mybatis.MapperBuilder;
-import titan.lightbatis.mybatis.meta.ColumnMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.provider.MapperProvider;
-import titan.lightbatis.mybatis.script.MybatisScriptFactory;
-import titan.lightbatis.result.Page;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 将生成动态 查询SQL 的提供者。
@@ -74,11 +72,12 @@ public class DynamicSelectProvider extends MapperProvider{
 	 */
 	public SqlSource buildDynamicSQL(String mappedStatementId, boolean forCountRow) throws Exception{
 		//如果查询语句中出现了 Path, OrderSpecifier 类型时
-		Class<?> entityClass = getEntityClass(mappedStatementId, method);
-		String tableName = tableName(entityClass);
-		LightbatisSqlSource sqlSource = new LightbatisSqlSource(this.configuration, mapperMate, forCountRow);
-		sqlSource.setEntityClass(entityClass);
-		sqlSource.setTableName(tableName);
+		LightbatisSqlSource sqlSource = null;
+			sqlSource = new LightbatisSqlSource(this.configuration, mapperMate, forCountRow);
+			Class<?> entityClass = getEntityClass(mappedStatementId, method);
+			String tableName = tableName(entityClass);
+			sqlSource.setEntityClass(entityClass);
+			sqlSource.setTableName(tableName);
 		return sqlSource;
 	}
 
@@ -110,7 +109,6 @@ public class DynamicSelectProvider extends MapperProvider{
 						if (t instanceof Class) {
 							entityClass = (Class<?>) t;
 						}
-						
 					}
 				}
 				if (entityClass == null) {
@@ -124,9 +122,22 @@ public class DynamicSelectProvider extends MapperProvider{
 					}
 				}
 			} else {
-				entityClass = mClass;
+				if (mClass.equals(Object.class)) {
+					Class<?> tmpClz = GenericsUtils.getImplementInterfaceParamType(mapperClass, method, 0);
+					if (tmpClz != null) {
+						entityClass = tmpClz;
+					} else {
+						entityClass = mClass;
+					}
+				} else {
+					entityClass = mClass;
+				}
+
 			}
 			if (entityClass != null) {
+				if (entityClass.equals(Object.class)) {
+					return null;
+				}
 				// 获取该类型后，第一次对该类型进行初始化
 				try {
 					EntityMetaManager.initEntityNameMap(entityClass, mapperBuilder.getConfig(),msId);

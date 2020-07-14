@@ -3,27 +3,6 @@
  */
 package titan.lightbatis.web.generate;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.lang.annotation.Annotation;
-import java.nio.charset.Charset;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.persistence.Id;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
 import com.google.common.io.Files;
 import com.mysema.codegen.CodeWriter;
@@ -33,13 +12,7 @@ import com.mysema.codegen.model.ClassType;
 import com.mysema.codegen.model.SimpleType;
 import com.mysema.codegen.model.Type;
 import com.mysema.codegen.model.TypeCategory;
-import com.querydsl.codegen.CodegenModule;
-import com.querydsl.codegen.EntityType;
-import com.querydsl.codegen.Property;
-import com.querydsl.codegen.QueryTypeFactory;
-import com.querydsl.codegen.Serializer;
-import com.querydsl.codegen.SimpleSerializerConfig;
-import com.querydsl.codegen.TypeMappings;
+import com.querydsl.codegen.*;
 import com.querydsl.sql.ColumnMetadata;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.SchemaAndTable;
@@ -49,14 +22,26 @@ import com.querydsl.sql.codegen.SQLCodegenModule;
 import com.querydsl.sql.codegen.SpatialSupport;
 import com.querydsl.sql.codegen.support.NotNullImpl;
 import com.querydsl.sql.codegen.support.SizeImpl;
-
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.Extension;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import titan.lightbatis.annotations.*;
 import titan.lightbatis.table.ColumnSchema;
-import titan.lightbatis.table.TableSchema;
-import io.swagger.annotations.ApiModel;
 import titan.lightbatis.web.entity.TableEntitySchema;
+
+import javax.annotation.Nullable;
+import javax.persistence.Id;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.annotation.Annotation;
+import java.nio.charset.Charset;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * 将 TableSchema 转换成 JavaBean

@@ -3,18 +3,6 @@
  */
 package titan.lightbatis.web.generate;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.sql.Date;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Generated;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.mysema.codegen.CodeWriter;
@@ -26,8 +14,12 @@ import com.querydsl.codegen.EntityType;
 import com.querydsl.codegen.Property;
 import com.querydsl.codegen.Serializer;
 import com.querydsl.codegen.SerializerConfig;
-
 import lombok.Data;
+
+import javax.annotation.Generated;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * @author lifei

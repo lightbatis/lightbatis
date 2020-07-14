@@ -6,9 +6,6 @@ package titan.lightbatis.web.entity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import titan.lightbatis.web.generate.mapper.MethodMeta;
-
-import java.util.List;
 /**
  * @author lifei
  *

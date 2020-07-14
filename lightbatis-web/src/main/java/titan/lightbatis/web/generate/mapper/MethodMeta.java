@@ -3,16 +3,15 @@
  */
 package titan.lightbatis.web.generate.mapper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mysema.codegen.model.Parameter;
 import com.mysema.codegen.model.Type;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 生成的Mapper 的方法名称

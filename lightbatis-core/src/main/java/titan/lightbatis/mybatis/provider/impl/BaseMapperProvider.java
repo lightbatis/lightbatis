@@ -9,6 +9,7 @@ import titan.lightbatis.generator.GeneratedValueType;
 import titan.lightbatis.generator.SnowflakeIdKeyGenerator;
 import titan.lightbatis.mybatis.MapperBuilder;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
+import titan.lightbatis.mybatis.meta.EntityMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.provider.MapperProvider;
 import titan.lightbatis.mybatis.script.MybatisScriptFactory;
@@ -80,6 +81,21 @@ public class BaseMapperProvider extends MapperProvider {
 			e.printStackTrace(System.err);
 		}
 		return sql.toString();
+	}
+
+	public String get(MappedStatement ms) {
+    	StringBuilder sql = new StringBuilder();
+		Class<?> entityClass = getEntityClass(ms);
+		String table = tableName(entityClass);
+		String msId = ms.getId();
+		try {
+			String selectSQL = MybatisScriptFactory.buildSelectSQL(msId, table, EntityMetaManager.getPKColumns(entityClass), null);
+			return selectSQL;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	private void processKey(StringBuilder sql, Class<?> entityClass, MappedStatement ms, Set<ColumnMeta> columnList){

@@ -1,7 +1,5 @@
 package titan.lightbatis.web.generate;
 
-import java.io.File;
-
 /**
  * 代码生成接口
  */

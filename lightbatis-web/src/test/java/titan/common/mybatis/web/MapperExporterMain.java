@@ -1,11 +1,11 @@
 package titan.common.mybatis.web;
 
-import java.io.File;
-import java.sql.SQLException;
-
 import titan.lightbatis.web.entity.TableEntitySchema;
 import titan.lightbatis.web.generate.InterfaceSerializer;
 import titan.lightbatis.web.generate.MapperExporter;
+
+import java.io.File;
+import java.sql.SQLException;
 
 public class MapperExporterMain {
 

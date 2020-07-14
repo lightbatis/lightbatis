@@ -3,8 +3,6 @@
  */
 package titan.common.mybatis.web;
 
-import org.springframework.util.ClassUtils;
-
 import com.querydsl.sql.codegen.DefaultNamingStrategy;
 
 /**

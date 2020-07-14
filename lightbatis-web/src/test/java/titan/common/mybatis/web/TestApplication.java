@@ -3,14 +3,9 @@
  */
 package titan.common.mybatis.web;
 
-import javax.annotation.Resource;
-
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import titan.lightbatis.LightbatisApplication;
 import titan.lightbatis.web.TitanDalApplication;
 

@@ -3,12 +3,11 @@
  */
 package titan.lightbatis.web.entity;
 
-import java.io.Serializable;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import titan.lightbatis.table.TableSchema;
+
+import java.io.Serializable;
 
 /**
  * @author lifei

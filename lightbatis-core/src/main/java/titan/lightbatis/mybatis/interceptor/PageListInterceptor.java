@@ -106,20 +106,40 @@ public class PageListInterceptor implements Interceptor {
 		CacheKey cacheKey;
 		BoundSql boundSql;
 
-
-
+		String msId = ms.getId();
+		MapperMeta meta = MapperMetaManger.getMeta(msId);
+		Object input = null;
 		//由于逻辑关系，只会进入一次
 		if(args.length == 4){
 			//4 个参数时
 			if (rowBounds != RowBounds.DEFAULT) {
+				Map paramMap = new HashMap();
 				if (parameter instanceof Map) {
-					Map paramMap = (Map) parameter;
+					paramMap = (Map) parameter;
 					paramMap.put(ROW_ROUNDS_KEY, rowBounds);
+				}else {
+					//如果参数只有一个值，不是以 map 的方式进行组装的，转换成 map
+					paramMap.put(ROW_ROUNDS_KEY, rowBounds);
+					Set<ParamMeta> predicates = meta.getPredicateParams();
+					if (!predicates.isEmpty()){
+						ParamMeta paramMeta = predicates.iterator().next();
+						paramMap.put(paramMeta.getName(), parameter);
+					}
+
+//					if (predicates.size() == 1) {
+//
+//					} else {
+//
+//					}
 				}
+				input = paramMap;
 			}
-			boundSql = ms.getBoundSql(parameter);
+			if (input == null) {
+				input = parameter;
+			}
+			boundSql = ms.getBoundSql(input);
 			//boundSql.setAdditionalParameter("_LIMIT",10);
-			cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
+			cacheKey = executor.createCacheKey(ms, input, rowBounds, boundSql);
 		} else {
 			//6 个参数时
 			cacheKey = (CacheKey) args[4];
@@ -129,13 +149,15 @@ public class PageListInterceptor implements Interceptor {
 
 		//检查是否需要分页
 		//rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
-		String msId = ms.getId();
-		MapperMeta meta = MapperMetaManger.getMeta(msId);
+
+		if (input == null) {
+			input = parameter;
+		}
 		if (meta == null) {
-			List resultList = executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
+			List resultList = executor.query(ms, input, rowBounds, resultHandler, cacheKey, boundSql);
 			return resultList;
 		}
-		List resultList = executor.query(ms, parameter, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
+		List resultList = executor.query(ms, input, RowBounds.DEFAULT, resultHandler, cacheKey, boundSql);
 		Class<?> clz = meta.getResultClz();
 		if (PageList.class.isAssignableFrom(clz)) {
 			PageList pList = new PageList<>();

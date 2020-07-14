@@ -3,11 +3,11 @@
  */
 package titan.lightbatis.web;
 
-import java.io.Serializable;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author lifei

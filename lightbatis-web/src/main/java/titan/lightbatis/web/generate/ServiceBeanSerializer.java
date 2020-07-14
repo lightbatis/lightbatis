@@ -3,40 +3,25 @@
  */
 package titan.lightbatis.web.generate;
 
-import static com.mysema.codegen.Symbols.COMMA;
-
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Generated;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.mysema.codegen.CodeWriter;
-import com.mysema.codegen.model.ClassType;
-import com.mysema.codegen.model.Parameter;
-import com.mysema.codegen.model.Type;
-import com.mysema.codegen.model.TypeCategory;
-import com.mysema.codegen.model.Types;
-import com.querydsl.codegen.BeanSerializer;
+import com.mysema.codegen.model.*;
 import com.querydsl.codegen.EntityType;
 import com.querydsl.codegen.Property;
 import com.querydsl.codegen.Serializer;
 import com.querydsl.codegen.SerializerConfig;
 import com.querydsl.core.util.BeanUtils;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import titan.lightbatis.web.generate.mapper.MethodMeta;
+
+import javax.annotation.Generated;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.*;
+
+import static com.mysema.codegen.Symbols.COMMA;
 
 /**
  * @author lifei
@@ -134,20 +119,28 @@ public class ServiceBeanSerializer implements Serializer {
         if (addToString && model.hasArrays()) {
             importedClasses.add(Arrays.class.getName());
         }
-		for (MethodMeta meta : methods) {
-			Type returnType = meta.getReturnType();
-			if (!StringUtils.startsWith(returnType.getFullName(), "java.lang")) {
-				importedClasses.add(returnType.getFullName());
-			}
-
-			Parameter[] parameters = meta.getParameters();
-			for (Parameter p : parameters) {
-				if (!StringUtils.startsWith(p.getType().getFullName(), "java.lang")) {
-					importedClasses.add(p.getType().getFullName());
-				}
-
-			}
-		}
+        if (printSupertype && model.getSuperType() != null) {
+            importedClasses.add(model.getSuperType().getType().getFullName());
+            ClassType clzType = (ClassType) model.getSuperType().getType();
+            List<Type> types = clzType.getParameters();
+            for (Type type:types) {
+                importedClasses.add(type.getFullName());
+            }
+        }
+//		for (MethodMeta meta : methods) {
+//			Type returnType = meta.getReturnType();
+//			if (!StringUtils.startsWith(returnType.getFullName(), "java.lang")) {
+//				importedClasses.add(returnType.getFullName());
+//			}
+//
+//			Parameter[] parameters = meta.getParameters();
+//			for (Parameter p : parameters) {
+//				if (!StringUtils.startsWith(p.getType().getFullName(), "java.lang")) {
+//					importedClasses.add(p.getType().getFullName());
+//				}
+//
+//			}
+//		}
 		
 		if (proxyType != null) {
 			importedClasses.add(proxyType.getFullName());

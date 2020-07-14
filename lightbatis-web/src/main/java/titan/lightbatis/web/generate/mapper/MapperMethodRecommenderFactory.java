@@ -3,28 +3,16 @@
  */
 package titan.lightbatis.web.generate.mapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
-import com.mysema.codegen.model.ClassType;
-import com.mysema.codegen.model.Parameter;
-import com.mysema.codegen.model.SimpleType;
-import com.mysema.codegen.model.Type;
-import com.mysema.codegen.model.TypeCategory;
-import com.mysema.codegen.model.Types;
+import com.mysema.codegen.model.*;
 import com.querydsl.core.util.BeanUtils;
-
+import org.springframework.stereotype.Service;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.table.ColumnSchema;
 import titan.lightbatis.web.entity.TableEntitySchema;
 import titan.lightbatis.web.generate.mapper.IMethodRecommender.MethodType;
+
+import java.util.*;
 
 /**
  * @author lifei
@@ -37,8 +25,8 @@ public class MapperMethodRecommenderFactory {
 	 * 
 	 */
 	public MapperMethodRecommenderFactory() {
-		recommenderSet.add(GetMethodRecommender.class);
-		recommenderSet.add(ListMethodRecommender.class);
+		//recommenderSet.add(GetMethodRecommender.class);
+		//recommenderSet.add(ListMethodRecommender.class);
 		//recommenderSet.add(UpdateByMethodRecommender.class);
 		
 		

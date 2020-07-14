@@ -3,22 +3,20 @@
  */
 package titan.lightbatis.web.generate;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
-
 import titan.lightbatis.annotations.DalEntity;
 import titan.lightbatis.web.DalConfig;
 import titan.lightbatis.web.EntityRespository;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author lifei

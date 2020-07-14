@@ -2,12 +2,12 @@
  * 
  */
 package titan.lightbatis.web.generate;
-import java.lang.annotation.Annotation;
+
+import titan.lightbatis.table.TableSchema;
 
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import titan.lightbatis.table.TableSchema;
+import java.lang.annotation.Annotation;
 /**
  * @author lifei
  *

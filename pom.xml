@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.lightbatis</groupId>
     <artifactId>lightbatis-master</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>pom</packaging>
     <name>统一数据访问层根工程</name>
 
@@ -27,7 +27,7 @@
         <querydsl.version>4.2.1</querydsl.version>
         <commons-lang3-version>3.8.1</commons-lang3-version>
         <springframework.version>5.1.3.RELEASE</springframework.version>
-        <lightbatis.version>1.1.0</lightbatis.version>
+        <lightbatis.version>1.1.1</lightbatis.version>
         <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
         <!-- java8版本导致javadoc打包编译失败时候，添加 -->
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
@@ -50,13 +50,36 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.lightbatis</groupId>
+                <artifactId>lightbatis-web</artifactId>
+                <version>${lightbatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lightbatis</groupId>
+                <artifactId>lightbatis-core</artifactId>
+                <version>${lightbatis.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
             <version>2.7</version>
-
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!--lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
     <profiles>
@@ -179,6 +202,15 @@
                 <artifactId>versions-maven-plugin</artifactId>
                 <configuration>
                     <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!--如果没有此部署，上述热部署依赖不会生效-->
+                <configuration>
+                    <fork>true</fork>  <!--动态文件热部署-->
+                    <addResources>true</addResources><!--静态文件热部署-->
                 </configuration>
             </plugin>
         </plugins>

@@ -3,7 +3,6 @@ package titan.lightbatis.web.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration

@@ -2,11 +2,11 @@
  * 
  */
 package titan.lightbatis.web.generate;
-import java.lang.annotation.Annotation;
-
-import javax.persistence.Column;
 
 import titan.lightbatis.table.ColumnSchema;
+
+import javax.persistence.Column;
+import java.lang.annotation.Annotation;
 /**
  * @author lifei
  *

@@ -261,7 +261,9 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         Class<?> parameterTypeClass = getParameterType(method);
         LanguageDriver languageDriver = getLanguageDriver(method);
         MapperBuilder mapperBuilder= new MapperBuilder();
+
         DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder);
+
         MapperMeta meta = provider.getMapperMate();
         if (meta == null) {
             meta = new MapperMeta();

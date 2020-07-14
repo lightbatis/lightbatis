@@ -3,9 +3,12 @@
  */
 package titan.lightbatis.web.generate;
 
-import static com.mysema.codegen.Symbols.COMMA;
-import static com.mysema.codegen.Symbols.SEMICOLON;
-import static com.mysema.codegen.Symbols.SPACE;
+import com.google.common.base.Function;
+import com.mysema.codegen.AbstractCodeWriter;
+import com.mysema.codegen.CodeWriter;
+import com.mysema.codegen.JavaWriter;
+import com.mysema.codegen.model.Parameter;
+import com.mysema.codegen.model.Type;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -13,12 +16,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.mysema.codegen.AbstractCodeWriter;
-import com.mysema.codegen.CodeWriter;
-import com.mysema.codegen.JavaWriter;
-import com.mysema.codegen.model.Parameter;
-import com.mysema.codegen.model.Type;
+import static com.mysema.codegen.Symbols.COMMA;
+import static com.mysema.codegen.Symbols.SPACE;
 
 /**
  * @author lifei

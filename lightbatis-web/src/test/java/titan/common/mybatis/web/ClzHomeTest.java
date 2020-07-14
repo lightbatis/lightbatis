@@ -3,17 +3,13 @@
  */
 package titan.common.mybatis.web;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 import org.apache.commons.lang3.ClassPathUtils;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.servlet.resource.PathResourceResolver;
-import org.springframework.web.servlet.resource.ResourceResolver;
-
 import titan.lightbatis.web.entity.OutputSetting;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * @author lifei

@@ -1,26 +1,16 @@
 package titan.lightbatis.web.service;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import titan.lightbatis.table.TableSchema;
 import titan.lightbatis.web.entity.OutputSetting;
 import titan.lightbatis.web.entity.TableEntitySchema;
-import titan.lightbatis.web.generate.InterfaceSerializer;
-import titan.lightbatis.web.generate.LombokBeanSerializer;
-import titan.lightbatis.web.generate.MapperExporter;
-import titan.lightbatis.web.generate.ServiceBeanSerializer;
-import titan.lightbatis.web.generate.ServiceExporter;
-import titan.lightbatis.web.generate.TableSchemaExporter;
-import titan.lightbatis.web.generate.mapper.IMethodRecommender;
+import titan.lightbatis.web.generate.*;
 import titan.lightbatis.web.generate.mapper.MapperMethodRecommenderFactory;
 import titan.lightbatis.web.generate.mapper.MethodMeta;
+
+import java.io.File;
+import java.io.StringWriter;
+import java.util.List;
 
 @Service
 public class GenerateService {

@@ -24,6 +24,7 @@ import titan.lightbatis.sample.model.entity.Member;
 import titan.lightbatis.sample.model.entity.MemberName;
 import titan.lightbatis.sample.model.entity.query.QMember;
 import titan.lightbatis.sample.mapper.MemberMapper;
+import titan.lightbatis.sample.service.MemberCrudService;
 import titan.lightbatis.web.annotations.EnableLightbatisWeb;
 
 @Lightbatis()
@@ -34,6 +35,9 @@ public class SampleMapperApplication implements CommandLineRunner {
 	@Autowired
 	private MemberMapper memberMapper = null;
 
+	@Autowired
+	private MemberCrudService memberCrudService = null;
+
 	public static void main(String[] args) {
 		SpringApplication.run(SampleMapperApplication.class, args);
 	}
@@ -41,28 +45,49 @@ public class SampleMapperApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		//PageInterceptor pageInterceptor = null;
-//		insertMember();
+		//insertMember();
 //		insertMemberWithId();
 //		updateMember();
-//		listMember();
+		listMember();
 //
 //		Member member = getMember();
 //		deleteMember();
-//		queryMember();
+		queryMember();
 		listMembers();
-//		listAllMembers();
-//		listPredicatesMembers();
-//		listMemberFields();
-//		listMemberByKindId();
-//		listMembersWithName();
-//		listMemberNames();
-//		listAllMemberNames();
-//		getMember();
-//		listMemberByPredicate();
-//		listMemberByPredicates();
-//		listMembersWithIn();
+		listAllMembers();
+		listPredicatesMembers();
+		listMemberFields();
+		listMemberByKindId();
+		listMembersWithName();
+		listMemberNames();
+		listAllMemberNames();
+		getMember();
+		listMemberByPredicate();
+		listMemberByPredicates();
+		listMembersWithIn();
+		testService();
 	}
+	private void testService () {
+		System.out.println("============>>> " + memberCrudService);
+		Member member = memberCrudService.get(732258481750409216L);
+		System.out.println(member);
 
+		PageList<Member> members = memberCrudService.list(new Page(10,1));
+		printMembers(members);
+
+		member = new Member();
+		member.setId(732258481750409216L);
+		List<Member> memberList = memberCrudService.findList(member);
+		printMembers(memberList);
+
+		Member m2 = memberCrudService.getByEntity(member);
+		System.out.println(m2);
+
+		Member member2 = new Member();
+		member2.setKindId(1);
+		PageList<Member> memberPage = memberCrudService.findPage(new Page(10,1), member2);
+		printMembers(memberPage);
+	}
 	private void listMemberByKindId() {
 		List<Member> memberList = memberMapper.listMemberByKindId(null, Page.newPage(1));
 		printMembers(memberList);
@@ -79,14 +104,16 @@ public class SampleMapperApplication implements CommandLineRunner {
 		memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(),new Page(1,10));
 	}
 	private void insertMember() {
-		Member member = new Member();
-		int count = 1;
+
+		int count = 15;
 		for (int i=0;i < count; i++ ){
+			Member member = new Member();
 			//member.setId(new Long(250 + i));
 			member.setMemberName("慧 20191110 " + i);
 			member.setKindId(1);
 			memberMapper.insert(member);
 			System.out.println(" insert id " + member.getId());
+
 		}
 	}
 

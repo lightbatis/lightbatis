@@ -25,9 +25,9 @@ public class MemberService {
      * @param id 主键 ID
      * @return 返回主键对应的对象
      */
-    public Member get(Long id) {
-        return memberMapper.get(id);
-    }
+//    public Member get(Long id) {
+//        return memberMapper.get(id);
+//    }
 
 }
 

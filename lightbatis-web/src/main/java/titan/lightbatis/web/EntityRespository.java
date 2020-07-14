@@ -3,11 +3,11 @@
  */
 package titan.lightbatis.web;
 
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
 
 /**
  * @author lifei

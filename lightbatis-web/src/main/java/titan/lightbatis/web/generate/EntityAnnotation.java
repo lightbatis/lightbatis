@@ -3,9 +3,8 @@
  */
 package titan.lightbatis.web.generate;
 
-import java.lang.annotation.Annotation;
-
 import javax.persistence.Entity;
+import java.lang.annotation.Annotation;
 
 /**
  * @author lifei
