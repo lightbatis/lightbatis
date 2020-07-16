@@ -337,7 +337,8 @@ public class EntityMetaManager {
 			entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
 		} else {
 			log.error(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
-			throw new NullPointerException(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
+			//throw new NullPointerException(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
+			return null;
 		}
 
 		entityColumn.setProperty(field.getName());
