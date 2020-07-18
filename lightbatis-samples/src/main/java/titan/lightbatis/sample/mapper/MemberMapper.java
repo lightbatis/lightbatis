@@ -30,7 +30,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
 
     /**
      * 根据 kindId 获取指定类型的企业。
-     * 相当于执行了SQL语句: select * from member where kind_id = ?
+     * 相当于执行了SQL语句: select * from member where kind_id = ? offset=? limit = ?
      * @param kindId
      * @return
      */
