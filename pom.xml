@@ -39,6 +39,7 @@
         <module>lightbatis-core</module>
         <module>lightbatis-web</module>
         <module>lightbatis-samples</module>
+        <module>lightbatis-pagelisthelper</module>
     </modules>
     <distributionManagement>
         <snapshotRepository>
