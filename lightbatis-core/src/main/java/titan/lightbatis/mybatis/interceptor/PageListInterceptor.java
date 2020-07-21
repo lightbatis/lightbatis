@@ -55,7 +55,6 @@ public class PageListInterceptor implements Interceptor {
 	 */
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
-
 //		Object[] args = invocation.getArgs();
 //		Object result = invocation.proceed();
 //		Object target = invocation.getTarget();
