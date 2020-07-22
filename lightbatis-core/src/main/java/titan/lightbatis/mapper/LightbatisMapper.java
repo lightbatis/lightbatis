@@ -3,6 +3,7 @@ package titan.lightbatis.mapper;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
+import org.springframework.transaction.annotation.Transactional;
 import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 
 /**
@@ -18,11 +19,14 @@ public interface LightbatisMapper<T> extends QueryMapper<T> {
      * @return 保存影响的条数
      */
     @InsertProvider(type = BaseMapperProvider.class, method = "insert")
+    @Transactional(readOnly = false)
     int insert(T record);
     
     @UpdateProvider(type = BaseMapperProvider.class, method="updateByPrimaryKey")
+    @Transactional(readOnly = false)
     int updateByPrimaryKey(T record);
     
     @DeleteProvider(type = BaseMapperProvider.class, method="deleteByPrimaryKey")
+    @Transactional(readOnly = false)
     int deleteByPrimaryKey(T record);
 }

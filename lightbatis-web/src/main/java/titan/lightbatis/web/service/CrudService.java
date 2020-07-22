@@ -8,7 +8,6 @@ import titan.lightbatis.result.PageList;
 
 import java.util.List;
 
-@Transactional(readOnly = true)
 public abstract class CrudService<D extends CrudMapper<T, PK>, T,PK> {
 
     /**
