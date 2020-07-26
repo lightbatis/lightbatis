@@ -125,20 +125,41 @@ public class LightbatisSqlSource implements SqlSource {
 //						System.out.println(paramValue.getClass());
 //					}
 					//如果 没有找到这一列，录入的值有，且类型是 实体类型，则说明输入是一个实体对象。
-					if (columnMeta == null && paramMap.containsKey(param.getName()) && ( entityClass.isAssignableFrom(paramMap.get(param.getName()).getClass()))) {
-						Object entityObject = paramMap.get(param.getName());
-						BeanMap bean = new BeanMap(entityObject);
-						Set<ColumnMeta> columnMetaSet = entityMeta.getClassColumns();
-						for(ColumnMeta col: columnMetaSet) {
-							String property = col.getProperty();
-							Object value = bean.get(property);
-							//将值不为 null 的添加到查询条件
-							if (value != null) {
-								Path path = this.queryEntity.getPath(property);
-								ComparableExpressionBase comparablePath = (ComparableExpressionBase)path;
-								dslBuilder.where(comparablePath.eq(value));
+					Object obj = paramMap.get(param.getName());
+					if (columnMeta == null) {
+						if (paramMap.containsKey(param.getName()) && ( entityClass.isAssignableFrom(paramMap.get(param.getName()).getClass()))) {
+							Object entityObject = paramMap.get(param.getName());
+							BeanMap bean = new BeanMap(entityObject);
+							Set<ColumnMeta> columnMetaSet = entityMeta.getClassColumns();
+							for(ColumnMeta col: columnMetaSet) {
+								String property = col.getProperty();
+								Object value = bean.get(property);
+								//将值不为 null 的添加到查询条件
+								if (value != null) {
+									Path path = this.queryEntity.getPath(property);
+									ComparableExpressionBase comparablePath = (ComparableExpressionBase)path;
+									dslBuilder.where(comparablePath.eq(value));
+								}
+							}
+						} else {
+//							Iterator<String> keyIterator = paramMap.keySet().iterator();
+//							for (;keyIterator.hasNext();) {
+//								String key = keyIterator.next();
+//
+//							}
+							Set<ColumnMeta> columnMetaSet = entityMeta.getClassColumns();
+							for(ColumnMeta col: columnMetaSet) {
+								String property = col.getProperty();
+								Object value = paramMap.get(property);
+								//将值不为 null 的添加到查询条件
+								if (value != null) {
+									Path path = this.queryEntity.getPath(property);
+									ComparableExpressionBase comparablePath = (ComparableExpressionBase)path;
+									dslBuilder.where(comparablePath.eq(value));
+								}
 							}
 						}
+
 					} else if (columnMeta != null) {//如果值为空，不进行查询。
 						// && paramMap.get(param.getName()) != null
 						if (paramMap != null && paramMap.get(param.getName()) != null) {
