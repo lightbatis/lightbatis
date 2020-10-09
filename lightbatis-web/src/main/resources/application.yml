@@ -13,8 +13,8 @@ spring:
 #    username: root
 #    password: 123456
 #    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/atnong_mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true
-    #url: jdbc:mysql://39.99.191.219:3306/atnong_mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true
+    #url: jdbc:mysql://localhost:3306/atnong_mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true
+    url: jdbc:mysql://39.99.191.219:3306/atnong_mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     #password: nong@2w20

@@ -248,6 +248,9 @@ public class MapperProvider {
         try {
             String table = column.getTableName();
             EntityMeta entityMeta = EntityMetaManager.getEntityMetaByTable(table);
+            if (entityMeta == null) {
+                entityMeta = EntityMetaManager.getEntityMeta(ms.getId());
+            }
             MetaObject msObject = SystemMetaObject.forObject(ms);
             msObject.setValue("keyGenerator", keyGenerator);
             msObject.setValue("keyProperties", entityMeta.getKeyProperties());

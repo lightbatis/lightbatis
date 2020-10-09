@@ -194,7 +194,7 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>resources/logback-spring.xml</exclude>
-<!--                    <exclude>application.yml</exclude>-->
+                    <exclude>application.yml</exclude>
                 </excludes>
             </resource>
         </resources>
