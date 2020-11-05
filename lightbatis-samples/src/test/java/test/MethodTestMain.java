@@ -2,6 +2,8 @@ package test;
 
 import titan.lightbatis.mybatis.GenericsUtils;
 import titan.lightbatis.sample.mapper.MemberCrudMapper;
+import titan.lightbatis.sample.model.entity.Member;
+import titan.lightbatis.table.ITableSchemaManager;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -11,6 +13,8 @@ import java.util.stream.Stream;
 
 public class MethodTestMain {
     public static void main(String[] args) {
+//        Member m = new Member();
+//        m.setId(ITableSchemaManager.getInstance().nextId());
         Class<MemberCrudMapper> clz = MemberCrudMapper.class;
         Method[] ms = clz.getMethods();
         for (Method m: ms) {

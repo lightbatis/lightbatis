@@ -40,6 +40,7 @@
         <module>lightbatis-web</module>
         <module>lightbatis-samples</module>
         <module>lightbatis-pagelisthelper</module>
+        <module>lightbatis-common</module>
     </modules>
     <distributionManagement>
         <snapshotRepository>
