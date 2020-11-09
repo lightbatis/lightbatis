@@ -3,6 +3,7 @@
  */
 package titan.lightbatis.result;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,9 +17,11 @@ import java.util.*;
 @Data
 @ApiModel(value="带分页查询的数据列表", description = "继承 List 接口，增加了总条数的属性")
 public class PageList<E> implements List<E> {
-	
+
+	@JsonProperty("records")
 	private List<E> records = new ArrayList<>();
 	@ApiModelProperty(value="本次查询的数据总条数")
+	@JsonProperty("totalSize")
 	private int totalSize = 0;
 
 	public PageList() {

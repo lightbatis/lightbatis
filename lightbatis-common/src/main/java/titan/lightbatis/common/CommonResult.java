@@ -1,5 +1,7 @@
 package titan.lightbatis.common;
 
+import titan.lightbatis.result.PageList;
+
 /**
  * 通用返回对象
  * Created by macro on 2019/4/19.
@@ -15,7 +17,13 @@ public class CommonResult<T> {
     protected CommonResult(long code, String message, T data) {
         this.code = code;
         this.message = message;
+//        if (data instanceof PageList){
+//            this.data = (T) new PageResult((PageList)data);
+//        } else {
+//
+//        }
         this.data = data;
+
     }
 
     /**
@@ -24,6 +32,12 @@ public class CommonResult<T> {
      * @param data 获取的数据
      */
     public static <T> CommonResult<T> success(T data) {
+        if (data instanceof  PageList) {
+            CommonPageResult result = new CommonPageResult<T>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
+            PageList list = (PageList)data;
+            result.setTotalSize(list.getTotalSize());
+            return result;
+        }
         return new CommonResult<T>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
     }
 
@@ -34,6 +48,12 @@ public class CommonResult<T> {
      * @param  message 提示信息
      */
     public static <T> CommonResult<T> success(T data, String message) {
+        if (data instanceof  PageList) {
+            CommonPageResult result = new CommonPageResult<T>(ResultCode.SUCCESS.getCode(), message, data);
+            PageList list = (PageList)data;
+            result.setTotalSize(list.getTotalSize());
+            return result;
+        }
         return new CommonResult<T>(ResultCode.SUCCESS.getCode(), message, data);
     }
 

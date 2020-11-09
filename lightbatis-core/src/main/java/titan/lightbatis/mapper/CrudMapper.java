@@ -1,5 +1,7 @@
 package titan.lightbatis.mapper;
 
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
 
@@ -44,4 +46,8 @@ public interface CrudMapper<T,PK> extends LightbatisMapper<T>{
      * @return
      */
     public PageList<T> findPage(Page page, T entity);
+
+    public PageList<T> listPageBy(Page page, Predicate...  predicates);
+
+    public PageList<T> listPageSortBy(Page page, OrderSpecifier orderSpecifier, Predicate...  predicates);
 }

@@ -12,4 +12,10 @@
     <artifactId>lightbatis-common</artifactId>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>com.github.lightbatis</groupId>
+            <artifactId>lightbatis-core</artifactId>
+        </dependency>
+    </dependencies>
 </project>
