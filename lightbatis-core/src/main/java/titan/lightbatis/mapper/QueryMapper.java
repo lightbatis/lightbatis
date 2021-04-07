@@ -1,5 +1,6 @@
 package titan.lightbatis.mapper;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 
@@ -11,5 +12,6 @@ public interface QueryMapper<T>  extends ILightMarker{
 	//@SelectProvider(type = QuerySelectProvider.class, method = "query")
 	//@LightbatisQuery
 	public List<T> query(Predicate...  predicates);
-	
+
+	public List<T> query(OrderSpecifier orderBy, Predicate... predicates);
 }

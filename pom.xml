@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.lightbatis</groupId>
     <artifactId>lightbatis-master</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.6</version>
     <packaging>pom</packaging>
     <name>统一数据访问层根工程</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.5.RELEASE</version>
+        <version>2.4.4</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,6 +41,7 @@
         <module>lightbatis-samples</module>
         <module>lightbatis-pagelisthelper</module>
         <module>lightbatis-common</module>
+        <module>lightbatis-jsvisual</module>
     </modules>
     <distributionManagement>
         <snapshotRepository>

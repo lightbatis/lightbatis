@@ -37,4 +37,4 @@ hs_err_pid*
 classpath-data.json
 /.metadata/
 /lightbatis-pagelisthelper/target/
-/lightbatis-jsvisual/logs/
+/logs/

@@ -21,7 +21,9 @@ public interface LightbatisMapper<T> extends QueryMapper<T> {
     @InsertProvider(type = BaseMapperProvider.class, method = "insert")
     @Transactional(readOnly = false)
     int insert(T record);
-    
+
+
+
     @UpdateProvider(type = BaseMapperProvider.class, method="updateByPrimaryKey")
     @Transactional(readOnly = false)
     int updateByPrimaryKey(T record);
