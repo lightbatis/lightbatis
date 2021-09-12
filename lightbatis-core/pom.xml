@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.lightbatis</groupId>
 		<artifactId>lightbatis-master</artifactId>
-		<version>1.1.6</version>
+		<version>1.1.7</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>lightbatis-core</artifactId>
@@ -39,6 +39,10 @@
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
 		</dependency>
 		<!-- swagger cloud start -->
 		<dependency>

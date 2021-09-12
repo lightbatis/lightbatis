@@ -39,6 +39,8 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 	private long workerId;
 	@Value("${snowflake.datacenterId}")
 	private long datacenterId;
+	@Value("${dal.startup.loadtable:true}")
+	private boolean startupLoadTable = true;
 
 	private static final int CATALOG_NAME = 1;
 	private static final int SCHEMA_NAME = 2;
@@ -93,6 +95,7 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 
 	private List<TableSchema> tables = new ArrayList<>();
 
+	private boolean loadedAllTable = false;
 	static DataSourceTableSchemaManager manager = null;
 
 	// private ITableSchemaSQLBuilder tableSchemaSQLBuilder = new
@@ -105,11 +108,28 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 	 */
 	@Override
 	public TableSchema getTable(String tableName) {
-		Optional<TableSchema> found = tables.stream()
-				.filter(schema -> schema.getTableName().equalsIgnoreCase(tableName)).findFirst();
-		if (found.isPresent()) {
-			return found.get();
+		if (loadedAllTable) {
+			Optional<TableSchema> found = tables.stream()
+					.filter(schema -> schema.getTableName().equalsIgnoreCase(tableName)).findFirst();
+			if (found.isPresent()) {
+				return found.get();
+			}
+		} else {
+			Optional<TableSchema> found = tables.stream()
+					.filter(schema -> schema.getTableName().equalsIgnoreCase(tableName)).findFirst();
+			if (found.isPresent()) {
+				return found.get();
+			}else {
+				try {
+					TableSchema schema = loadTableSchema(tableName);
+					return schema;
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
 		}
+
 		return null;
 	}
 
@@ -129,23 +149,39 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 	 */
 	@Override
 	public List<TableSchema> listTables() {
+		if (!loadedAllTable) {
+			try{
+				loadAllTables();
+			}catch (Exception ex) {
+				ex.printStackTrace(System.err);
+			}
+			loadedAllTable = true;
+		}
 		List<TableSchema> list = Collections.unmodifiableList(tables);
 		return list;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		String[] names = applicationContext.getBeanNamesForType(DataSource.class);
-		for (String name : names) {
-			DataSource dataSource = (DataSource) applicationContext.getBean(name);
-			try {
-				loadTables(dataSource, name);
-			} catch (Exception ex) {
-				ex.printStackTrace(System.err);
-				throw ex;
-			}
-
+//		String[] names = applicationContext.getBeanNamesForType(DataSource.class);
+//		for (String name : names) {
+//			DataSource dataSource = (DataSource) applicationContext.getBean(name);
+//			try {
+//				long start = System.currentTimeMillis();
+//				//loadTables(dataSource, name);
+//				long end = System.currentTimeMillis();
+//				long els = (end - start) / 1000;
+//				System.err.println("加载表结构启动用时: " + (els));
+//			} catch (Exception ex) {
+//				ex.printStackTrace(System.err);
+//				throw ex;
+//			}
+//
+//		}
+		if (startupLoadTable) {
+			listTables();
 		}
+
 		DataSourceTableSchemaManager.manager = this;
 	}
 
@@ -170,7 +206,63 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 
 		return tableSchemaSQLBuilder;
 	}
+	private void loadAllTables() throws Exception{
+		String[] names = applicationContext.getBeanNamesForType(DataSource.class);
+		for (String name : names) {
+			DataSource dataSource = (DataSource) applicationContext.getBean(name);
+			try {
+				long start = System.currentTimeMillis();
+				loadTables(dataSource, name);
+				long end = System.currentTimeMillis();
+				long els = (end - start) / 1000;
+				System.err.println("加载表结构启动用时: " + (els));
+			} catch (Exception ex) {
+				ex.printStackTrace(System.err);
+				throw ex;
+			}
+		}
+	}
+	private TableSchema loadTableSchema(String table) throws Exception{
+		String[] names = applicationContext.getBeanNamesForType(DataSource.class);
+		ResultSet rs = null;
+		Statement stmt = null;
+		Connection conn = null;
+		for (String name : names) {
+			DataSource dataSource = (DataSource) applicationContext.getBean(name);
+			try {
+				conn = dataSource.getConnection();
+				DatabaseMetaData metaData = conn.getMetaData();
+				String catalog = conn.getCatalog();
+				rs = metaData.getTables(catalog, null, table, new String[] { "TABLE"});
+				while (rs.next()) {
+					String tableType = rs.getString("TABLE_TYPE");
+					if (!tableType.equals("TABLE")) {
+						continue;
+					}
+					TableSchema schema = loadTableSchema(rs, conn, name, metaData);
+					if (schema != null) {
+						tables.add(schema);
+						return schema;
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace(System.err);
+				throw ex;
+			} finally {
+				if (stmt != null){
+					stmt.close();
+				}
+				if (rs != null){
+					rs.close();
+				}
+				if (conn != null){
+					conn.close();
+				}
 
+			}
+		}
+		return null;
+	}
 	private void loadTables(DataSource dataSource, String dsname) throws Exception {
 
 		Connection conn = dataSource.getConnection();
@@ -181,7 +273,7 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 
 			DatabaseMetaData metaData = conn.getMetaData();
 			String catalog = conn.getCatalog();
-			String dbtype = metaData.getDatabaseProductName();
+			//String dbtype = metaData.getDatabaseProductName();
 			//if (StringUtils.equalsIgnoreCase(dbtype, "PostgreSQL")) {
 				// 获取所有的表名
 				rs = metaData.getTables(catalog, dbschema, null, new String[] { "TABLE"});
@@ -190,61 +282,8 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 					if (!tableType.equals("TABLE")) {
 						continue;
 					}
-					TableSchema schema = new TableSchema();
-					schema.setDs(dsname);
-
-					String tableName = rs.getString("TABLE_NAME");
-					//System.out.println("tableName = " + tableName);
-					String clzName = namingStrategy.getClassName(tableName);
-					String schemaName = "";
-					schema.setEntityName(clzName);
-
-					String tmpName = dsname + tableName.toLowerCase();
-					if (tableSet.contains(tmpName)) {
-						String msg = dsname + "系统中已经存在一个以上表名为 " + tmpName + "的数据表，但又没有为这个表指定数据的读写路由规则，请确认.";
-						System.err.println(msg);
-						throw new RuntimeException(msg);
-					}
-					tableSet.add(tmpName);
-					String common = rs.getString("REMARKS");
-					schema.setCommon(common);
-					schema.setDbSchema(schemaName);
-					schema.setTableName(tableName);
-
-					///////////////////////////// 加载Column 的信息
-					ResultSet colRs = metaData.getColumns(null, "%", tableName, "%");
-					while (colRs.next()) {
-
-						String field = colRs.getString("COLUMN_NAME");
-						int dataType = colRs.getInt("DATA_TYPE");
-						String type = colRs.getString("TYPE_NAME");
-						int nullable = colRs.getInt("NULLABLE");
-						int length = colRs.getInt("COLUMN_SIZE");
-						// String key = rs.getString("Key");
-						String comment = colRs.getString("REMARKS");
-
-						ColumnSchema col = new ColumnSchema(field);
-						col.setCommon(comment);
-						col.setNullable(nullable);
-						col.setLength(length);
-						col.setPropertyName(namingStrategy.getPropertyName(field, null));
-						// col.setPrimary(key.equalsIgnoreCase("PRI"));
-						col.setType(dataType);
-						col.setTypeName(type);
-						col.setColumnClz(JDBCTypeMapping.defaultTypes.get(dataType));
-						schema.addColumn(col);
-					}
-					colRs.close();
-					// 获取表的主键字段
-					ResultSet keyRes = metaData.getPrimaryKeys(null, null, tableName);
-					while (keyRes.next()) {
-						String field = keyRes.getString("COLUMN_NAME");
-						schema.addPrimaryKey(field);
-						schema.setPrimaryField(field, true);
-					}
-					keyRes.close();
+					TableSchema schema = loadTableSchema(rs, conn, dsname, metaData);
 					tables.add(schema);
-
 				}
 //			} else {
 //				ITableSchemaSQLBuilder tableSchemaSQLBuilder = getSchemaSQLBuilder(dataSource);
@@ -320,15 +359,76 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 //			}
 
 		} finally
-
 		{
-			if (stmt != null)
+			if (stmt != null){
 				stmt.close();
-			if (rs != null)
+			}
+			if (rs != null){
 				rs.close();
-			if (conn != null)
+			}
+			if (conn != null){
 				conn.close();
+			}
 		}
+	}
+
+	private TableSchema loadTableSchema(ResultSet rs, Connection conn, String dsname, DatabaseMetaData metaData) throws SQLException{
+
+		TableSchema schema = new TableSchema();
+		schema.setDs(dsname);
+		String catalog = conn.getCatalog();
+		String tableName = rs.getString("TABLE_NAME");
+		//System.out.println("tableName = " + tableName);
+		String clzName = namingStrategy.getClassName(tableName);
+		String schemaName = conn.getSchema();
+		schema.setEntityName(clzName);
+
+		String tmpName = dsname + tableName.toLowerCase();
+		if (tableSet.contains(tmpName)) {
+			String msg = dsname + "系统中已经存在一个以上表名为 " + tmpName + "的数据表，但又没有为这个表指定数据的读写路由规则，请确认.";
+			System.err.println(msg);
+			//throw new RuntimeException(msg);
+		}
+		tableSet.add(tmpName);
+		String common = rs.getString("REMARKS");
+		schema.setCommon(common);
+		schema.setDbSchema(schemaName);
+		schema.setTableName(tableName);
+
+
+		///////////////////////////// 加载Column 的信息
+		ResultSet colRs = metaData.getColumns(catalog, schemaName, tableName, "%");
+		while (colRs.next()) {
+
+			String field = colRs.getString("COLUMN_NAME");
+			int dataType = colRs.getInt("DATA_TYPE");
+			String type = colRs.getString("TYPE_NAME");
+			int nullable = colRs.getInt("NULLABLE");
+			int length = colRs.getInt("COLUMN_SIZE");
+			// String key = rs.getString("Key");
+			String comment = colRs.getString("REMARKS");
+
+			ColumnSchema col = new ColumnSchema(field);
+			col.setCommon(comment);
+			col.setNullable(nullable);
+			col.setLength(length);
+			col.setPropertyName(namingStrategy.getPropertyName(field, null));
+			// col.setPrimary(key.equalsIgnoreCase("PRI"));
+			col.setType(dataType);
+			col.setTypeName(type);
+			col.setColumnClz(JDBCTypeMapping.defaultTypes.get(dataType));
+			schema.addColumn(col);
+		}
+		colRs.close();
+		// 获取表的主键字段
+		ResultSet keyRes = metaData.getPrimaryKeys(catalog, null, tableName);
+		while (keyRes.next()) {
+			String field = keyRes.getString("COLUMN_NAME");
+			schema.addPrimaryKey(field);
+			schema.setPrimaryField(field, true);
+		}
+		keyRes.close();
+		return schema;
 	}
 
 	private void loadTableColumns(TableSchema schema, Connection conn, String tableName,
