@@ -45,6 +45,13 @@ public class SampleMapperApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		//PageInterceptor pageInterceptor = null;
+		//testMain();
+		testUser();
+	}
+	private void testUser() {
+		System.out.println("test user");
+	}
+	private void testMain() {
 		//insertMember();
 //		insertMemberWithId();
 //		updateMember();
