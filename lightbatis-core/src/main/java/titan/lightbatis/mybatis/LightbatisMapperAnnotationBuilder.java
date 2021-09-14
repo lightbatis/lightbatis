@@ -76,6 +76,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             loadXmlResource();
             configuration.addLoadedResource(resource);
         }
+        configuration.setUseGeneratedKeys(true);
         assistant.setCurrentNamespace(type.getName());
         parseCache();
         parseCacheRef();

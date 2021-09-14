@@ -171,6 +171,9 @@ public class EntityMeta implements Serializable {
             this.keyProperties = new ArrayList<String>();
             this.keyProperties.add(keyProperty);
         } else {
+            if (this.keyProperties.contains(keyProperty)){
+                return;
+            }
             this.keyProperties.add(keyProperty);
         }
     }
@@ -187,6 +190,9 @@ public class EntityMeta implements Serializable {
             this.keyColumns = new ArrayList<String>();
             this.keyColumns.add(keyColumn);
         } else {
+            if (this.keyColumns.contains(keyColumn)){
+                return;
+            }
             this.keyColumns.add(keyColumn);
         }
     }
@@ -248,7 +254,7 @@ public class EntityMeta implements Serializable {
         propertyMap = new HashMap<String, ColumnMeta>(entityClassColumns.size());
         for (ColumnMeta column : entityClassColumns) {
             propertyMap.put(column.getProperty(), column);
-            if (column.isIdentity()) {
+            if (column.isIdentity() & !keyColumns.contains(column.getColumn())) {
                 keyColumns.add(column.getColumn());
                 keyProperties.add(column.getProperty());
             }

@@ -235,7 +235,6 @@ public class MapperProvider {
 							e.printStackTrace(System.err);
 							throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
 						}
-
                     }
                 }
             }

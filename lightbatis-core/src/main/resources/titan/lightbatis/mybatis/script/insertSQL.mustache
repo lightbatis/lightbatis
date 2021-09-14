@@ -1,13 +1,13 @@
-INSERT INTO {{table}}
-<trim prefix="(" suffix=")" suffixOverrides=",">
-    {{#columns}}
-        {{column}},
-    {{/columns}}
-</trim>
-<trim prefix="VALUES(" suffix=")" suffixOverrides=",">
-    {{#values}}
-        {{>column}}
-    {{/values}}
-</trim>
+ INSERT INTO {{table}}
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        {{#columns}}
+            {{column}},
+        {{/columns}}
+    </trim>
+    <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+        {{#values}}
+            {{>column}}
+        {{/values}}
+    </trim>
 
 

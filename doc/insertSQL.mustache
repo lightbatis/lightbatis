@@ -1,0 +1,14 @@
+<selectKey resultType="int" keyProperty="id" order="BEFORE">
+    SELECT LAST_INSERT_ID() AS id
+</selectKey>
+INSERT INTO {{table}}
+<trim prefix="(" suffix=")" suffixOverrides=",">
+    {{#columns}}
+        {{column}},
+    {{/columns}}
+</trim>
+<trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+    {{#values}}
+        {{>column}}
+    {{/values}}
+</trim>

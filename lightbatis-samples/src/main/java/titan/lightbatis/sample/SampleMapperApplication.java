@@ -7,6 +7,7 @@ import java.util.List;
 
 //import com.github.pagehelper.PageInterceptor;
 import com.querydsl.core.types.Predicate;
+import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -45,34 +46,35 @@ public class SampleMapperApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		//PageInterceptor pageInterceptor = null;
-		//testMain();
-		testUser();
+		testMain();
+		//testUser();
 	}
 	private void testUser() {
 		System.out.println("test user");
 	}
 	private void testMain() {
-		//insertMember();
+		Jdbc3KeyGenerator jdbc3KeyGenerator = null;
+		insertMember();
 //		insertMemberWithId();
 //		updateMember();
-		listMember();
+//		listMember();
 //
 //		Member member = getMember();
 //		deleteMember();
-		queryMember();
-		listMembers();
-		listAllMembers();
-		listPredicatesMembers();
-		listMemberFields();
-		listMemberByKindId();
-		listMembersWithName();
-		listMemberNames();
-		listAllMemberNames();
-		getMember();
-		listMemberByPredicate();
-		listMemberByPredicates();
-		listMembersWithIn();
-		testService();
+//		queryMember();
+//		listMembers();
+//		listAllMembers();
+//		listPredicatesMembers();
+//		listMemberFields();
+//		listMemberByKindId();
+//		listMembersWithName();
+//		listMemberNames();
+//		listAllMemberNames();
+//		getMember();
+//		listMemberByPredicate();
+//		listMemberByPredicates();
+//		listMembersWithIn();
+//		testService();
 	}
 	private void testService () {
 		System.out.println("============>>> " + memberCrudService);
@@ -112,7 +114,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 	}
 	private void insertMember() {
 
-		int count = 15;
+		int count = 1;
 		for (int i=0;i < count; i++ ){
 			Member member = new Member();
 			//member.setId(new Long(250 + i));

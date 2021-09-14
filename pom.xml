@@ -58,12 +58,12 @@
             <dependency>
                 <groupId>com.github.lightbatis</groupId>
                 <artifactId>lightbatis-web</artifactId>
-                <version>${lightbatis.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.lightbatis</groupId>
                 <artifactId>lightbatis-core</artifactId>
-                <version>${lightbatis.version}</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -78,6 +78,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.18</version>
+
         </dependency>
     </dependencies>
     <profiles>

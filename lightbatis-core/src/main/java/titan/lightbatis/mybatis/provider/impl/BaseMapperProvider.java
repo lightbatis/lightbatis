@@ -4,17 +4,18 @@
 package titan.lightbatis.mybatis.provider.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
 import titan.lightbatis.generator.GeneratedValueType;
 import titan.lightbatis.generator.SnowflakeIdKeyGenerator;
 import titan.lightbatis.mybatis.MapperBuilder;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
-import titan.lightbatis.mybatis.meta.EntityMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.provider.MapperProvider;
 import titan.lightbatis.mybatis.script.MybatisScriptFactory;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -69,10 +70,12 @@ public class BaseMapperProvider extends MapperProvider {
 		Class<?> entityClass = getEntityClass(ms);
 		StringBuilder sql = new StringBuilder();
 		//获取全部列
+
 		Set<ColumnMeta> columnList = EntityMetaManager.getColumns(entityClass);
-		processKey(sql, entityClass, ms, columnList);
+		Set<ColumnMeta> insertColumns = processKey(sql, entityClass, ms, columnList);
 		try {
-			String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
+			//String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
+			String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), insertColumns, insertColumns);
 			sql.append(insertSQL);
 			//log.debug("==========");
 			//System.out.println(insertSQL);
@@ -98,7 +101,8 @@ public class BaseMapperProvider extends MapperProvider {
 		return null;
 	}
 
-	private void processKey(StringBuilder sql, Class<?> entityClass, MappedStatement ms, Set<ColumnMeta> columnList){
+	private Set<ColumnMeta> processKey(StringBuilder sql, Class<?> entityClass, MappedStatement ms, Set<ColumnMeta> columnList){
+		Set<ColumnMeta> insertColumns = new HashSet<>();
 		for (ColumnMeta column: columnList) {
 			if (column.isIdentity()) {
 				log.debug("column = " + column.getProperty() + " is identity");
@@ -107,13 +111,20 @@ public class BaseMapperProvider extends MapperProvider {
 					if (column.getGenerator().equals(GeneratedValueType.SNOWFLAKE)) {
 						//给 MappedStatement 设置自动增长的值
 						setKeyGenerator(ms,column, new SnowflakeIdKeyGenerator());
-					} else {
+						insertColumns.add(column);
+					} else if (column.getGenerator().equals("JDBC")) {
+						setKeyGenerator(ms,column, new Jdbc3KeyGenerator());
+					}else {
+						insertColumns.add(column);
 						// TODO 其它情况的处理
 						log.warn(ms.getId() + " = " + column.getGenerator() + " 类型的自动增长，目前还不支持！！");
 					}
 				}
+			}else {
+				insertColumns.add(column);
 			}
 		}
+		return insertColumns;
 	}
 
 
