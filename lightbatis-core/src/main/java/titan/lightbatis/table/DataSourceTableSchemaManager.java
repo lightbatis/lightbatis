@@ -378,7 +378,7 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 		schema.setDs(dsname);
 		String catalog = conn.getCatalog();
 		String tableName = rs.getString("TABLE_NAME");
-		//System.out.println("tableName = " + tableName);
+		//System.out.println("=========== tableName = " + tableName);
 		String clzName = namingStrategy.getClassName(tableName);
 		String schemaName = conn.getSchema();
 		schema.setEntityName(clzName);
