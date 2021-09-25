@@ -49,7 +49,7 @@ public class GenericsUtils {
          for(Type type: types) {
              if ((type instanceof ParameterizedType)) {
                  ParameterizedType ptype = (ParameterizedType)type;
-                 System.out.println(ptype.getRawType());
+                 //System.out.println(ptype.getRawType());
                  if (ptype.getRawType().equals(method.getDeclaringClass())) {
                      Type[] argTypes = ptype.getActualTypeArguments();
                      if (index < argTypes.length) {

@@ -198,7 +198,7 @@ public class EntityMetaManager {
 		if (tableMetas.containsKey(entityTable.getName())) {
 			tableMetas.put(entityTable.getName(), entityTable);
 		} else {
-			log.warn( entityTable.getName() + " 表已经存在！");
+			//log.warn( entityTable.getName() + " 表已经存在！");
 		}
 		return entityTable;
 	}
