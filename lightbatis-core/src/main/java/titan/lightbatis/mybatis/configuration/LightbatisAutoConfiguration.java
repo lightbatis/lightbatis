@@ -38,6 +38,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import titan.lightbatis.configuration.MapperConfig;
+import titan.lightbatis.mapper.LightbatisMapper;
 import titan.lightbatis.mybatis.LightbatisProperties;
 import titan.lightbatis.scan.ClassPathMapperScanner;
 import titan.lightbatis.table.DataSourceTableSchemaManager;
@@ -201,11 +203,14 @@ public class LightbatisAutoConfiguration {
 						logger.debug("Using auto-configuration base package '{}'", pkg);
 					}
 				}
-
+				//packages.add("qutm.framework.provider");
+//				for (String packageName: packages) {
+//					System.out.println("扫描包 ======= " + packageName);
+//				}
 				scanner.setAnnotationClass(Mapper.class);
 				//scanner.setMarkerInterface(LightbatisMapper.class);
 				scanner.registerFilters();
-				scanner.doScan(StringUtils.toStringArray(packages));
+				//scanner.doScan(StringUtils.toStringArray(packages));
 			} catch (IllegalStateException ex) {
 				logger.debug("Could not determine auto-configuration package, automatic mapper scanning disabled.", ex);
 			}
