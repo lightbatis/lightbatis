@@ -172,6 +172,9 @@ public class MapperProvider {
                 SqlNode sqlNode = (SqlNode) method.invoke(this, ms);
                 DynamicSqlSource dynamicSqlSource = new DynamicSqlSource(ms.getConfiguration(), sqlNode);
                 setSqlSource(ms, dynamicSqlSource);
+            } else if (SqlSource.class.isAssignableFrom(method.getReturnType())) {
+                SqlSource sqlSource = (SqlSource) method.invoke(this, ms);
+                setSqlSource(ms, sqlSource);
             }
             //第三种，返回xml形式的sql字符串
             else if (String.class.equals(method.getReturnType())) {
@@ -242,7 +245,7 @@ public class MapperProvider {
         throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
     }
 
-    protected void setKeyGenerator(MappedStatement ms, ColumnMeta column, KeyGenerator keyGenerator) {
+    protected static void setKeyGenerator(MappedStatement ms, ColumnMeta column, KeyGenerator keyGenerator) {
         //keyGenerator
         try {
             String table = column.getTableName();

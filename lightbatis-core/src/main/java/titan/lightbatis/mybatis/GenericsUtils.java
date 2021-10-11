@@ -3,8 +3,23 @@ package titan.lightbatis.mybatis;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 public class GenericsUtils {
+
+    public static Class getClassGenericType(Class clazz) {
+        Type[] types= clazz.getGenericInterfaces();
+        if (types.length > 0) {
+            ParameterizedType type = (ParameterizedType) types[0];
+            Type[] argTypes = type.getActualTypeArguments();
+            if (argTypes.length > 0) {
+                Class<?> eType = (Class<?>) argTypes[0];
+                return eType;
+            }
+        }
+
+        return null;
+    }
     /**
      * 通过反射,获得定义Class时声明的父类的范型参数的类型. 如public BookManager extends
      * GenricManager<Book>

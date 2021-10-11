@@ -1,9 +1,11 @@
 package titan.lightbatis.mapper;
 
+import com.querydsl.core.types.Predicate;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.springframework.transaction.annotation.Transactional;
+import titan.lightbatis.annotations.LightSave;
 import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 
 /**
@@ -22,7 +24,15 @@ public interface LightbatisMapper<T> extends QueryMapper<T> {
     @Transactional(readOnly = false)
     int insert(T record);
 
-
+    /**
+     * 如果存在就更新，不存在就插入
+     * @param record
+     * @return
+     */
+    @Transactional(readOnly = false)
+    @LightSave
+    @InsertProvider(type = BaseMapperProvider.class, method = "save")
+    int save(T record);
 
     @UpdateProvider(type = BaseMapperProvider.class, method="updateByPrimaryKey")
     @Transactional(readOnly = false)

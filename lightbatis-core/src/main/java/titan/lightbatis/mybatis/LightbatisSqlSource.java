@@ -13,8 +13,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.session.Configuration;
@@ -23,7 +25,10 @@ import org.apache.ibatis.type.SimpleTypeRegistry;
 import org.springframework.beans.BeanUtils;
 import titan.lightbatis.mybatis.interceptor.PageListInterceptor;
 import titan.lightbatis.mybatis.meta.*;
+import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
+import titan.lightbatis.mybatis.script.MybatisScriptFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -42,6 +47,7 @@ public class LightbatisSqlSource implements SqlSource {
 
 	//private QueryDslBuilder dslBuilder = null;
 	private boolean forCountRow = false;
+	private SqlCommandType commandType = null;
 	/**
 	 *
 	 */
@@ -50,10 +56,22 @@ public class LightbatisSqlSource implements SqlSource {
 		this.mapperMeta = mapperMeta;
 
 		this.forCountRow = forCountRow;
+		this.commandType = SqlCommandType.SELECT;
+	}
+
+	public LightbatisSqlSource(Configuration configuration, MapperMeta meta, SqlCommandType commandType) {
+		this.configuration = configuration;
+		this.mapperMeta = meta;
+
+		this.forCountRow = false;
+		this.commandType = commandType;
 	}
 
 	@Override
 	public BoundSql getBoundSql(Object parameterObject) {
+//		if (SqlCommandType.INSERT == this.commandType) {
+//			return insert(parameterObject);
+//		}
 		QueryDslBuilder dslBuilder = new QueryDslBuilder(configuration);
 		HashMap<String, Object> paramMap = null;
 		boolean paramIsObject = false;
@@ -220,6 +238,22 @@ public class LightbatisSqlSource implements SqlSource {
 		return boundSql;
 	}
 
+//	private BoundSql insert(Object parameterObject) {
+//		StringBuilder sql = new StringBuilder();
+//		Set<ColumnMeta> columnList = EntityMetaManager.getColumns(entityClass);
+//		Set<ColumnMeta> insertColumns = BaseMapperProvider.processKey(sql, entityClass, columnList);
+//		String insertSQL = null;
+//		try {
+//			insertSQL = MybatisScriptFactory.buildSave(tableName, insertColumns, insertColumns);
+//			sql.append(insertSQL);
+//			System.out.println(insertSQL);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//
+//		return null;
+//	}
 
 	public void setEntityClass(Class<?> entityClass) {
 		this.entityClass = entityClass;

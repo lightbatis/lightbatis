@@ -1,0 +1,19 @@
+ INSERT INTO {{table}}
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        {{#columns}}
+            {{column}},
+        {{/columns}}
+    </trim>
+    <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+        {{#values}}
+            {{>column}}
+        {{/values}}
+    </trim>
+ ON DUPLICATE KEY UPDATE
+ <trim prefix="" suffix="" suffixOverrides=",">
+ {{#updateColumns}}
+         <if test="{{property}} != null">
+             {{column}} = {{>columnHolder}},
+         </if>
+ {{/updateColumns}}
+ </trim>

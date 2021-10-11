@@ -6,8 +6,11 @@ package titan.lightbatis.mybatis.provider.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMap;
+import org.apache.ibatis.mapping.SqlSource;
 import titan.lightbatis.generator.GeneratedValueType;
 import titan.lightbatis.generator.SnowflakeIdKeyGenerator;
+import titan.lightbatis.mybatis.ExecuteSqlSource;
 import titan.lightbatis.mybatis.MapperBuilder;
 import titan.lightbatis.mybatis.meta.ColumnMeta;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
@@ -65,7 +68,27 @@ public class BaseMapperProvider extends MapperProvider {
 			return removeSql;
 		}
     }
-    
+    public String save(MappedStatement ms) {
+		//System.out.println("处理.... save On ");
+		Class<?> entityClass = getEntityClass(ms);
+		StringBuilder sql = new StringBuilder();
+		Set<ColumnMeta> columnList = EntityMetaManager.getColumns(entityClass);
+		Set<ColumnMeta> insertColumns = BaseMapperProvider.processKey(sql, entityClass, ms, columnList);
+		Set<ColumnMeta> updateColumns = BaseMapperProvider.processUpdate(sql, entityClass, columnList);
+		try {
+			//String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
+			String insertSQL = MybatisScriptFactory.buildSave(tableName(entityClass), insertColumns, insertColumns, updateColumns);
+			sql.append(insertSQL);
+			//log.debug("==========");
+			//System.out.println(insertSQL);
+			//log.debug(insertSQL);
+//			ExecuteSqlSource sqlSource = new ExecuteSqlSource(ms.getConfiguration(), null, entityClass, tableName(entityClass));
+//			return sqlSource;
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
+		}
+		return sql.toString();
+	}
 	public String insert(MappedStatement ms) {
 		Class<?> entityClass = getEntityClass(ms);
 		StringBuilder sql = new StringBuilder();
@@ -101,7 +124,7 @@ public class BaseMapperProvider extends MapperProvider {
 		return null;
 	}
 
-	private Set<ColumnMeta> processKey(StringBuilder sql, Class<?> entityClass, MappedStatement ms, Set<ColumnMeta> columnList){
+	public static Set<ColumnMeta> processKey(StringBuilder sql, Class<?> entityClass, MappedStatement ms, Set<ColumnMeta> columnList){
 		Set<ColumnMeta> insertColumns = new HashSet<>();
 		for (ColumnMeta column: columnList) {
 			if (column.isIdentity()) {
@@ -127,5 +150,38 @@ public class BaseMapperProvider extends MapperProvider {
 		return insertColumns;
 	}
 
+	public static Set<ColumnMeta> processKey(StringBuilder sql, Class<?> entityClass, Set<ColumnMeta> columnList){
+		Set<ColumnMeta> insertColumns = new HashSet<>();
+		for (ColumnMeta column: columnList) {
+			if (column.isIdentity()) {
+				log.debug("column = " + column.getProperty() + " is identity");
+				//sql.append(LightbatisSQLBuilder.getBindCache(column));
+				if (column.getGenerator() != null) {
+					if (column.getGenerator().equals(GeneratedValueType.SNOWFLAKE)) {
+						//给 MappedStatement 设置自动增长的值
+						insertColumns.add(column);
+					} else if (column.getGenerator().equals("JDBC")) {
+					}else {
+						insertColumns.add(column);
+						// TODO 其它情况的处理
+					}
+				}
+			}else {
+				insertColumns.add(column);
+			}
+		}
+		return insertColumns;
+	}
 
+	public static Set<ColumnMeta> processUpdate(StringBuilder sql, Class<?> entityClass, Set<ColumnMeta> columnList) {
+		Set<ColumnMeta> insertColumns = new HashSet<>();
+		for (ColumnMeta column: columnList) {
+			if (column.isIdentity()) {
+
+			}else {
+				insertColumns.add(column);
+			}
+		}
+		return insertColumns;
+	}
 }

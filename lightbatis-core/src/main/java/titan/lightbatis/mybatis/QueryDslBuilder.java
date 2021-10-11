@@ -55,6 +55,7 @@ public class QueryDslBuilder {
 		for (Predicate predicate: predicates) {
 			queryMetadata.addWhere(predicate);
 		}
+
 		return this;
 	}
 	public void buildQuerySQL(DynamicContext context,  List<ParameterMapping> parameterMappings, boolean forCountRow){

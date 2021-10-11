@@ -27,6 +27,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
+import titan.lightbatis.annotations.LightSave;
 import titan.lightbatis.mybatis.interceptor.PageListInterceptor;
 import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
@@ -45,6 +46,9 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
     private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
     private final Set<Class<? extends Annotation>> sqlAnnotationTypes = new HashSet<Class<? extends Annotation>>();
     private final Set<Class<? extends Annotation>> sqlProviderAnnotationTypes = new HashSet<Class<? extends Annotation>>();
+
+
+    private final Set<Class<? extends Annotation>> sqlInsertAnnotationTypes = new HashSet<Class<? extends Annotation>>();
 
     private final Configuration configuration;
     private final MapperBuilderAssistant assistant;
@@ -66,6 +70,8 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         sqlProviderAnnotationTypes.add(InsertProvider.class);
         sqlProviderAnnotationTypes.add(UpdateProvider.class);
         sqlProviderAnnotationTypes.add(DeleteProvider.class);
+
+        sqlInsertAnnotationTypes.add(LightSave.class);
     }
 
     @Override
@@ -263,12 +269,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         LanguageDriver languageDriver = getLanguageDriver(method);
         MapperBuilder mapperBuilder= new MapperBuilder();
 
-        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder);
 
-        MapperMeta meta = provider.getMapperMate();
-        if (meta == null) {
-            meta = new MapperMeta();
-        }
         //DynamicMethodSqlSource sqlSource = createDynaticSqlSource(method, parameterTypeClass, languageDriver);
 
         Options options = method.getAnnotation(Options.class);
@@ -334,6 +335,12 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             resultMapId = sb.toString();
         } else if (isSelect) {
             resultMapId = parseResultMap(method);
+        }
+
+        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder, sqlCommandType);
+        MapperMeta meta = provider.getMapperMate();
+        if (meta == null) {
+            meta = new MapperMeta();
         }
 
         //将当前的 MappedStatementId 放到 SQLSource 中去。
@@ -491,6 +498,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         try {
             Class<? extends Annotation> sqlAnnotationType = getSqlAnnotationType(method);
             Class<? extends Annotation> sqlProviderAnnotationType = getSqlProviderAnnotationType(method);
+            Class<? extends Annotation> sqlExecuteAnnoationType = null;//chooseAnnotationType(method, sqlInsertAnnotationTypes);
             if (sqlAnnotationType != null) {
                 if (sqlProviderAnnotationType != null) {
                     throw new BindingException(
@@ -502,6 +510,9 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             } else if (sqlProviderAnnotationType != null) {
                 Annotation sqlProviderAnnotation = method.getAnnotation(sqlProviderAnnotationType);
                 return new ProviderSqlSource(assistant.getConfiguration(), sqlProviderAnnotation, type, method);
+            } else if (sqlExecuteAnnoationType != null) {
+//                Annotation executeAnnotation = method.getAnnotation(sqlExecuteAnnoationType);
+//                return new ExecuteSqlSource(assistant.getConfiguration(), executeAnnotation, type, method);
             }
             return null;
         } catch (Exception e) {
@@ -525,6 +536,14 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
      * @return
      */
     private SqlCommandType guessSqlCommandType(Method method) {
+        Class<? extends Annotation> type = chooseAnnotationType(method, sqlInsertAnnotationTypes);
+        if (type != null) {
+            if (type == LightSave.class) {
+                return SqlCommandType.INSERT;
+            }
+        }
+
+
         return SqlCommandType.SELECT;
     }
 

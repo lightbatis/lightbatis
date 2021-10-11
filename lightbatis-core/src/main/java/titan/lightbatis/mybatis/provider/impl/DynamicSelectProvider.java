@@ -27,11 +27,13 @@
 package titan.lightbatis.mybatis.provider.impl;
 
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.reflection.ParamNameResolver;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import titan.lightbatis.exception.LightbatisException;
+import titan.lightbatis.mybatis.ExecuteSqlSource;
 import titan.lightbatis.mybatis.GenericsUtils;
 import titan.lightbatis.mybatis.LightbatisSqlSource;
 import titan.lightbatis.mybatis.MapperBuilder;
@@ -54,12 +56,14 @@ public class DynamicSelectProvider extends MapperProvider{
 	private MapperMeta mapperMate = null;
 	private Configuration configuration = null;
 	private ParamNameResolver parameterResolver = null;
-	public DynamicSelectProvider(Configuration config, Method method, Class<?> mapperClass, MapperBuilder mapperHelper) {
+	private SqlCommandType commandType = null;
+	public DynamicSelectProvider(Configuration config, Method method, Class<?> mapperClass, MapperBuilder mapperHelper, SqlCommandType sqlCommandType) {
 		super(mapperClass, mapperHelper);
 		parameterResolver= new ParamNameResolver(config, method);
 		this.mapperMate =  MapperMetaManger.parse(method);
 		this.method = method;
 		this.configuration = config;
+		this.commandType = sqlCommandType;
 	}
 
 	public MapperMeta getMapperMate () {
@@ -71,14 +75,24 @@ public class DynamicSelectProvider extends MapperProvider{
 	 * @param mappedStatementId
 	 */
 	public SqlSource buildDynamicSQL(String mappedStatementId, boolean forCountRow) throws Exception{
-		//如果查询语句中出现了 Path, OrderSpecifier 类型时
-		LightbatisSqlSource sqlSource = null;
+		if (SqlCommandType.INSERT.equals(commandType) ) {
+//			Class<?> entityClass = getInsertEntityClass(mappedStatementId, method);
+//			String tableName = tableName(entityClass);
+//
+//			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName);
+//
+//			return sqlSource;
+			return null;
+		}else {
+			//如果查询语句中出现了 Path, OrderSpecifier 类型时
+			LightbatisSqlSource sqlSource = null;
 			sqlSource = new LightbatisSqlSource(this.configuration, mapperMate, forCountRow);
 			Class<?> entityClass = getEntityClass(mappedStatementId, method);
 			String tableName = tableName(entityClass);
 			sqlSource.setEntityClass(entityClass);
 			sqlSource.setTableName(tableName);
-		return sqlSource;
+			return sqlSource;
+		}
 	}
 
 	/**
@@ -92,7 +106,34 @@ public class DynamicSelectProvider extends MapperProvider{
 		// 修改返回值类型为实体类型
 		setResultType(mappedStatement, entityClass);
 	}
+	public Class<?> getInsertEntityClass(String msId, Method method) {
+		if (entityClassMap.containsKey(msId)) {
+			return entityClassMap.get(msId);
+		}else {
+			Class<?> entityClass = null;
 
+			Class<?> tmpClz = GenericsUtils.getClassGenericType(mapperClass);
+			if (tmpClz != null) {
+				entityClass = tmpClz;
+			}
+			if (entityClass != null) {
+				if (entityClass.equals(Object.class)) {
+					return null;
+				}
+				// 获取该类型后，第一次对该类型进行初始化
+				try {
+					EntityMetaManager.initEntityNameMap(entityClass, mapperBuilder.getConfig(),msId);
+					entityClassMap.put(msId, entityClass);
+					return entityClass;
+				} catch (Exception e) {
+					System.err.println(msId + " = " + method + " 加载失败！");
+					e.printStackTrace(System.err);
+					throw new LightbatisException("无法获取Mapper<T>泛型类型:" + msId);
+				}
+			}
+			return null;
+		}
+	}
 	public Class<?> getEntityClass(String msId, Method method) {
 		if (entityClassMap.containsKey(msId)) {
 			return entityClassMap.get(msId);

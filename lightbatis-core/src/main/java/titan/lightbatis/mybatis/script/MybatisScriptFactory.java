@@ -136,5 +136,15 @@ public class MybatisScriptFactory {
 		return script;
 	}
 
+	public static String buildSave (String table, Set<ColumnMeta> columns, Set values,Set<ColumnMeta> updateColumns) throws IOException {
+		Map<String, Object> param = new HashMap<>();
+		param.put("table", table);
+		param.put("columns", columns);
+		param.put("values", values);
+		param.put("updateColumns", updateColumns);
+		Template template = handlebars.compile("saveSQL");
+		String script = template.apply(param);
+		return script;
+	}
 
 }
