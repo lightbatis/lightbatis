@@ -29,7 +29,9 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
+import titan.lightbatis.annotations.LightDelete;
 import titan.lightbatis.annotations.LightSave;
+import titan.lightbatis.annotations.LightUpdate;
 import titan.lightbatis.mybatis.interceptor.PageListInterceptor;
 import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
@@ -50,7 +52,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
     private final Set<Class<? extends Annotation>> sqlProviderAnnotationTypes = new HashSet<Class<? extends Annotation>>();
 
 
-    private final Set<Class<? extends Annotation>> sqlInsertAnnotationTypes = new HashSet<Class<? extends Annotation>>();
+    private final Set<Class<? extends Annotation>> sqlInsertAnnotationTypes = MapperMetaManger.sqlInsertAnnotationTypes;
 
     private final Configuration configuration;
     private final MapperBuilderAssistant assistant;
@@ -73,7 +75,9 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         sqlProviderAnnotationTypes.add(UpdateProvider.class);
         sqlProviderAnnotationTypes.add(DeleteProvider.class);
 
-        sqlInsertAnnotationTypes.add(LightSave.class);
+//        sqlInsertAnnotationTypes.add(LightSave.class);
+//        sqlInsertAnnotationTypes.add(LightUpdate.class);
+//        sqlInsertAnnotationTypes.add(LightDelete.class);
     }
 
     @Override
@@ -290,7 +294,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         StatementType statementType = StatementType.PREPARED;
         ResultSetType resultSetType = ResultSetType.FORWARD_ONLY;
         //根据方法猜测查询的类型。
-        SqlCommandType sqlCommandType = guessSqlCommandType(method);
+        SqlCommandType sqlCommandType = MapperMetaManger.guessSqlCommandType(method);
 
         boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
         boolean flushCache = !isSelect;
@@ -553,10 +557,21 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         if (type != null) {
             if (type == LightSave.class) {
                 return SqlCommandType.INSERT;
+            } else if (type == LightUpdate.class) {
+                return SqlCommandType.UPDATE;
+            } else if (type == LightDelete.class) {
+                return SqlCommandType.DELETE;
+            }
+        } else {
+            String methodName = method.getName();
+            if (methodName.startsWith("save")) {
+                return SqlCommandType.INSERT;
+            }else if (methodName.startsWith("update")) {
+                return SqlCommandType.UPDATE;
+            }else if (methodName.startsWith("delete")) {
+                return SqlCommandType.DELETE;
             }
         }
-
-
         return SqlCommandType.SELECT;
     }
 

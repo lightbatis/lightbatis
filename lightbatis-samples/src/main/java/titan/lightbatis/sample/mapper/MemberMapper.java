@@ -5,6 +5,8 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+import titan.lightbatis.annotations.LightUpdate;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.mapper.LightbatisMapper;
@@ -101,4 +103,10 @@ public interface MemberMapper extends LightbatisMapper<Member> {
      */
     @Select("select id, member_name as memberName from member where kind_id=#{kindId}")
     public List<MemberName> listAllMemberNames(Integer kindId);
+
+    @LightUpdate()
+    public Integer updateMemberName(String memberName, Predicate... predicates);
+
+    public int deleteMemberById(Long id);
+
 }

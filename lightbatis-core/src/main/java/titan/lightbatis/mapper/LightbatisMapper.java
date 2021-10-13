@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.springframework.transaction.annotation.Transactional;
+import titan.lightbatis.annotations.LightDelete;
 import titan.lightbatis.annotations.LightSave;
 import titan.lightbatis.mybatis.provider.impl.BaseMapperProvider;
 
@@ -31,7 +32,6 @@ public interface LightbatisMapper<T> extends QueryMapper<T> {
      */
     @Transactional(readOnly = false)
     @LightSave
-    //@InsertProvider(type = BaseMapperProvider.class, method = "save")
     int save(T record);
 
     @UpdateProvider(type = BaseMapperProvider.class, method="updateByPrimaryKey")
@@ -41,4 +41,8 @@ public interface LightbatisMapper<T> extends QueryMapper<T> {
     @DeleteProvider(type = BaseMapperProvider.class, method="deleteByPrimaryKey")
     @Transactional(readOnly = false)
     int deleteByPrimaryKey(T record);
+
+    @Transactional(readOnly = false)
+    @LightDelete
+    int delete(Predicate... predicates);
 }

@@ -40,6 +40,7 @@ public class LightbatisSQLSerializer extends SQLSerializer {
 		this.maxLimit = (Integer) metaObject.getValue("maxLimit");
 	}
 
+    @Override
     protected void serializeForQuery(QueryMetadata metadata, boolean forCountRow) {
         boolean oldInSubquery = inSubquery;
         inSubquery = inSubquery || getLength() > 0;

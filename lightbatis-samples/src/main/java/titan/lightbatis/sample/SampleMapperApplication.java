@@ -28,7 +28,7 @@ import titan.lightbatis.sample.mapper.MemberMapper;
 import titan.lightbatis.sample.service.MemberCrudService;
 import titan.lightbatis.web.annotations.EnableLightbatisWeb;
 
-@Lightbatis()
+@Lightbatis(basePackages = {"titan.lightbatis.web.mapper","titan.lightbatis.sample.mapper"})
 @EnableLightbatisWeb()
 @SpringBootApplication
 public class SampleMapperApplication implements CommandLineRunner {
@@ -53,8 +53,10 @@ public class SampleMapperApplication implements CommandLineRunner {
 		System.out.println("test user");
 	}
 	private void testMain() {
-		Jdbc3KeyGenerator jdbc3KeyGenerator = null;
-		insertMember();
+		deleteMemberById();
+		deleteMemberBy();
+		//insertMember();
+//		updateMemberWhere();
 //		insertMemberWithId();
 //		updateMember();
 //		listMember();
@@ -124,6 +126,20 @@ public class SampleMapperApplication implements CommandLineRunner {
 			System.out.println(" insert id " + member.getId());
 
 		}
+	}
+
+	private void updateMemberWhere() {
+		QMember member = QMember.member;
+		memberMapper.updateMemberName("UPdate Where ", member.id.eq(1L));
+	}
+	private void deleteMemberById() {
+		int count = memberMapper.deleteMemberById(1L);
+		System.out.println("count = " + count);
+	}
+	private void deleteMemberBy() {
+		QMember member = QMember.member;
+		int count = memberMapper.delete(member.id.gt(2));
+		System.out.println("count = " + count);
 	}
 
 	private void insertMemberWithId() {

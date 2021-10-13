@@ -39,6 +39,10 @@ public class MapperMeta implements Serializable {
 	 */
 	private Set<ParamMeta> predicateParams = new HashSet<> ();
 
+	/**
+	 * 更新字段
+	 */
+	private Set<ParamMeta> updateParams = new HashSet<>();
 
 	/**
 	 * 本次使用中是否包括了 Path, OrderSpecifier 等类型 @see Path
@@ -76,4 +80,5 @@ public class MapperMeta implements Serializable {
 
 	public void addPredicate(ParamMeta meta) { predicateParams.add(meta);}
 
+	public void addUpdate(ParamMeta meta) {this.updateParams.add(meta);}
 }

@@ -76,11 +76,20 @@ public class DynamicSelectProvider extends MapperProvider{
 		if (SqlCommandType.INSERT.equals(commandType) ) {
 			Class<?> entityClass = getInsertEntityClass(mappedStatementId, method);
 			String tableName = tableName(entityClass);
-//			SaveOnSqlSource saveSource =new SaveOnSqlSource(this.configuration, mapperClass,method, entityClass, tableName);
-//			return saveSource;
-			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName);
+			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName, commandType);
 			return sqlSource;
-		}else {
+		} else if (SqlCommandType.UPDATE.equals(commandType)) {
+			Class<?> entityClass = getInsertEntityClass(mappedStatementId, method);
+			String tableName= tableName(entityClass);
+			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName, commandType);
+			return sqlSource;
+		} else if (SqlCommandType.DELETE.equals(commandType)) {
+			Class<?> entityClass = getInsertEntityClass(mappedStatementId, method);
+			String tableName= tableName(entityClass);
+			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName, commandType);
+			return sqlSource;
+		}
+		else {
 			//如果查询语句中出现了 Path, OrderSpecifier 类型时
 			LightbatisSqlSource sqlSource = null;
 			sqlSource = new LightbatisSqlSource(this.configuration, mapperMate, forCountRow);
