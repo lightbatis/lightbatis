@@ -77,7 +77,7 @@ public class QueryDslBuilder {
 		LightbatisSQLSerializer sqlSerializer = new LightbatisSQLSerializer(new com.querydsl.sql.Configuration(sqlTemplates));
 		sqlSerializer.serialize(queryMetadata,forCountRow);
 		String sql = sqlSerializer.toString();
-		context.appendSql(sql);
+		//context.appendSql(sql);
 		buildSQL(context, sql, sqlSerializer, parameterMappings);
 //		List<Object> constantList = sqlSerializer.getConstants();
 //		List<Path<?>> fields = sqlSerializer.getConstantPaths();
