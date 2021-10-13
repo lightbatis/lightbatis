@@ -77,7 +77,7 @@ public class BaseMapperProvider extends MapperProvider {
 		Set<ColumnMeta> updateColumns = BaseMapperProvider.processUpdate(sql, entityClass, columnList);
 		try {
 			//String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
-			String insertSQL = MybatisScriptFactory.buildSave(tableName(entityClass), insertColumns, insertColumns, updateColumns);
+			String insertSQL = MybatisScriptFactory.buildSave(tableName(entityClass), insertColumns, insertColumns, updateColumns, true);
 			sql.append(insertSQL);
 			//log.debug("==========");
 			//System.out.println(insertSQL);

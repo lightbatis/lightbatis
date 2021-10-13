@@ -10,23 +10,23 @@ spring:
       additional-paths: src/main/java, src/main/resources
       exclude: WEB-INF/**
   datasource:
-#    username: root
-#    password: 123456
-#    driver-class-name: com.mysql.jdbc.Driver
-    #url: jdbc:mysql://localhost:3306/atnong_mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true
-    url: jdbc:mysql://39.99.191.219:3306/atnong_mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useInformationSchema=true
-    driver-class-name: com.mysql.jdbc.Driver
-    username: root
-    #password: nong@2w20
-    password: 123456
-    #方言
-    #dialect: postgresql
-    hikari: 
-      maximumPoolSize: 10
-      minimumIdle: 2
-      idleTimeout: 600000
-      connectionTimeout: 30000
-      maxLifetime: 1800000
+    url: jdbc:mysql://39.104.25.76:13306/qutmtrade?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&zeroDateTimeBehavior=convertToNull
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: bitrade
+    password: bitrade093867koio
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: druid
+        login-password: druid
+      test-on-borrow: false
+      test-while-idle: true
+      test-on-return: false
+      validation-query: SELECT 1
     
 
 

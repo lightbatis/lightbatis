@@ -31,7 +31,7 @@ public interface LightbatisMapper<T> extends QueryMapper<T> {
      */
     @Transactional(readOnly = false)
     @LightSave
-    @InsertProvider(type = BaseMapperProvider.class, method = "save")
+    //@InsertProvider(type = BaseMapperProvider.class, method = "save")
     int save(T record);
 
     @UpdateProvider(type = BaseMapperProvider.class, method="updateByPrimaryKey")

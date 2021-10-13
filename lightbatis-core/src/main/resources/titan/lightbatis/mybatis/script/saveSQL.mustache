@@ -12,8 +12,11 @@
  ON DUPLICATE KEY UPDATE
  <trim prefix="" suffix="" suffixOverrides=",">
  {{#updateColumns}}
-         <if test="{{property}} != null">
-             {{column}} = {{>columnHolder}},
-         </if>
+     <if test="{{property}} != null">
+         {{#identity}}
+             {{#updateOn}}{{column}} = {{>columnHolder}},{{/updateOn}}
+         {{/identity}}
+         {{^identity}}{{column}} = {{>columnHolder}},{{/identity}}
+     </if>
  {{/updateColumns}}
  </trim>

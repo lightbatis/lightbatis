@@ -26,6 +26,7 @@
  */
 package titan.lightbatis.mybatis.provider.impl;
 
+import org.apache.ibatis.builder.annotation.ProviderSqlSource;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
@@ -33,10 +34,7 @@ import org.apache.ibatis.reflection.ParamNameResolver;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import titan.lightbatis.exception.LightbatisException;
-import titan.lightbatis.mybatis.ExecuteSqlSource;
-import titan.lightbatis.mybatis.GenericsUtils;
-import titan.lightbatis.mybatis.LightbatisSqlSource;
-import titan.lightbatis.mybatis.MapperBuilder;
+import titan.lightbatis.mybatis.*;
 import titan.lightbatis.mybatis.meta.EntityMetaManager;
 import titan.lightbatis.mybatis.meta.MapperMeta;
 import titan.lightbatis.mybatis.meta.MapperMetaManger;
@@ -76,13 +74,12 @@ public class DynamicSelectProvider extends MapperProvider{
 	 */
 	public SqlSource buildDynamicSQL(String mappedStatementId, boolean forCountRow) throws Exception{
 		if (SqlCommandType.INSERT.equals(commandType) ) {
-//			Class<?> entityClass = getInsertEntityClass(mappedStatementId, method);
-//			String tableName = tableName(entityClass);
-//
-//			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName);
-//
-//			return sqlSource;
-			return null;
+			Class<?> entityClass = getInsertEntityClass(mappedStatementId, method);
+			String tableName = tableName(entityClass);
+//			SaveOnSqlSource saveSource =new SaveOnSqlSource(this.configuration, mapperClass,method, entityClass, tableName);
+//			return saveSource;
+			ExecuteSqlSource sqlSource =new ExecuteSqlSource(this.configuration, mapperMate,entityClass, tableName);
+			return sqlSource;
 		}else {
 			//如果查询语句中出现了 Path, OrderSpecifier 类型时
 			LightbatisSqlSource sqlSource = null;

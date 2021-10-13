@@ -1,11 +1,14 @@
 package titan.lightbatis.web;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import titan.lightbatis.annotations.Lightbatis;
 
 
 @SpringBootApplication
-
+//@MapperScan("titan.lightbatis.web.mapper")
+//@Lightbatis(value = {"titan.lightbatis.web.mapper"})
 public class TitanDalApplication {
 
 //    @Autowired

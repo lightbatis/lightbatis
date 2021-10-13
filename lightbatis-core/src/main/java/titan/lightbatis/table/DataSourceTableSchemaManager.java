@@ -35,9 +35,9 @@ import java.util.*;
 @Slf4j
 public class DataSourceTableSchemaManager implements ITableSchemaManager, InitializingBean, ApplicationContextAware {
 
-	@Value("${snowflake.workerId}")
+	@Value("${snowflake.workerId:1}")
 	private long workerId;
-	@Value("${snowflake.datacenterId}")
+	@Value("${snowflake.datacenterId:1}")
 	private long datacenterId;
 	@Value("${dal.startup.loadtable:true}")
 	private boolean startupLoadTable = true;

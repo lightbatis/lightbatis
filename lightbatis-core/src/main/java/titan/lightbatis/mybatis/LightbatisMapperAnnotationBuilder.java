@@ -19,6 +19,8 @@ import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.parsing.PropertyParser;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.reflection.TypeParameterResolver;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
@@ -257,6 +259,15 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             } catch (Exception e) {
                 configuration.addIncompleteMethod(new MethodResolver(this, method));
             }
+        }else {
+//            Class<? extends Annotation> sqlExecuteAnnoationType = chooseAnnotationType(method, sqlInsertAnnotationTypes);
+//            if (method.getName().equals("save")) {
+//                final String mappedStatementId = type.getName() + "." + method.getName();
+//                //System.out.println("save ..............");
+//                //MappedStatement statement = configuration.getMappedStatement(mappedStatementId);
+//                //MetaObject meta = SystemMetaObject.forObject(statement);
+//                //meta.setValue("sqlSource",new SqlSourceProxy(sqlSource));
+//            }
         }
     }
 
@@ -284,6 +295,19 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
         boolean flushCache = !isSelect;
         boolean useCache = isSelect;
+
+
+        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder, sqlCommandType);
+        MapperMeta meta = provider.getMapperMate();
+        if (meta == null) {
+            meta = new MapperMeta();
+        }
+
+        //将当前的 MappedStatementId 放到 SQLSource 中去。
+        //sqlSource.setMappedStatementId(mappedStatementId);
+        //创建 SQL
+        SqlSource sqlSource = provider.buildDynamicSQL(mappedStatementId, false);
+
 
         KeyGenerator keyGenerator;
         String keyProperty = "id";
@@ -337,16 +361,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             resultMapId = parseResultMap(method);
         }
 
-        DynamicSelectProvider provider = new DynamicSelectProvider(configuration,method, type, mapperBuilder, sqlCommandType);
-        MapperMeta meta = provider.getMapperMate();
-        if (meta == null) {
-            meta = new MapperMeta();
-        }
 
-        //将当前的 MappedStatementId 放到 SQLSource 中去。
-        //sqlSource.setMappedStatementId(mappedStatementId);
-        //创建 SQL
-        SqlSource sqlSource = provider.buildDynamicSQL(mappedStatementId, false);
 
         MappedStatement mappedStatement = assistant.addMappedStatement(mappedStatementId, sqlSource, statementType, sqlCommandType, fetchSize,
                 timeout,
@@ -510,10 +525,8 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             } else if (sqlProviderAnnotationType != null) {
                 Annotation sqlProviderAnnotation = method.getAnnotation(sqlProviderAnnotationType);
                 return new ProviderSqlSource(assistant.getConfiguration(), sqlProviderAnnotation, type, method);
-            } else if (sqlExecuteAnnoationType != null) {
-//                Annotation executeAnnotation = method.getAnnotation(sqlExecuteAnnoationType);
-//                return new ExecuteSqlSource(assistant.getConfiguration(), executeAnnotation, type, method);
             }
+
             return null;
         } catch (Exception e) {
             throw new BuilderException("Could not find value method on SQL annotation.  Cause: " + e, e);
