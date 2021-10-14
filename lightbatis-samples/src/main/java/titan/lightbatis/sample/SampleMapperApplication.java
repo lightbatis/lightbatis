@@ -53,9 +53,9 @@ public class SampleMapperApplication implements CommandLineRunner {
 		System.out.println("test user");
 	}
 	private void testMain() {
-		deleteMemberById();
-		deleteMemberBy();
-		//insertMember();
+//		deleteMemberById();
+//		deleteMemberBy();
+//		insertMember();
 //		updateMemberWhere();
 //		insertMemberWithId();
 //		updateMember();
@@ -67,7 +67,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		listMembers();
 //		listAllMembers();
 //		listPredicatesMembers();
-//		listMemberFields();
+		listMemberFields();
 //		listMemberByKindId();
 //		listMembersWithName();
 //		listMemberNames();
@@ -116,7 +116,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 	}
 	private void insertMember() {
 
-		int count = 1;
+		int count = 10;
 		for (int i=0;i < count; i++ ){
 			Member member = new Member();
 			//member.setId(new Long(250 + i));

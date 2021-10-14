@@ -1,5 +1,6 @@
 package titan.lightbatis.web.service;
 
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import titan.lightbatis.mapper.CrudMapper;
@@ -67,6 +68,13 @@ public abstract class CrudService<D extends CrudMapper<T, PK>, T,PK> {
         return dao.insert(entity);
     }
 
+    public int save(T entity) {
+        return dao.save(entity);
+    }
+
+    public int delete(Predicate... predicates) {
+        return dao.delete(predicates);
+    }
     /**
      * 根据主键更新一条记录
      * @param entity

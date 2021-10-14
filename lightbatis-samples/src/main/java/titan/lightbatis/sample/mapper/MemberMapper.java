@@ -6,6 +6,7 @@ import com.querydsl.core.types.Predicate;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import titan.lightbatis.annotations.LightDelete;
 import titan.lightbatis.annotations.LightUpdate;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.result.Page;
@@ -106,7 +107,7 @@ public interface MemberMapper extends LightbatisMapper<Member> {
 
     @LightUpdate()
     public Integer updateMemberName(String memberName, Predicate... predicates);
-
+    @LightDelete()
     public int deleteMemberById(Long id);
 
 }
