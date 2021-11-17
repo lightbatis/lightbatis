@@ -1,6 +1,7 @@
 package titan.lightbatis.pagehelper;
 
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.ImmutableSet;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.RowBounds;
 import titan.lightbatis.result.PageList;
@@ -18,6 +19,7 @@ public class PageListHelper extends PageHelper {
         if (pageList instanceof PageList){
             return pageList;
         }
+//        ImmutableSet.of()
         return super.afterPage(pageList, parameterObject, rowBounds);
     }
 }
