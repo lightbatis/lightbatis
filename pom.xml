@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.lightbatis</groupId>
     <artifactId>lightbatis-master</artifactId>
-    <version>1.1.11</version>
+    <version>1.1.12</version>
     <packaging>pom</packaging>
     <name>统一数据访问层根工程</name>
 
@@ -66,6 +66,17 @@
                 <artifactId>lightbatis-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- swagger cloud start -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>1.9.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -74,6 +85,7 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
             <version>2.7</version>
+            <scope>provided</scope>
         </dependency>
         <!--lombok -->
         <dependency>

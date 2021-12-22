@@ -1,5 +1,7 @@
 package titan.lightbatis.common;
 
+import titan.lightbatis.result.PageList;
+
 public class BaseController {
 
     protected <T> CommonResult<T> success(T data) {

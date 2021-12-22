@@ -237,7 +237,8 @@ public class EntityMetaManager {
 		if (tableSchema == null) {
 			System.err.println("table is null " + entityMeta.getName());
 			log.error("table is null " + entityMeta.getName());
-			throw new LightbatisException(entityMeta.getName() + " 没有找到！");
+			//throw new LightbatisException(entityMeta.getName() + " 没有找到！");
+			return null;
 		}
 		// 处理所有列
 		List<FieldMeta> fields = null;
@@ -331,15 +332,17 @@ public class EntityMetaManager {
 		if (StringUtils.isEmpty(entityColumn.getTableName())) {
 			entityColumn.setTableName(entityMeta.getName());
 		}
-
-		ColumnSchema colSchema = tableSchema.getColumn(columnName);
-		if (colSchema != null) {
-			entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
-		} else {
-			log.error(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
-			//throw new NullPointerException(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
-			return null;
+		if (tableSchema != null) {
+			ColumnSchema colSchema = tableSchema.getColumn(columnName);
+			if (colSchema != null) {
+				entityColumn.setJdbcType(JdbcType.forCode(colSchema.getType()));
+			} else {
+				log.error(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
+				//throw new NullPointerException(entityMeta.getEntityClass() + " 没有找到与实体表 " + tableSchema.getTableName() + " 与之对应的列  " + columnName);
+				return null;
+			}
 		}
+
 
 		entityColumn.setProperty(field.getName());
 		entityColumn.setColumn(columnName);

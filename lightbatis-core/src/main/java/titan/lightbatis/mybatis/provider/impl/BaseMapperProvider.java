@@ -90,13 +90,14 @@ public class BaseMapperProvider extends MapperProvider {
 		return sql.toString();
 	}
 	public String insert(MappedStatement ms) {
-		Class<?> entityClass = getEntityClass(ms);
+
 		StringBuilder sql = new StringBuilder();
 		//获取全部列
 
-		Set<ColumnMeta> columnList = EntityMetaManager.getColumns(entityClass);
-		Set<ColumnMeta> insertColumns = processKey(sql, entityClass, ms, columnList);
 		try {
+			Class<?> entityClass = getEntityClass(ms);
+			Set<ColumnMeta> columnList = EntityMetaManager.getColumns(entityClass);
+			Set<ColumnMeta> insertColumns = processKey(sql, entityClass, ms, columnList);
 			//String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), EntityMetaManager.getColumns(entityClass), columnList);
 			String insertSQL = MybatisScriptFactory.buildInsert(tableName(entityClass), insertColumns, insertColumns);
 			sql.append(insertSQL);
