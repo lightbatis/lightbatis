@@ -1,8 +1,6 @@
 package titan.lightbatis.mybatis;
 
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -203,16 +201,20 @@ public class ExecuteSqlSource implements SqlSource {
             Object obj = paramMap.get(param.getName());
             if (path instanceof StringPath) {
                 StringPath fieldPath = (StringPath)path;
-                pathExpressionMap.put(fieldPath, fieldPath.eq(obj.toString()));
+                Constant<String> value = ConstantImpl.create(String.class, obj.toString());
+                pathExpressionMap.put(fieldPath, value);
             } else if (path instanceof NumberPath) {
                 NumberPath fieldPath = (NumberPath)path;
-                pathExpressionMap.put(fieldPath, fieldPath.eq((Number)obj));
+                Constant<Number> value = ConstantImpl.create(Number.class, (Number)obj);
+                pathExpressionMap.put(fieldPath, value);
             } else if (path instanceof DatePath) {
                 DatePath fieldPath = (DatePath)path;
-                pathExpressionMap.put(fieldPath, fieldPath.eq((Date)obj));
+                Constant<Date> value = ConstantImpl.create(Date.class, (Date)obj);
+                pathExpressionMap.put(fieldPath, value);
             } else if (path instanceof DateTimePath) {
                 DateTimePath fieldPath = (DateTimePath) path;
-                pathExpressionMap.put(fieldPath, fieldPath.eq((Timestamp)obj));
+                Constant<Timestamp> value = ConstantImpl.create(Timestamp.class, (Timestamp)obj);
+                pathExpressionMap.put(fieldPath, value);
             }
         }
 
