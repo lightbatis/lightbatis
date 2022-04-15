@@ -64,10 +64,10 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		Member member = getMember();
 //		deleteMember();
 //		queryMember();
-//		listMembers();
+		listMembers();
 //		listAllMembers();
 //		listPredicatesMembers();
-		listMemberFields();
+//		listMemberFields();
 //		listMemberByKindId();
 //		listMembersWithName();
 //		listMemberNames();
@@ -77,6 +77,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		listMemberByPredicates();
 //		listMembersWithIn();
 //		testService();
+//		selectMember();
 	}
 	private void testService () {
 		System.out.println("============>>> " + memberCrudService);
@@ -112,7 +113,10 @@ public class SampleMapperApplication implements CommandLineRunner {
 	}
 	private void selectMember() {
 		QMember member = QMember.member;
-		memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(),new Page(1,10));
+		PageList<Member> members = memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(),new Page(1,10));
+		for (Member m : members) {
+			System.out.println(m);
+		}
 	}
 	private void insertMember() {
 
@@ -194,7 +198,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 
 	private void listMembers() {
 		QMember member = QMember.member;
-		List<Member> members =memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(), new Page(3,2));
+		List<Member> members =memberMapper.listMembers(member.id, member.memberName, 1, member.id.asc(), new Page(3,1));
 		printMembers(members);
 		for (Member m : members) {
 
