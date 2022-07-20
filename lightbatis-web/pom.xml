@@ -15,7 +15,7 @@
 		<java.version>1.8</java.version>
 		<mapper.version>3.4.0</mapper.version>
 		<mysql.version>5.1.39</mysql.version>
-		<mysql-connector.version>8.0.19</mysql-connector.version>
+		<mysql-connector.version>8.0.28</mysql-connector.version>
 		<springfox.version>2.9.2</springfox.version>
 		<druid.version>1.2.6</druid.version>
 		<mybatis.version>3.4.6</mybatis.version>
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.19</version>
+			<version>8.0.28</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity -->
