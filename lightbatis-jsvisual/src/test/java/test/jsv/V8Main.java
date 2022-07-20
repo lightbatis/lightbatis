@@ -58,9 +58,9 @@ public class V8Main {
     }
 
     private static void testExpr() throws IOException {
-        File file = new File("/Users/lifei/workspace/lightbatis/lightbatis-jsvisual/src/test/resources/waist.js");
+        File file = new File("/Users/lifei/myspace/lightbatis/lightbatis-jsvisual/src/test/resources/waist.js");
         String script = FileUtils.readFileToString(file, "UTF-8");
-        System.out.println(script);
+        //System.out.println(script);
         HashMap<String, Object> params = new HashMap<>();
         params.put("waist", 35);
         params.put("gender", 1);

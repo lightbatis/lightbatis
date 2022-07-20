@@ -459,3 +459,7 @@ server:
 ### 使用 handlebars 用来动态生成 MyBatis SQL  
 
 Handlebars https://handlebarsjs.com/guide/
+
+# 版本说明：
+* 1.1.15
+  * 增加了一个重要功能，可以动态增加 SQL。

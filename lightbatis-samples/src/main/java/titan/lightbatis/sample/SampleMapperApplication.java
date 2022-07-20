@@ -8,6 +8,7 @@ import java.util.List;
 //import com.github.pagehelper.PageInterceptor;
 import com.querydsl.core.types.Predicate;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

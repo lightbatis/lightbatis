@@ -4,6 +4,7 @@
 package titan.lightbatis.mybatis.configuration;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.ExecutorType;
@@ -40,6 +41,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import titan.lightbatis.configuration.MapperConfig;
 import titan.lightbatis.mapper.LightbatisMapper;
+import titan.lightbatis.mybatis.IDynamicMapperScanner;
 import titan.lightbatis.mybatis.LightbatisProperties;
 import titan.lightbatis.scan.ClassPathMapperScanner;
 import titan.lightbatis.table.DataSourceTableSchemaManager;
@@ -117,13 +119,22 @@ public class LightbatisAutoConfiguration {
 	@ConditionalOnMissingBean
 	public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
 		SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
+
 		factory.setDataSource(dataSource);
 		factory.setVfs(SpringBootVFS.class);
 
 		if (StringUtils.hasText(this.properties.getConfigLocation())) {
 			factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
 		}
-		factory.setConfiguration(properties.getConfiguration());
+		LightbatisConfiguration configuration = null;
+		if ( properties.getConfiguration() == null) {
+			configuration = new LightbatisConfiguration();
+		} else {
+			configuration = new LightbatisConfiguration(properties.getConfiguration());
+		}
+
+		factory.setConfiguration(configuration);
+		//factory.setConfiguration(properties.getConfiguration());
 		if (this.properties.getConfigurationProperties() != null) {
 			factory.setConfigurationProperties(this.properties.getConfigurationProperties());
 		}
@@ -143,7 +154,14 @@ public class LightbatisAutoConfiguration {
 			factory.setMapperLocations(this.properties.resolveMapperLocations());
 		}
 
-		return factory.getObject();
+		SqlSessionFactory sessionFactory = factory.getObject();
+		String[] names = applicationContext.getBeanNamesForType(IDynamicMapperScanner.class);
+		for (String name: names) {
+			logger.debug("==================== 查找动态扫描器 ===== " + name);
+			IDynamicMapperScanner mapperScanner = applicationContext.getBean(name, IDynamicMapperScanner.class);
+			mapperScanner.start(sessionFactory, configuration);
+		}
+		return sessionFactory;
 	}
 
 	@Bean

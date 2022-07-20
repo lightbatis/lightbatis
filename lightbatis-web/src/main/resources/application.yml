@@ -10,10 +10,14 @@ spring:
       additional-paths: src/main/java, src/main/resources
       exclude: WEB-INF/**
   datasource:
-    url: jdbc:mysql://39.104.25.76:13306/qutmtrade?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&zeroDateTimeBehavior=convertToNull
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: bitrade
-    password: bitrade093867koio
+#    url: jdbc:mysql://39.104.25.76:13306/qutmtrade?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&zeroDateTimeBehavior=convertToNull
+#    username: bitrade
+#    password: bitrade093867koio
+    url: jdbc:mysql://127.0.0.1:3306/lightbatisdb?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&zeroDateTimeBehavior=convertToNull
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
     druid:
       initial-size: 5 #连接池初始化大小
       min-idle: 10 #最小空闲连接数
@@ -27,7 +31,13 @@ spring:
       test-while-idle: true
       test-on-return: false
       validation-query: SELECT 1
-    
+    hikari:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      maximumPoolSize: 10
+      minimumIdle: 2
+      idleTimeout: 600000
+      connectionTimeout: 30000
+      maxLifetime: 1800000
 
 
 springfox:

@@ -15,6 +15,7 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandler;
@@ -113,9 +114,11 @@ public class PageListInterceptor implements Interceptor {
 			//4 个参数时
 			if (rowBounds != RowBounds.DEFAULT) {
 				Map paramMap = new HashMap();
+
 				if (parameter instanceof Map) {
 					paramMap = (Map) parameter;
 					paramMap.put(ROW_ROUNDS_KEY, rowBounds);
+
 				}else {
 					//如果参数只有一个值，不是以 map 的方式进行组装的，转换成 map
 					paramMap.put(ROW_ROUNDS_KEY, rowBounds);
@@ -124,12 +127,6 @@ public class PageListInterceptor implements Interceptor {
 						ParamMeta paramMeta = predicates.iterator().next();
 						paramMap.put(paramMeta.getName(), parameter);
 					}
-
-//					if (predicates.size() == 1) {
-//
-//					} else {
-//
-//					}
 				}
 				input = paramMap;
 			}
@@ -145,14 +142,38 @@ public class PageListInterceptor implements Interceptor {
 			boundSql = (BoundSql) args[5];
 			//boundSql.setAdditionalParameter("_LIMIT",10);
 		}
-
 		//检查是否需要分页
 		//rowBounds用参数值，不使用分页插件处理时，仍然支持默认的内存分页
-
 		if (input == null) {
 			input = parameter;
 		}
 		if (meta == null) {
+			// 分页。
+			if (rowBounds != RowBounds.DEFAULT) {
+				Map inputArgs = (HashMap)input;
+				inputArgs.put("_offset",rowBounds.getOffset());
+				inputArgs.put("_limit",rowBounds.getLimit());
+				PageList pList = new PageList<>();
+				String countMsId = ms.getId() + COUNT_MSID_KEY;
+				MappedStatement countMs = getExistedMappedStatement(ms.getConfiguration(), countMsId);
+				if(countMs != null) {
+					BoundSql countBoundSql = countMs.getBoundSql(parameter);
+					long count = queryCount(executor, countMs, input, countBoundSql, rowBounds, resultHandler);
+					pList.setTotalSize(new Long(count).intValue());
+				}
+				// 分页的数据
+				String dataMsId = ms.getId() + ROW_ROUNDS_KEY;
+				MappedStatement pageMs = getExistedMappedStatement(ms.getConfiguration(),dataMsId);
+				if (pageMs != null) {
+					BoundSql dataBoundSql = pageMs.getBoundSql(input);
+					List resultList = executor.query(pageMs, input, RowBounds.DEFAULT, resultHandler, cacheKey, dataBoundSql);
+					pList.addAll(resultList);
+					return pList;
+				} else {
+					List resultList = executor.query(ms, input, rowBounds, resultHandler, cacheKey, boundSql);
+					return resultList;
+				}
+			}
 			List resultList = executor.query(ms, input, rowBounds, resultHandler, cacheKey, boundSql);
 			return resultList;
 		}
@@ -201,7 +222,17 @@ public class PageListInterceptor implements Interceptor {
 		CacheKey countKey = executor.createCacheKey(countMs, parameter, RowBounds.DEFAULT, countBoundSql);
 		//执行 count 查询
 		Object countResultList = executor.query(countMs, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
-		Long count = (Long) ((List) countResultList).get(0);
+		Object obj = ((List) countResultList).get(0);
+		Long count = new Long(0);
+		if (obj instanceof Map) {
+			Map countMap = (Map)obj;
+			if (countMap.containsKey("_count")) {
+				count = (Long)countMap.get("_count");
+			}
+		} else {
+			count = (Long)obj;
+		}
+
 		return count;
 	}
 	/**
@@ -522,5 +553,15 @@ public class PageListInterceptor implements Interceptor {
 			Object parameterObject) throws SQLException {
 		ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
 		parameterHandler.setParameters(ps);
+	}
+
+	public static MappedStatement getExistedMappedStatement(Configuration configuration, String msId) {
+		MappedStatement mappedStatement = null;
+		try {
+			mappedStatement = configuration.getMappedStatement(msId, false);
+		} catch (Throwable t) {
+			//ignore
+		}
+		return mappedStatement;
 	}
 }

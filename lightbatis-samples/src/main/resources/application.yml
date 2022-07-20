@@ -14,14 +14,14 @@ spring:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    username: root
 #    password: 6BqFNjYhiQkg
-#    url: jdbc:mysql://localhost:3306/lightbatisdb?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&nullCatalogMeansCurrent=true
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    username: root
-#    password: 123456
-    url: jdbc:mysql://39.104.25.76:13306/qutmtrade?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    url: jdbc:mysql://localhost:3306/lightbatisdb?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&nullCatalogMeansCurrent=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: bitrade
-    password: bitrade093867koio
+    username: root
+    password: 123456
+#    url: jdbc:mysql://39.104.25.76:13306/qutmtrade?characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: bitrade
+#    password: bitrade093867koio
     #type: com.alibaba.druid.pool.DruidDataSource
 #    username: postgres
 #    password: 123456
@@ -49,6 +49,8 @@ springfox:
 #   configuration: org.apache.ibatis.session.Configuration
 
 #lightbatis:
+#  dynamic:
+#    dir: ./dynamic-mapper
 #  mappers: titan.common.dal.mapper.QueryMapper
 
 #logging:
@@ -66,7 +68,8 @@ snowflake:
 mybatis:
     configuration:
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-      
+     # 配置mapper的扫描，找到所有的mapper.xml映射文件
+    mapperLocations: classpath*:mybatis/**/*Mapper.xml
 #dal:
 #  base-package: com.aeotrade.provider
    

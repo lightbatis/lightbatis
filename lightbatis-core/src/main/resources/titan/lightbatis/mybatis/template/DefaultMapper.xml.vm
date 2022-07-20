@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="$namespace">
+
+    <sql id="${id}_sql">
+        $query
+    </sql>
+    <select id="$id" parameterType="java.util.Map" resultType="java.util.Map">
+        <include refid="${id}_sql"/>
+    </select>
+    <select id="${id}__RowBounds" parameterType="java.util.Map" resultType="java.util.Map">
+        <include refid="${id}_sql"/>
+        <if test="_offset != null and _limit != null">
+            limit #{_offset},#{_limit}
+        </if>
+
+    </select>
+    <select id="${id}_COUNT" parameterType="java.util.Map" resultType="java.util.Map">
+        select count(0) as _count from (
+        <include refid="${id}_sql"/>
+        ) table_count
+    </select>
+
+#foreach( $statement in $statements)
+    <select id="${statement.statementId}" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        #foreach($col in $statement.columns)
+            #if(${foreach.index} >0),#end ${col}
+        #end
+        from $statement.table where $statement.pkColumn in
+        <foreach collection="values" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+#end
+
+
+</mapper>
