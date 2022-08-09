@@ -3,7 +3,10 @@
 <mapper namespace="$namespace">
 
     <sql id="${id}_sql">
-        $query
+        <include refid="${dataset_id}_sql"/>
+#if ( $datascope_id)
+        <include refid="${datascope_id}"/>
+#end
     </sql>
 
     <select id="$id" parameterType="java.util.Map" resultType="java.util.Map">

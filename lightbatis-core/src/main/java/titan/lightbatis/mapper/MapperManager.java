@@ -28,7 +28,8 @@ public class MapperManager implements InitializingBean {
     private static MapperManager manager = null;
     @Autowired
     private FileDynamicMapperScanner mapperScanner = null;
-    public static final String defaultNamespace = "lightbatis.mapper";
+    public static final String DefaultNamespace = "lightbatis.mapper";
+    public static final String DATA_SCOPE_NAME_SPACE = DefaultNamespace + ".datascope";
     private File mapperDir = null;
     private VelocityEngine engine = null;
     private HashMap<String, List<StatementFragment>> statementMappingColumns = new HashMap<>();
@@ -40,7 +41,7 @@ public class MapperManager implements InitializingBean {
     }
 
     public String addSelectMapper(String id, String query, List<? extends IColumnMappingMeta> mappingColumns) throws IOException {
-        return this.addSelectMapper(defaultNamespace, id, query, mappingColumns);
+        return this.addSelectMapper(DefaultNamespace, id, query, mappingColumns);
     }
 
     public String addSelectMapper(String namespace, String id, String query, List<? extends IColumnMappingMeta> mappingColumns) throws IOException{
@@ -54,8 +55,40 @@ public class MapperManager implements InitializingBean {
         params.put("statementId",statementId);
         List<StatementFragment>  statementList = addColumnMapping(statementId, mappingColumns);
         statementMappingColumns.put(statementId, statementList);
-        return generateMapper(params, filename, statementList);
+        params.put("statements", statementList);
+        return generateMapper("titan/lightbatis/mybatis/template/DefaultMapper.xml.vm", params, filename);
     }
+
+    public String addSQLMapper(String namespace, String id, String query) throws IOException {
+        String tmplFile = "titan/lightbatis/mybatis/template/DefaultDatascopeMapper.xml.vm";
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("namespace", namespace);
+        params.put("id", id);
+        params.put("query", query);
+        String filename = namespace + "_" + id + ".xml";
+
+        String statementId = namespace + "." + id;
+        params.put("statementId",statementId);
+        return generateMapper(tmplFile, params, filename);
+    }
+
+
+    public String  addMergeSelectMapper(String id, String datasetStmtId, String datascopeStmtId, List<? extends IColumnMappingMeta> mappingColumns) throws IOException{
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("namespace", DefaultNamespace);
+        params.put("id", id);
+        String filename = DefaultNamespace + "_" + id + ".xml";
+
+        String statementId = DefaultNamespace + "." + id;
+        params.put("statementId",statementId);
+        params.put("dataset_id", datasetStmtId);
+        params.put("datascope_id", datascopeStmtId);
+        List<StatementFragment>  statementList = addColumnMapping(statementId, mappingColumns);
+        statementMappingColumns.put(statementId, statementList);
+        params.put("statements", statementList);
+        return generateMapper("titan/lightbatis/mybatis/template/DefaultDatasetScopeMapper.xml.vm", params, filename);
+    }
+
 
     /**
      * 获取映射关系
@@ -69,10 +102,10 @@ public class MapperManager implements InitializingBean {
         return Collections.emptyList();
     }
 
-    private String generateMapper(HashMap<String, Object> params, String filename, List<StatementFragment> statementList) throws IOException {
-        Template template = engine.getTemplate("titan/lightbatis/mybatis/template/DefaultMapper.xml.vm", "UTF-8");
+    private String generateMapper(String templateFile, HashMap<String, Object> params, String filename) throws IOException {
+        Template template = engine.getTemplate(templateFile, "UTF-8");
         VelocityContext context = new VelocityContext(params);
-        context.put("statements", statementList);
+
         File file = new File(mapperDir,filename);
         FileWriter writer = new FileWriter(file);
         template.merge(context, writer);
@@ -103,8 +136,14 @@ public class MapperManager implements InitializingBean {
         return statementList;
     }
 
-    public void removeResource(String resource) {
+    public void removeResource(String resource, boolean delete) {
         mapperScanner.removeResource(resource);
+        if (delete) {
+            File file = new File (resource);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
     }
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -116,6 +155,7 @@ public class MapperManager implements InitializingBean {
         engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         engine.init();
     }
+
 
 
     @Data

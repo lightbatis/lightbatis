@@ -65,7 +65,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		Member member = getMember();
 //		deleteMember();
 //		queryMember();
-		listMembers();
+//		listMembers();
 //		listAllMembers();
 //		listPredicatesMembers();
 //		listMemberFields();

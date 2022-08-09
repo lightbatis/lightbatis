@@ -49,7 +49,7 @@ public class SimpleController extends BaseController {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
-        return success(MapperManager.defaultNamespace + "." + id);
+        return success(MapperManager.DefaultNamespace + "." + id);
     }
 
 }
