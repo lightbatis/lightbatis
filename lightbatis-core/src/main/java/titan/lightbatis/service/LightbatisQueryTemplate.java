@@ -1,8 +1,14 @@
 package titan.lightbatis.service;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import titan.lightbatis.mapper.MapperManager;
 import titan.lightbatis.mybatis.meta.StatementFragment;
@@ -13,11 +19,12 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class LightbatisQueryTemplate {
+public class LightbatisQueryTemplate implements InitializingBean, ApplicationContextAware {
 
     @Autowired
-    private SqlSessionTemplate sessionTemplate = null;
-
+    private SqlSessionTemplate primarySessionTemplate = null;
+    @Autowired
+    private MapperManager mapperManager = null;
     /**
      *
      * @param statementId Mybatis 的查询ID
@@ -26,11 +33,17 @@ public class LightbatisQueryTemplate {
      * @param fetchMappingColumn 获取这个查询的映射信息。
      * @return
      */
-    public PageList<Map<String, Object>> list(String statementId, Map<String,Object> params, Page page, boolean fetchMappingColumn) {
-        List<Map<String,Object>> dataList = sessionTemplate.selectList(statementId, params, page);
+    public List<Map<String, Object>> list(String statementId, Map<String,Object> params, Page page, boolean fetchMappingColumn) {
+        List<Map<String,Object>> tmpList = new ArrayList<>();
+        if (page == null) {
+            tmpList = primarySessionTemplate.selectList(statementId, params);
+        } else {
+            tmpList = primarySessionTemplate.selectList(statementId, params, page);
+        }
+        final List<Map<String,Object>> dataList = new ArrayList<>(tmpList);
         if (fetchMappingColumn) {
             //读取所有关联表
-             List<StatementFragment> stmtList = MapperManager.getManager().getStatementMappingColumns(statementId);
+             List<StatementFragment> stmtList = mapperManager.getStatementMappingColumns(statementId);
             stmtList.forEach( stmt ->{
                 String stmtId = stmt.getStatementId();
                 Set<Object> values = new HashSet<>();
@@ -47,7 +60,7 @@ public class LightbatisQueryTemplate {
                 String fragmentStmtId = stmt.getStatementId();
                 try{
                     //查询关联表的数据
-                    List<Map<String,Object>> stmtDataList = sessionTemplate.selectList(fragmentStmtId, stmtParams);
+                    List<Map<String,Object>> stmtDataList = primarySessionTemplate.selectList(fragmentStmtId, stmtParams);
                     stmtDataList.forEach(fragment ->{
                         // 将数据关联到主表上去
                         dataList.stream().filter(data -> data.get(stmt.getSourceColumn()).toString().equals(fragment.get(stmt.getPkColumn()).toString())).forEach( item ->{
@@ -62,6 +75,31 @@ public class LightbatisQueryTemplate {
                 }
             });
         }
-        return (PageList<Map<String, Object>>) dataList;
+        if (page == null) {
+            return  dataList;
+        } else {
+            PageList plist = new PageList();
+            plist.addAll(dataList);
+            if (tmpList instanceof PageList) {
+                PageList tmpPage = (PageList) tmpList;
+                plist.setTotalSize(tmpPage.getTotalSize());
+            }
+            return plist;
+        }
+
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+       String[] names = applicationContext.getBeanNamesForType(SqlSessionTemplate.class);
+        for (String name: names) {
+            SqlSessionTemplate sessionTemplate =  applicationContext.getBean(name, SqlSessionTemplate.class);
+            System.out.println(sessionTemplate);
+        }
     }
 }

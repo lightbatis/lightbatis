@@ -227,7 +227,8 @@ public class PageListInterceptor implements Interceptor {
 		if (obj instanceof Map) {
 			Map countMap = (Map)obj;
 			if (countMap.containsKey("_count")) {
-				count = (Long)countMap.get("_count");
+				Number n = (Number)countMap.get("_count");
+				count = n.longValue();
 			}
 		} else {
 			count = (Long)obj;

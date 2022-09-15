@@ -3,6 +3,7 @@
  */
 package titan.lightbatis.mybatis.configuration;
 
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -26,6 +27,7 @@ import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
@@ -74,6 +76,8 @@ public class LightbatisAutoConfiguration {
 
 	private final DatabaseIdProvider databaseIdProvider;
 
+	private LightbatisConfiguration configuration = null;
+
 //	@Autowired
 //	private List<SqlSessionFactory> sqlSessionFactoryList;
 	@Autowired
@@ -114,6 +118,42 @@ public class LightbatisAutoConfiguration {
 		//checkQueryMapper();
 	}
 
+	public LightbatisConfiguration getConfiguration() {
+		return configuration;
+	}
+	public MybatisProperties getProperties(){
+		return properties;
+	}
+
+	public LightbatisProperties getLightProperties() {
+		return lightProperties;
+	}
+
+	public Interceptor[] getInterceptors() {
+		return interceptors;
+	}
+
+	public ResourceLoader getResourceLoader() {
+		return resourceLoader;
+	}
+
+	public DatabaseIdProvider getDatabaseIdProvider() {
+		return databaseIdProvider;
+	}
+
+	public ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
+
+	public ITableSchemaManager getTableSchemaManager() {
+		return tableSchemaManager;
+	}
+
+//	@Bean("primaryDataSource")
+//	@ConfigurationProperties("spring.datasource")
+//	public DataSource primaryDataSource() {
+//		return DruidDataSourceBuilder.create().build();
+//	}
 	//
 	@Bean
 	@ConditionalOnMissingBean
@@ -126,7 +166,7 @@ public class LightbatisAutoConfiguration {
 		if (StringUtils.hasText(this.properties.getConfigLocation())) {
 			factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
 		}
-		LightbatisConfiguration configuration = null;
+
 		if ( properties.getConfiguration() == null) {
 			configuration = new LightbatisConfiguration();
 		} else {
@@ -164,9 +204,9 @@ public class LightbatisAutoConfiguration {
 		return sessionFactory;
 	}
 
-	@Bean
+	@Bean("primarySessionTemplate")
 	@ConditionalOnMissingBean
-	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+	public SqlSessionTemplate primarySessionTemplate(SqlSessionFactory sqlSessionFactory) {
 		ExecutorType executorType = this.properties.getExecutorType();
 		if (executorType != null) {
 			return new SqlSessionTemplate(sqlSessionFactory, executorType);

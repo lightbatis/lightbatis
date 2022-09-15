@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 
-@Service
+@Service("fileDynamicMapperScanner")
 public class FileDynamicMapperScanner extends DefaultDynamicMapperScanner implements InitializingBean  {
 
     @Value("${lightbatis.dynamic.dir:./dynamic-mapper}")
-    private String mapperDir = "./dynamic-mapper";
+    protected String mapperDir = "./dynamic-mapper";
 
     protected File scanDir = null;
 
@@ -21,10 +21,19 @@ public class FileDynamicMapperScanner extends DefaultDynamicMapperScanner implem
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        scanDir = new File(mapperDir);
+        scanDir = new File(mapperDir, getDataSourceName());
         if (!scanDir.exists()) {
             scanDir.mkdir();
         }
+        this.initMonitor();
+    }
+
+    public String getDataSourceName() {
+        return "primaryDataSource";
+    }
+
+
+    protected void initMonitor() {
         monitor = new FileAlterationMonitor(1000);
         FileAlterationObserver observer = new FileAlterationObserver(scanDir);
         monitor.addObserver(observer);

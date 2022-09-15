@@ -43,12 +43,12 @@ public class SimpleController extends BaseController {
     @ApiOperation(value = "添加一个 Mapper")
     @PostMapping("/save/mapper")
     public CommonResult addMapper(@RequestParam(value = "id") String id, @RequestBody() String query) {
-        try {
-            mapperManager.addSelectMapper(id, query,  null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return CommonResult.failed(e.getMessage());
-        }
+//        try {
+//            mapperManager.addSelectMapper(id, query,  null, null);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return CommonResult.failed(e.getMessage());
+//        }
         return success(MapperManager.DefaultNamespace + "." + id);
     }
 

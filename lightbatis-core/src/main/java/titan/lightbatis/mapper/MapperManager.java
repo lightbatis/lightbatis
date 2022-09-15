@@ -9,14 +9,18 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import titan.lightbatis.mybatis.meta.IColumnMappingMeta;
 import titan.lightbatis.mybatis.meta.StatementFragment;
 import titan.lightbatis.mybatis.scanner.FileDynamicMapperScanner;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,27 +28,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class MapperManager implements InitializingBean {
-    private static MapperManager manager = null;
+public class MapperManager implements InitializingBean, ApplicationContextAware {
     @Autowired
-    private FileDynamicMapperScanner mapperScanner = null;
+    protected FileDynamicMapperScanner fileDynamicMapperScanner = null;
     public static final String DefaultNamespace = "lightbatis.mapper";
     public static final String DATA_SCOPE_NAME_SPACE = DefaultNamespace + ".datascope";
-    private File mapperDir = null;
+    protected File mapperDir = null;
     private VelocityEngine engine = null;
     private HashMap<String, List<StatementFragment>> statementMappingColumns = new HashMap<>();
-    public static MapperManager getManager() {
-        return manager;
-    }
+//    private HashMap<String,String> datasourceMap = new HashMap<>();
+//    private HashMap<String, File> datasourceDirMap = new HashMap<>();
+//    private HashSet<FileDynamicMapperScanner> mapperScannerSet = new HashSet<>();
     public MapperManager() {
-        MapperManager.manager = this;
+
     }
 
-    public String addSelectMapper(String id, String query, List<? extends IColumnMappingMeta> mappingColumns) throws IOException {
-        return this.addSelectMapper(DefaultNamespace, id, query, mappingColumns);
-    }
 
-    public String addSelectMapper(String namespace, String id, String query, List<? extends IColumnMappingMeta> mappingColumns) throws IOException{
+
+    public String addSelectMapper(String namespace, String id, String query, List<? extends IColumnMappingMeta> mappingColumns, String datasource) throws IOException{
         HashMap<String,Object> params = new HashMap<>();
         params.put("namespace", namespace);
         params.put("id", id);
@@ -56,10 +57,10 @@ public class MapperManager implements InitializingBean {
         List<StatementFragment>  statementList = addColumnMapping(statementId, mappingColumns);
         statementMappingColumns.put(statementId, statementList);
         params.put("statements", statementList);
-        return generateMapper("titan/lightbatis/mybatis/template/DefaultMapper.xml.vm", params, filename);
+        return generateMapper("titan/lightbatis/mybatis/template/DefaultMapper.xml.vm", params, filename, datasource);
     }
 
-    public String addSQLMapper(String namespace, String id, String query) throws IOException {
+    public String addSQLMapper(String namespace, String id, String query, String datasource) throws IOException {
         String tmplFile = "titan/lightbatis/mybatis/template/DefaultDatascopeMapper.xml.vm";
         HashMap<String,Object> params = new HashMap<>();
         params.put("namespace", namespace);
@@ -69,11 +70,11 @@ public class MapperManager implements InitializingBean {
 
         String statementId = namespace + "." + id;
         params.put("statementId",statementId);
-        return generateMapper(tmplFile, params, filename);
+        return generateMapper(tmplFile, params, filename, datasource);
     }
 
 
-    public String  addMergeSelectMapper(String id, String datasetStmtId, String datascopeStmtId, List<? extends IColumnMappingMeta> mappingColumns) throws IOException{
+    public String  addMergeSelectMapper(String id, String datasetStmtId, String datascopeStmtId, List<? extends IColumnMappingMeta> mappingColumns, String datasource) throws IOException{
         HashMap<String,Object> params = new HashMap<>();
         params.put("namespace", DefaultNamespace);
         params.put("id", id);
@@ -86,7 +87,7 @@ public class MapperManager implements InitializingBean {
         List<StatementFragment>  statementList = addColumnMapping(statementId, mappingColumns);
         statementMappingColumns.put(statementId, statementList);
         params.put("statements", statementList);
-        return generateMapper("titan/lightbatis/mybatis/template/DefaultDatasetScopeMapper.xml.vm", params, filename);
+        return generateMapper("titan/lightbatis/mybatis/template/DefaultDatasetScopeMapper.xml.vm", params, filename, datasource);
     }
 
 
@@ -102,10 +103,13 @@ public class MapperManager implements InitializingBean {
         return Collections.emptyList();
     }
 
-    private String generateMapper(String templateFile, HashMap<String, Object> params, String filename) throws IOException {
+    private String generateMapper(String templateFile, HashMap<String, Object> params, String filename, String datasource) throws IOException {
         Template template = engine.getTemplate(templateFile, "UTF-8");
         VelocityContext context = new VelocityContext(params);
-
+//        File mapperDir = null;
+//        if (datasourceDirMap.containsKey(datasource)) {
+//            mapperDir = datasourceDirMap.get(datasource);
+//        }
         File file = new File(mapperDir,filename);
         FileWriter writer = new FileWriter(file);
         template.merge(context, writer);
@@ -137,7 +141,10 @@ public class MapperManager implements InitializingBean {
     }
 
     public void removeResource(String resource, boolean delete) {
-        mapperScanner.removeResource(resource);
+        fileDynamicMapperScanner.removeResource(resource);
+//        for (FileDynamicMapperScanner scanner: mapperScannerSet) {
+//            scanner.removeResource(resource);
+//        }
         if (delete) {
             File file = new File (resource);
             if (file.exists()) {
@@ -147,8 +154,8 @@ public class MapperManager implements InitializingBean {
     }
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(mapperScanner, "获取 FileDynamicMapperScanner 不能为空，用来获取 Mapper  的目录。 ");
-        this.mapperDir = mapperScanner.getScanDir();
+//        Assert.notNull(mapperScanner, "获取 FileDynamicMapperScanner 不能为空，用来获取 Mapper  的目录。 ");
+        this.mapperDir = fileDynamicMapperScanner.getScanDir();
 
         engine = new VelocityEngine();
         engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
@@ -156,6 +163,20 @@ public class MapperManager implements InitializingBean {
         engine.init();
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//        String[] dsNames = applicationContext.getBeanNamesForType(DataSource.class);
+//        for(String dsName: dsNames) {
+//            System.out.println("=================== dsName =" + dsName);
+//        }
+//        String[] names = applicationContext.getBeanNamesForType(FileDynamicMapperScanner.class);
+//        for (String name: names) {
+//           FileDynamicMapperScanner mapperScanner = applicationContext.getBean(name, FileDynamicMapperScanner.class);
+//           datasourceMap.put(name, mapperScanner.getDataSourceName());
+//           datasourceDirMap.put(mapperScanner.getDataSourceName(), mapperScanner.getScanDir());
+//           mapperScannerSet.add(mapperScanner);
+//        }
+    }
 
 
     @Data
