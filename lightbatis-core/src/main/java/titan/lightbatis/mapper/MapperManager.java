@@ -156,7 +156,9 @@ public class MapperManager implements InitializingBean, ApplicationContextAware 
     public void afterPropertiesSet() throws Exception {
 //        Assert.notNull(mapperScanner, "获取 FileDynamicMapperScanner 不能为空，用来获取 Mapper  的目录。 ");
         this.mapperDir = fileDynamicMapperScanner.getScanDir();
-
+         if (!mapperDir.exists()){
+             mapperDir.mkdirs();
+         }
         engine = new VelocityEngine();
         engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
