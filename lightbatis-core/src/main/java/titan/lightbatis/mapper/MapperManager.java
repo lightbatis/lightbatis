@@ -14,6 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import titan.lightbatis.mybatis.meta.IColumnMappingMeta;
@@ -28,11 +29,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Scope("prototype")
 public class MapperManager implements InitializingBean, ApplicationContextAware {
-    @Autowired
-    protected FileDynamicMapperScanner fileDynamicMapperScanner = null;
+
     public static final String DefaultNamespace = "lightbatis.mapper";
     public static final String DATA_SCOPE_NAME_SPACE = DefaultNamespace + ".datascope";
+
+    public static final String DefaultTempNamespace = DefaultNamespace + ".temp";
     protected File mapperDir = null;
     private VelocityEngine engine = null;
     private HashMap<String, List<StatementFragment>> statementMappingColumns = new HashMap<>();
@@ -54,9 +57,12 @@ public class MapperManager implements InitializingBean, ApplicationContextAware 
 
         String statementId = namespace + "." + id;
         params.put("statementId",statementId);
-        List<StatementFragment>  statementList = addColumnMapping(statementId, mappingColumns);
-        statementMappingColumns.put(statementId, statementList);
-        params.put("statements", statementList);
+        if (mappingColumns != null) {
+            List<StatementFragment>  statementList = addColumnMapping(statementId, mappingColumns);
+            statementMappingColumns.put(statementId, statementList);
+            params.put("statements", statementList);
+        }
+
         return generateMapper("titan/lightbatis/mybatis/template/DefaultMapper.xml.vm", params, filename, datasource);
     }
 
@@ -141,7 +147,7 @@ public class MapperManager implements InitializingBean, ApplicationContextAware 
     }
 
     public void removeResource(String resource, boolean delete) {
-        fileDynamicMapperScanner.removeResource(resource);
+
 //        for (FileDynamicMapperScanner scanner: mapperScannerSet) {
 //            scanner.removeResource(resource);
 //        }
@@ -155,14 +161,18 @@ public class MapperManager implements InitializingBean, ApplicationContextAware 
     @Override
     public void afterPropertiesSet() throws Exception {
 //        Assert.notNull(mapperScanner, "获取 FileDynamicMapperScanner 不能为空，用来获取 Mapper  的目录。 ");
-        this.mapperDir = fileDynamicMapperScanner.getScanDir();
-         if (!mapperDir.exists()){
-             mapperDir.mkdirs();
-         }
+
         engine = new VelocityEngine();
         engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         engine.init();
+    }
+
+    public void setMapperDir(File dir) {
+        this.mapperDir = dir;
+        if (!mapperDir.exists()){
+            mapperDir.mkdirs();
+        }
     }
 
     @Override

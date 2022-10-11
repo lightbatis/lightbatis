@@ -3,6 +3,13 @@ package titan.lightbatis.service;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.builder.xml.XMLConfigBuilder;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.SqlSource;
+import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -11,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import titan.lightbatis.mapper.MapperManager;
+import titan.lightbatis.mybatis.meta.MapperMetaManger;
 import titan.lightbatis.mybatis.meta.StatementFragment;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.result.PageList;
@@ -25,6 +33,19 @@ public class LightbatisQueryTemplate implements InitializingBean, ApplicationCon
     private SqlSessionTemplate primarySessionTemplate = null;
     @Autowired
     private MapperManager mapperManager = null;
+
+    public void parseStatementParameters(String statementId, Map<String,Object> params, Page page) {
+        MappedStatement mappedStatement = primarySessionTemplate.getConfiguration().getMappedStatement(statementId);
+        BoundSql bsql = mappedStatement.getBoundSql(params);
+        List<ParameterMapping> parameterMappings = bsql.getParameterMappings();
+        System.out.println("========================" + parameterMappings);
+        SqlSource sqlSource  =  mappedStatement.getSqlSource();
+        System.out.println("sql source ======= " + sqlSource);
+        MixedSqlNode msnode =  null;
+        XMLConfigBuilder  bb = null;
+
+    }
+
     /**
      *
      * @param statementId Mybatis 的查询ID
@@ -86,7 +107,6 @@ public class LightbatisQueryTemplate implements InitializingBean, ApplicationCon
             }
             return plist;
         }
-
     }
 
     @Override

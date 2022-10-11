@@ -47,7 +47,7 @@ public class DefaultDynamicMapperScanner implements IDynamicMapperScanner, Appli
         logger.info("#################################################### 结束了 #######################");
     }
 
-    public void addFile(File file) {
+    public void addFile(File file) throws Exception{
         logger.debug("############# add file " + file.getAbsolutePath());
         String fileName = file.getName();
         if (!fileName.endsWith(".xml")) {
@@ -61,8 +61,8 @@ public class DefaultDynamicMapperScanner implements IDynamicMapperScanner, Appli
             builder.parse();
             // 添加 Count 语句
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("文件添加失败! " + file.getAbsolutePath());
+            throw e;
         }
 
     }

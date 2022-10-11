@@ -63,7 +63,11 @@ public class FileDynamicMapperScanner extends DefaultDynamicMapperScanner implem
         File[] files = scanDir.listFiles();
         for (File f: files) {
             if (f.exists()) {
-                addFile(f);
+                try {
+                    addFile(f);
+                }catch (Exception ex) {
+                    ex.printStackTrace(System.err);
+                }
             }
         }
     }
@@ -82,13 +86,21 @@ public class FileDynamicMapperScanner extends DefaultDynamicMapperScanner implem
         @Override
         public void onFileCreate(File file) {
             super.onFileCreate(file);
-            addFile(file);
+            try {
+                addFile(file);
+            }catch (Exception ex) {
+                ex.printStackTrace(System.err);
+            }
         }
 
         @Override
         public void onFileChange(File file) {
             super.onFileChange(file);
-            addFile(file);
+            try {
+                addFile(file);
+            }catch (Exception ex) {
+                ex.printStackTrace(System.err);
+            }
         }
 
         @Override
