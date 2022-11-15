@@ -5,9 +5,9 @@ import com.eclipsesource.v8.utils.V8ObjectUtils;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import titan.lightbatis.jsv.transform.JavaScriptTransform;
 
-import javax.lang.model.type.PrimitiveType;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,7 +64,45 @@ public class V8EngineServer {
 		v8.getLocker().acquire();
 		v8.executeScript(script);
 	}
+	public Object executeScript(String script, Map<String, Object> params) {
+		V8Object context = null;
+		V8Array parameters = null;
+		try{
+			v8.getLocker().acquire();
+			context = asV8Object(params);
+			parameters = new V8Array(v8.getRuntime()).push(context);
+			for (Map.Entry<String, Object> entry: params.entrySet()) {
+				Object value = entry.getValue();
+				String key = entry.getKey();
+				addValueAll(v8, key, value);
+			}
+			Object objectResult = v8.executeScript(script);
+			try{
+				if (objectResult instanceof V8Object) {
+					V8Object object = (V8Object) objectResult;
+					if (object.isUndefined()) {
+						return null;
+					}
+					Map<String, Object> returnMap = asMap(object);
+					object.release();
+					return returnMap;
+				} else {
+					return objectResult;
+				}
+			}catch (V8ResultUndefined undefined) {
+				undefined.printStackTrace(System.err);
+				return null;
+			}
 
+		} finally {
+			// 释放句柄
+			if(context != null)
+				context.release();
+			if (parameters != null)
+				parameters.release();
+			v8.getLocker().release();
+		}
+	}
 	/**
 	 * 执行 JS 脚本
 	 * @param script
@@ -269,12 +307,11 @@ public class V8EngineServer {
 				}
 				//v8.add(entry.getKey(), entry.getValue());
 			}
-			int a = v8.getInteger("a");
 			//System.out.println("a = " + a);
 			try{
+
 				V8Object object = v8.executeObjectFunction(name, parameters);
 				Map<String, Object> returnMap = asMap(object);
-				a = v8.getInteger("a");
 				//System.out.println("a = " + a);
 				object.release();
 				return returnMap;
@@ -328,13 +365,13 @@ public class V8EngineServer {
 
 		for (Map.Entry<String, Object> entry : data.entrySet()) {
 			Object value = entry.getValue();
-			addValue(context, entry.getKey(), value);
+			addValueAll(context, entry.getKey(), value);
 		}
 
 		return context;
 	}
+	public void addValueAll(V8Object context, String key, Object value) {
 
-	public static void addValue(V8Object context, String key, Object value) {
 		if (value instanceof Double) {
 			context.add(key, (Double) value);
 		} else if (value instanceof String) {
@@ -343,9 +380,47 @@ public class V8EngineServer {
 			context.add(key, (Integer) value);
 		} else if (value instanceof Boolean) {
 			context.add(key, (Boolean) value);
-		} else {
+		} else if (value instanceof List) {
+			List list = (List) value;
+			V8Array array = new V8Array(context.getRuntime());
+			for (int i=0;i<list.size();i++) {
+				Object v = list.get(i);
+				if (v instanceof Map) {
+					V8Object vo = asV8Object((Map<String, Object>) v);
+					array.push(vo);
+				}
+			}
+			context.add(key, array);
+		}
+		else {
+			//throw new RuntimeException("数据类型: " + value.getClass().getName() + " 不支持");
+		}
+
+	}
+	public static void addValue(V8Object context, String key, Object value) {
+
+		if (value instanceof Double) {
+			context.add(key, (Double) value);
+		} else if (value instanceof String) {
+			context.add(key, (String) value);
+		} else if (value instanceof Integer) {
+			context.add(key, (Integer) value);
+		} else if (value instanceof Boolean) {
+			context.add(key, (Boolean) value);
+		} else if (value instanceof List) {
+			List list = (List) value;
+			V8Array array = new V8Array(context.getRuntime());
+			for (int i=0;i<list.size();i++) {
+				Object v = list.get(i);
+				if (v instanceof Map) {
+				}
+			}
+			context.add(key, array);
+		}
+		else {
 			throw new RuntimeException("数据类型: " + value.getClass().getName() + " 不支持");
 		}
+
 	}
 
 	class Console {
