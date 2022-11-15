@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.lightbatis</groupId>
     <artifactId>lightbatis-master</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <packaging>pom</packaging>
     <name>统一数据访问层根工程</name>
 
@@ -43,6 +43,7 @@
         <module>lightbatis-pagelisthelper</module>
         <module>lightbatis-common</module>
         <module>lightbatis-jsvisual</module>
+        <module>lightbatis-dataset</module>
     </modules>
     <distributionManagement>
         <snapshotRepository>
