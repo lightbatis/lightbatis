@@ -19,6 +19,8 @@ import titan.lightbatis.dataset.exception.ColumnNotFoundRuntimeException;
 import titan.lightbatis.table.ColumnSchema;
 import titan.lightbatis.table.TableSchema;
 
+import java.util.List;
+
 
 public interface DataTable {
 
@@ -79,5 +81,7 @@ public interface DataTable {
 
     void copyFrom(Object source);
 
-    public DataRow getRowById(String rowId);
+    DataRow getRowById(String rowId);
+
+    List<DataRow> getRows();
 }

@@ -75,6 +75,10 @@ public class DataTableImpl implements DataTable {
         return  null;
     }
 
+    public List<DataRow> getRows() {
+        return rows;
+    }
+
     public DataRow addRow() {
         DataRow row = new DataRowImpl(this);
         rows.add(row);

@@ -17,6 +17,8 @@ package titan.lightbatis.dataset;
 
 import titan.lightbatis.dataset.exception.ColumnNotFoundRuntimeException;
 
+import java.util.Map;
+
 
 public interface DataRow {
 
@@ -48,4 +50,6 @@ public interface DataRow {
 
 
     void copyFrom(Object source);
+
+    Map values();
 }

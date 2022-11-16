@@ -165,6 +165,11 @@ public class DataRowImpl implements DataRow {
 
     }
 
+    @Override
+    public Map values() {
+        return values_;
+    }
+
     private void copyFromMap(Map source) {
         for (Iterator i = source.keySet().iterator(); i.hasNext();) {
             String columnName = (String) i.next();
