@@ -38,7 +38,8 @@ public class ColumnSchema implements Serializable {
 	//实体Bean 中的属性名称，类的字段名称
 	@ApiModelProperty("实体Bean 中的属性名称，类的字段名称")
 	private String propertyName;
-	
+
+	private boolean writable = true;
 
 	public ColumnSchema() {
 		super();

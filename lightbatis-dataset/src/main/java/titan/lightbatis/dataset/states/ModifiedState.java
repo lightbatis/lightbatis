@@ -21,6 +21,8 @@ import java.util.List;
 import titan.lightbatis.dataset.DataRow;
 import titan.lightbatis.dataset.DataTable;
 import titan.lightbatis.dataset.RowState;
+import titan.lightbatis.dataset.exception.PrimaryKeyNotFoundRuntimeException;
+import titan.lightbatis.table.ColumnSchema;
 
 /**
  * 更新用の {@link RowState}です。
@@ -42,31 +44,31 @@ public class ModifiedState extends AbstractRowState {
         buf.append("UPDATE ");
         buf.append(table.getTableName());
         buf.append(" SET ");
-//        for (int i = 0; i < table.getColumnSize(); ++i) {
-//            DataColumn column = table.getColumn(i);
-//            if (column.isWritable() && !column.isPrimaryKey()) {
-//                buf.append(column.getColumnName());
-//                buf.append(" = ?, ");
-//                argList.add(row.getValue(i));
-//                argTypeList.add(column.getColumnType().getType());
-//            }
-//        }
-//        buf.setLength(buf.length() - 2);
-//        buf.append(" WHERE ");
-//        boolean hasPrimaryKey = false;
-//        for (int i = 0; i < table.getColumnSize(); ++i) {
-//            DataColumn column = table.getColumn(i);
-//            if (column.isPrimaryKey()) {
-//                hasPrimaryKey = true;
-//                buf.append(column.getColumnName());
-//                buf.append(" = ? AND ");
-//                argList.add(row.getValue(i));
-//                argTypeList.add(column.getColumnType().getType());
-//            }
-//        }
-//        if (!hasPrimaryKey) {
-//            throw new PrimaryKeyNotFoundRuntimeException(table.getTableName());
-//        }
+        for (int i = 0; i < table.getColumnSize(); ++i) {
+            ColumnSchema column = table.getColumn(i);
+            if (column.isWritable() && !column.isPrimary()) {
+                buf.append(column.getColumnName());
+                buf.append(" = ?, ");
+                argList.add(row.getValue(i));
+                argTypeList.add(column.getColumnClz());
+            }
+        }
+        buf.setLength(buf.length() - 2);
+        buf.append(" WHERE ");
+        boolean hasPrimaryKey = false;
+        for (int i = 0; i < table.getColumnSize(); ++i) {
+            ColumnSchema column = table.getColumn(i);
+            if (column.isPrimary()) {
+                hasPrimaryKey = true;
+                buf.append(column.getColumnName());
+                buf.append(" = ? AND ");
+                argList.add(row.getValue(i));
+                argTypeList.add(column.getColumnClz());
+            }
+        }
+        if (!hasPrimaryKey) {
+            throw new PrimaryKeyNotFoundRuntimeException(table.getTableName());
+        }
         buf.setLength(buf.length() - 5);
         return new SqlContext(buf.toString(), argList.toArray(),
                 (Class[]) argTypeList.toArray(new Class[argTypeList.size()]));

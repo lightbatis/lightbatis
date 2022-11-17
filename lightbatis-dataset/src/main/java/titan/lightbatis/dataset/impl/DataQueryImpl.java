@@ -23,4 +23,9 @@ public class DataQueryImpl implements DataQuery {
         }
         return null;
     }
+
+    public void query(String sql) {
+
+
+    }
 }

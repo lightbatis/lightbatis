@@ -20,6 +20,7 @@ import java.util.List;
 
 import titan.lightbatis.dataset.DataRow;
 import titan.lightbatis.dataset.DataTable;
+import titan.lightbatis.table.ColumnSchema;
 
 
 public class CreatedState extends AbstractRowState {
@@ -37,16 +38,16 @@ public class CreatedState extends AbstractRowState {
         buf.append(table.getTableName());
         buf.append(" (");
         int writableColumnSize = 0;
-//        for (int i = 0; i < table.getColumnSize(); ++i) {
-//            DataColumn column = table.getColumn(i);
-//            if (column.isWritable()) {
-//                ++writableColumnSize;
-//                buf.append(column.getColumnName());
-//                buf.append(", ");
-//                argList.add(row.getValue(i));
-//                argTypeList.add(column.getColumnType().getType());
-//            }
-//        }
+        for (int i = 0; i < table.getColumnSize(); ++i) {
+            ColumnSchema column = table.getColumn(i);
+            if (column.isWritable()) {
+                ++writableColumnSize;
+                buf.append(column.getColumnName());
+                buf.append(", ");
+                argList.add(row.getValue(i));
+                argTypeList.add(column.getColumnClz());
+            }
+        }
         buf.setLength(buf.length() - 2);
         buf.append(") VALUES (");
         for (int i = 0; i < writableColumnSize; ++i) {

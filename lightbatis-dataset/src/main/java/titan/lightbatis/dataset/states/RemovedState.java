@@ -21,6 +21,7 @@ import java.util.List;
 import titan.lightbatis.dataset.DataRow;
 import titan.lightbatis.dataset.DataTable;
 import titan.lightbatis.dataset.exception.PrimaryKeyNotFoundRuntimeException;
+import titan.lightbatis.table.ColumnSchema;
 
 
 public class RemovedState extends AbstractRowState {
@@ -38,16 +39,16 @@ public class RemovedState extends AbstractRowState {
         buf.append(table.getTableName());
         buf.append(" WHERE ");
         boolean hasPrimaryKey = false;
-//        for (int i = 0; i < table.getColumnSize(); ++i) {
-//            DataColumn column = table.getColumn(i);
-//            if (column.isPrimaryKey()) {
-//                hasPrimaryKey = true;
-//                buf.append(column.getColumnName());
-//                buf.append(" = ? AND ");
-//                argList.add(row.getValue(i));
-//                argTypeList.add(column.getColumnType().getType());
-//            }
-//        }
+        for (int i = 0; i < table.getColumnSize(); ++i) {
+            ColumnSchema column = table.getColumn(i);
+            if (column.isPrimary()) {
+                hasPrimaryKey = true;
+                buf.append(column.getColumnName());
+                buf.append(" = ? AND ");
+                argList.add(row.getValue(i));
+                argTypeList.add(column.getColumnClz());
+            }
+        }
         if (!hasPrimaryKey) {
             throw new PrimaryKeyNotFoundRuntimeException(table.getTableName());
         }
