@@ -7,6 +7,10 @@ import titan.lightbatis.dataset.DataWriter;
 public class JdbcDatasetWriter implements DataWriter {
     private JdbcTemplate jdbcTemplate = null;
 
+    public JdbcDatasetWriter(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     @Override
     public void write(DataSet dataSet) {
         JdbcTableWriter tableWriter = new JdbcTableWriter(jdbcTemplate);
