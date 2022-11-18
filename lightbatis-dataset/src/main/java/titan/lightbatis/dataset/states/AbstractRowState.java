@@ -15,11 +15,11 @@
  */
 package titan.lightbatis.dataset.states;
 
-import javax.sql.DataSource;
-
+import org.springframework.jdbc.core.JdbcTemplate;
 import titan.lightbatis.dataset.DataRow;
 import titan.lightbatis.dataset.RowState;
-import titan.lightbatis.dataset.handler.UpdateHandler;
+import titan.lightbatis.dataset.jdbc.UpdateHandler;
+import titan.lightbatis.dataset.jdbc.BasicUpdateHandler;
 
 
 public abstract class AbstractRowState implements RowState {
@@ -27,9 +27,10 @@ public abstract class AbstractRowState implements RowState {
     AbstractRowState() {
     }
 
-    public void update(DataSource dataSource, DataRow row) {
+    public void update(JdbcTemplate jdbcTemplate, DataRow row) {
         SqlContext ctx = getSqlContext(row);
-        //UpdateHandler handler = new BasicUpdateHandler(dataSource, ctx.getSql());
+        System.out.println(ctx.getSql());
+        UpdateHandler handler = new BasicUpdateHandler(jdbcTemplate, ctx.getSql());
         //execute(handler, ctx.getArgs(), ctx.getArgTypes());
     }
 

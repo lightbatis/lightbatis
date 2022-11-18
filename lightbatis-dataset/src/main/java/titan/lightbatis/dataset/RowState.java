@@ -15,11 +15,13 @@
  */
 package titan.lightbatis.dataset;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import javax.sql.DataSource;
 
 
 public interface RowState {
 
 
-    void update(DataSource dataSource, DataRow row);
+    void update(JdbcTemplate jdbcTemplate, DataRow row);
 }

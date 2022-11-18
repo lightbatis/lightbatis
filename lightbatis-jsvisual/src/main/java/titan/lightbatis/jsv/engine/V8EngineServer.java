@@ -64,7 +64,7 @@ public class V8EngineServer {
 		v8.getLocker().acquire();
 		v8.executeScript(script);
 	}
-	public Object executeScript(String script, Map<String, Object> params) {
+	public Object executeScript(String script, Map<String, Object> params) throws Exception {
 		V8Object context = null;
 		V8Array parameters = null;
 		try{
@@ -76,8 +76,9 @@ public class V8EngineServer {
 				String key = entry.getKey();
 				addValueAll(v8, key, value);
 			}
-			Object objectResult = v8.executeScript(script);
+			Object objectResult = null;
 			try{
+				 objectResult = v8.executeScript(script);
 				if (objectResult instanceof V8Object) {
 					V8Object object = (V8Object) objectResult;
 					if (object.isUndefined()) {
@@ -89,9 +90,10 @@ public class V8EngineServer {
 				} else {
 					return objectResult;
 				}
-			}catch (V8ResultUndefined undefined) {
+			}catch (Exception undefined) {
+				System.out.println(script);
 				undefined.printStackTrace(System.err);
-				return null;
+				throw undefined;
 			}
 
 		} finally {

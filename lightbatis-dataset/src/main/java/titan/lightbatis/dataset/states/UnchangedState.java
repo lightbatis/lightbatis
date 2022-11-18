@@ -17,6 +17,7 @@ package titan.lightbatis.dataset.states;
 
 import javax.sql.DataSource;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import titan.lightbatis.dataset.DataRow;
 import titan.lightbatis.dataset.RowState;
 
@@ -28,5 +29,10 @@ public class UnchangedState implements RowState {
 
     public String toString() {
         return "UNCHANGED";
+    }
+
+    @Override
+    public void update(JdbcTemplate jdbcTemplate, DataRow row) {
+
     }
 }
