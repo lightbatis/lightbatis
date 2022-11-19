@@ -19,5 +19,5 @@ package titan.lightbatis.dataset;
 public interface TableWriter {
 
 
-    public void write(DataTable table);
+    public void write(DataTable table) throws WriteException;
 }

@@ -21,7 +21,7 @@ import titan.lightbatis.dataset.exception.SQLRuntimeException;
 public interface UpdateHandler {
 
 
-    int execute(Object[] args) throws SQLRuntimeException;
+//    int execute(Object[] args) throws SQLRuntimeException;
 
 
     int execute(Object[] args, Class[] argTypes) throws SQLRuntimeException;

@@ -1,10 +1,7 @@
 package titan.lightbatis.dataset.impl;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import titan.lightbatis.dataset.DataRow;
-import titan.lightbatis.dataset.DataTable;
-import titan.lightbatis.dataset.RowState;
-import titan.lightbatis.dataset.TableWriter;
+import titan.lightbatis.dataset.*;
 
 public class JdbcTableWriter implements TableWriter {
     private JdbcTemplate jdbcTemplate = null;
@@ -12,7 +9,7 @@ public class JdbcTableWriter implements TableWriter {
         this.jdbcTemplate = jdbcTemplate;
     }
     @Override
-    public void write(DataTable table) {
+    public void write(DataTable table) throws WriteException {
         for (int i=0; i< table.getRowSize(); i++) {
             DataRow row = table.getRow(i);
             RowState state = row.getState();

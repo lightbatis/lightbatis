@@ -4,7 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class BasicHandler {
     private String sql;
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     public BasicHandler(JdbcTemplate jdbcTemplate, String sql) {
         this.jdbcTemplate = jdbcTemplate;

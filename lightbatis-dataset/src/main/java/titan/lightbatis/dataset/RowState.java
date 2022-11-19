@@ -23,5 +23,5 @@ import javax.sql.DataSource;
 public interface RowState {
 
 
-    void update(JdbcTemplate jdbcTemplate, DataRow row);
+    void update(JdbcTemplate jdbcTemplate, DataRow row) throws WriteException;
 }

@@ -18,6 +18,8 @@ package titan.lightbatis.dataset.states;
 import org.springframework.jdbc.core.JdbcTemplate;
 import titan.lightbatis.dataset.DataRow;
 import titan.lightbatis.dataset.RowState;
+import titan.lightbatis.dataset.WriteException;
+import titan.lightbatis.dataset.exception.SQLRuntimeException;
 import titan.lightbatis.dataset.jdbc.UpdateHandler;
 import titan.lightbatis.dataset.jdbc.BasicUpdateHandler;
 
@@ -27,11 +29,11 @@ public abstract class AbstractRowState implements RowState {
     AbstractRowState() {
     }
 
-    public void update(JdbcTemplate jdbcTemplate, DataRow row) {
+    public void update(JdbcTemplate jdbcTemplate, DataRow row) throws WriteException {
         SqlContext ctx = getSqlContext(row);
         System.out.println(ctx.getSql());
         UpdateHandler handler = new BasicUpdateHandler(jdbcTemplate, ctx.getSql());
-        //execute(handler, ctx.getArgs(), ctx.getArgTypes());
+        execute(handler, ctx.getArgs(), ctx.getArgTypes());
     }
 
 
@@ -39,7 +41,11 @@ public abstract class AbstractRowState implements RowState {
 
 
     protected void execute(UpdateHandler handler, Object[] args,
-                           Class[] argTypes) {
-        handler.execute(args, argTypes);
+                           Class[] argTypes) throws WriteException{
+        try {
+            handler.execute(args, argTypes);
+        }catch (SQLRuntimeException ex) {
+            throw new WriteException(ex);
+        }
     }
 }
