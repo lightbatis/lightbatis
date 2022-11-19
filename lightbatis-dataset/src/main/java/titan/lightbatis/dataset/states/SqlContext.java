@@ -46,7 +46,7 @@ public class SqlContext {
         setSql(sql);
         setArgs(args);
         //setArgTypes(argTypes);
-        System.out.println("================>>>>>>>>" + argTypeList);
+       // System.out.println("================>>>>>>>>" + argTypeList);
         argTypes = new int[argTypeList.size()];
         for (int i=0;i< argTypeList.size();i++) {
             argTypes[i] = argTypeList.get(i);
