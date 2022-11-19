@@ -24,5 +24,5 @@ public interface UpdateHandler {
 //    int execute(Object[] args) throws SQLRuntimeException;
 
 
-    int execute(Object[] args, Class[] argTypes) throws SQLRuntimeException;
+    int execute(Object[] args, int[] argTypes) throws SQLRuntimeException;
 }

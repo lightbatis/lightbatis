@@ -40,7 +40,7 @@ public class ModifiedState extends AbstractRowState {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List argList = new ArrayList();
-        List argTypeList = new ArrayList();
+        List<Integer> argTypeList = new ArrayList();
         buf.append("UPDATE ");
         buf.append(table.getTableName());
         buf.append(" SET ");
@@ -50,7 +50,8 @@ public class ModifiedState extends AbstractRowState {
                 buf.append(column.getColumnName());
                 buf.append(" = ?, ");
                 argList.add(row.getValue(i));
-                argTypeList.add(column.getColumnClz());
+                //argTypeList.add(column.getColumnClz());
+                argTypeList.add(column.getType());
             }
         }
         buf.setLength(buf.length() - 2);
@@ -63,15 +64,16 @@ public class ModifiedState extends AbstractRowState {
                 buf.append(column.getColumnName());
                 buf.append(" = ? AND ");
                 argList.add(row.getValue(i));
-                argTypeList.add(column.getColumnClz());
+//                argTypeList.add(column.getColumnClz());
+                argTypeList.add(column.getType());
             }
         }
         if (!hasPrimaryKey) {
             throw new PrimaryKeyNotFoundRuntimeException(table.getTableName());
         }
         buf.setLength(buf.length() - 5);
-        return new SqlContext(buf.toString(), argList.toArray(),
-                (Class[]) argTypeList.toArray(new Class[argTypeList.size()]));
+
+        return new SqlContext(buf.toString(), argList.toArray(), argTypeList);
     }
     /*
      * protected String getSql(DataTable table) { String sql = (String)

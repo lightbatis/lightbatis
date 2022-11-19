@@ -16,51 +16,41 @@
 package titan.lightbatis.dataset.states;
 
 
+import lombok.Data;
+
+import java.util.List;
+
+@Data
 public class SqlContext {
 
     private String sql;
 
     private Object[] args;
 
-    private Class[] argTypes;
+//    private Class[] argTypes;
 
+    private int[] argTypes;
 
     public SqlContext() {
     }
 
 
-    public SqlContext(String sql, Object[] args, Class[] argTypes) {
+//    public SqlContext(String sql, Object[] args, Class[] argTypes) {
+//        setSql(sql);
+//        setArgs(args);
+//        setArgTypes(argTypes);
+//    }
+
+    public SqlContext(String sql, Object[] args, List<Integer> argTypeList) {
+        //int[] argTypes
         setSql(sql);
         setArgs(args);
-        setArgTypes(argTypes);
+        //setArgTypes(argTypes);
+        System.out.println("================>>>>>>>>" + argTypeList);
+        argTypes = new int[argTypeList.size()];
+        for (int i=0;i< argTypeList.size();i++) {
+            argTypes[i] = argTypeList.get(i);
+        }
     }
 
-
-    public Object[] getArgs() {
-        return args;
-    }
-
-
-    public void setArgs(Object[] args) {
-        this.args = args;
-    }
-
-    public Class[] getArgTypes() {
-        return argTypes;
-    }
-
-
-    public void setArgTypes(Class[] argTypes) {
-        this.argTypes = argTypes;
-    }
-
-
-    public String getSql() {
-        return sql;
-    }
-
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
 }

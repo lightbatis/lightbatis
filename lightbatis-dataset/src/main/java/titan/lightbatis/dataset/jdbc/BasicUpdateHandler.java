@@ -20,11 +20,12 @@ public class BasicUpdateHandler extends  BasicHandler implements UpdateHandler{
 //    }
 
     @Override
-    public int execute(Object[] args, Class[] argTypes) throws SQLRuntimeException {
+    public int execute(Object[] args, int[] argTypes) throws SQLRuntimeException {
         try{
             int count = jdbcTemplate.update(getSql(), args, argTypes);
             return count;
         }catch (Throwable ex) {
+            ex.printStackTrace(System.out);
             throw new SQLRuntimeException("\r\n" + getSql() + "\r\n" + ArrayUtils.toString(args), ex);
         }
 

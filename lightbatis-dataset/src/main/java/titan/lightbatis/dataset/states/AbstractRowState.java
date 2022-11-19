@@ -41,7 +41,7 @@ public abstract class AbstractRowState implements RowState {
 
 
     protected void execute(UpdateHandler handler, Object[] args,
-                           Class[] argTypes) throws WriteException{
+                           int[] argTypes) throws WriteException{
         try {
             handler.execute(args, argTypes);
         }catch (SQLRuntimeException ex) {
