@@ -144,11 +144,10 @@ public class DataRowImpl implements DataRow {
             String columnName = table_.getColumnName(i);
             Object value = values_.get(i);
             Object otherValue = other.getValue(columnName);
-            return value.equals(otherValue);
-//            ColumnType ct = ColumnTypes.getColumnType(value);
-//            if (ct.equals(value, otherValue)) {
-//                continue;
-//            }
+            if(value.equals(otherValue)){
+                continue;
+            }
+            return false;
         }
         return true;
     }
