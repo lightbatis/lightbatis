@@ -80,8 +80,8 @@ public interface DataTable {
 
 
     void copyFrom(Object source);
-
-    DataRow getRowById(String rowId);
+//
+//    DataRow getRowById(String rowId);
 
     List<DataRow> getRows();
 }

@@ -17,7 +17,13 @@ public class DataQueryImpl implements DataQuery {
     @Override
     public DataRow findBy(String column, Object value) {
         List<DataRow> rows = table.getRows();
-        Optional<DataRow> rowOptional = rows.stream().filter(row-> row.getValue(column).equals(value)).findFirst();
+        Optional<DataRow> rowOptional = rows.stream().filter((row)->{
+           Object val = row.getValue(column);
+           if (val != null && val.equals(value)) {
+               return true;
+           }
+            return false;
+        }).findFirst();
         if (rowOptional.isPresent()) {
             return rowOptional.get();
         }

@@ -67,13 +67,13 @@ public class DataTableImpl implements DataTable {
         return (DataRow) rows.get(index);
     }
 
-    public DataRow getRowById(String rowId)  {
-        Optional<DataRow> rowOptional = rows.stream().filter(row-> row.getRowId().equals(rowId)).findFirst();
-        if (rowOptional.isPresent()) {
-           return rowOptional.get();
-        }
-        return  null;
-    }
+//    public DataRow getRowById(String rowId)  {
+//        Optional<DataRow> rowOptional = rows.stream().filter(row-> row.getRowId().equals(rowId)).findFirst();
+//        if (rowOptional.isPresent()) {
+//           return rowOptional.get();
+//        }
+//        return  null;
+//    }
 
     public List<DataRow> getRows() {
         return rows;

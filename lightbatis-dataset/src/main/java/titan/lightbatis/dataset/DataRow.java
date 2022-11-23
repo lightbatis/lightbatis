@@ -22,8 +22,8 @@ import java.util.Map;
 
 public interface DataRow {
 
-    String setRowId(String rowId);
-    String getRowId();
+//    String setRowId(String rowId);
+//    String getRowId();
 
     Object getValue(int index);
 

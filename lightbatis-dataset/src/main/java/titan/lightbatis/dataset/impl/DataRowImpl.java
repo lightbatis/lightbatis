@@ -41,7 +41,7 @@ public class DataRowImpl implements DataRow {
 
     private RowState state_ = RowStates.UNCHANGED;
 
-    private String rowId = null;
+//    private String rowId = null;
     public DataRowImpl(DataTable table) {
         table_ = table;
         initValues();
@@ -54,15 +54,15 @@ public class DataRowImpl implements DataRow {
     }
 
 
-    @Override
-    public String setRowId(String rowId) {
-        return this.rowId = rowId;
-    }
-
-    @Override
-    public String getRowId() {
-        return rowId;
-    }
+//    @Override
+//    public String setRowId(String rowId) {
+//        return this.rowId = rowId;
+//    }
+//
+//    @Override
+//    public String getRowId() {
+//        return rowId;
+//    }
 
     public Object getValue(int index) {
         return values_.get(index);
