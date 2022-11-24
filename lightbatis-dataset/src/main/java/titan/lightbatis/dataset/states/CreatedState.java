@@ -35,7 +35,8 @@ public class CreatedState extends AbstractRowState {
         List argList = new ArrayList();
 //        List argTypeList = new ArrayList();
         List<Integer> argTypeList = new ArrayList();
-        buf.append("INSERT INTO ");
+        //buf.append("INSERT INTO ");
+        buf.append("REPLACE INTO ");
         buf.append(table.getTableName());
         buf.append(" (");
         int writableColumnSize = 0;
