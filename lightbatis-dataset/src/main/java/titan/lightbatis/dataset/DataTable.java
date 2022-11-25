@@ -84,4 +84,6 @@ public interface DataTable {
 //    DataRow getRowById(String rowId);
 
     List<DataRow> getRows();
+
+    void clear();
 }

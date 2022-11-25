@@ -79,6 +79,11 @@ public class DataTableImpl implements DataTable {
         return rows;
     }
 
+    @Override
+    public void clear() {
+        rows.clear();
+    }
+
     public DataRow addRow() {
         DataRow row = new DataRowImpl(this);
         rows.add(row);
