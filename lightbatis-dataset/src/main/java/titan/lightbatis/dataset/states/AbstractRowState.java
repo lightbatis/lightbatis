@@ -32,6 +32,7 @@ public abstract class AbstractRowState implements RowState {
     public void update(JdbcTemplate jdbcTemplate, DataRow row) throws WriteException {
         SqlContext ctx = getSqlContext(row);
         System.out.println(ctx.getSql());
+        System.out.println(row.toString());
         UpdateHandler handler = new BasicUpdateHandler(jdbcTemplate, ctx.getSql());
         execute(handler, ctx.getArgs(), ctx.getArgTypes());
     }
