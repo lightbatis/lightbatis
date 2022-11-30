@@ -37,7 +37,7 @@ public class DataRowImpl implements DataRow {
 
     private DataTable table_;
 
-    private ArrayMap values_ = new CaseInsensitiveMap();
+    private CaseInsensitiveMap values_ = new CaseInsensitiveMap();
 
     private RowState state_ = RowStates.UNCHANGED;
 
@@ -172,8 +172,8 @@ public class DataRowImpl implements DataRow {
     private void copyFromMap(Map source) {
         for (Iterator i = source.keySet().iterator(); i.hasNext();) {
             String columnName = (String) i.next();
-            ColumnSchema columnSchema = table_.getColumn(columnName);
             if (table_.hasColumn(columnName)) {
+                ColumnSchema columnSchema = table_.getColumn(columnName);
                 Object value = source.get(columnName);
                 setValue(columnName, convert(value, columnSchema));
             }
