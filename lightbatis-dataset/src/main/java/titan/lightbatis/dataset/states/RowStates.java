@@ -17,39 +17,19 @@ package titan.lightbatis.dataset.states;
 
 import titan.lightbatis.dataset.RowState;
 
-/**
- * {@link RowState}を管理するインターフェースです。
- * 
- * @author higa
- * 
- */
 public interface RowStates {
 
-    /**
-     * 変更がないとき用の {@link RowState}です。
-     * 
-     * @see UnchangedState
-     */
+
     RowState UNCHANGED = new UnchangedState();
 
-    /**
-     * 新規作成用の {@link RowState}です。
-     * 
-     * @see CreatedState
-     */
+
     RowState CREATED = new CreatedState();
 
-    /**
-     * 更新用の {@link RowState}です。
-     * 
-     * @see ModifiedState
-     */
+
     RowState MODIFIED = new ModifiedState();
 
-    /**
-     * 削除用の {@link RowState}です。
-     * 
-     * @see RemovedState
-     */
+
     RowState REMOVED = new RemovedState();
+
+    RowState SAVE = new SaveState();
 }
