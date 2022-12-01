@@ -73,7 +73,9 @@ public class DataRowImpl implements DataRow {
             throws ColumnNotFoundRuntimeException {
 
         ColumnSchema column = table_.getColumn(columnName);
-        return values_.get(column.getColumnIndex());
+        Object obj = values_.get(columnName);
+        return obj;
+        //return values_.get(column.getColumnIndex());
     }
 
 
@@ -83,11 +85,14 @@ public class DataRowImpl implements DataRow {
         ColumnSchema column = table_.getColumn(columnName);
         values_.put(columnName, convert(value, column));
         modify();
+
     }
 
 
     public void setValue(int index, Object value) {
         ColumnSchema column = table_.getColumn(index);
+        Object val = convert(value, column);
+        values_.put(column.getColumnName(), val);
         values_.set(index, convert(value, column));
         modify();
     }

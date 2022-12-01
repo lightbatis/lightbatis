@@ -91,8 +91,8 @@ public class V8EngineServer {
 					return objectResult;
 				}
 			}catch (Exception undefined) {
-				System.out.println(script);
-				undefined.printStackTrace(System.err);
+				//System.out.println(script);
+				//undefined.printStackTrace(System.err);
 				throw undefined;
 			}
 
