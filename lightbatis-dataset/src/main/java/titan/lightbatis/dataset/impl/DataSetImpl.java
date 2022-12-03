@@ -54,7 +54,6 @@ public class DataSetImpl implements DataSet {
 
     public DataTable getTable(String tableName)
             throws TableNotFoundRuntimeException {
-
         DataTable table = (DataTable) tables.get(tableName);
         if (table == null) {
             throw new TableNotFoundRuntimeException(tableName);
