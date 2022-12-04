@@ -180,11 +180,6 @@ public class XlsReader implements DataReader, DataSetConstants {
         Row nameRow = sheet.getRow(option.getColumnNameStartRow());
         Row valueRow = sheet.getRow(option.getColumnNameStartRow() +1);
 
-//        for(int columnIndex =0; columnIndex < nameRow.getLastCellNum(); columnIndex++) {
-//            Cell cell = nameRow.getCell(columnIndex);
-//            System.out.println(cell);
-//        }
-
         for (int i = 0; i <= Short.MAX_VALUE; ++i) {
             Cell nameCell = nameRow.getCell( i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             if (nameCell == null) {
