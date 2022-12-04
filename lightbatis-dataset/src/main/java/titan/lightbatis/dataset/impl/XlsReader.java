@@ -181,10 +181,11 @@ public class XlsReader implements DataReader, DataSetConstants {
         Row valueRow = sheet.getRow(option.getColumnNameStartRow() +1);
 
         for (int i = 0; i <= Short.MAX_VALUE; ++i) {
-            Cell nameCell = nameRow.getCell( i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            Cell nameCell = nameRow.getCell( i);
             if (nameCell == null) {
                 break;
             }
+
             String columnName = nameCell.getRichStringCellValue().getString();
             if (columnName.length() == 0) {
                 break;
@@ -210,6 +211,14 @@ public class XlsReader implements DataReader, DataSetConstants {
                 //table.addColumn(columnName);
             }
         }
+        if (table.getColumnSize() > 0) {
+            ColumnSchema columnSchema = new ColumnSchema();
+            columnSchema.setColumnName("_id");
+            columnSchema.setColumnClz(String.class);
+            columnSchema.setColumnIndex(table.getColumnSize());
+            columnSchema.setWritable(false);
+            table.addColumn(columnSchema);
+        }
     }
 
 
@@ -219,18 +228,19 @@ public class XlsReader implements DataReader, DataSetConstants {
             if (row == null) {
                 break;
             }
-            setupRow(table, row);
+            setupRow(table, row,i);
         }
     }
 
 
-    protected void setupRow(DataTable table, Row row) {
+    protected void setupRow(DataTable table, Row row, Integer index) {
         DataRow dataRow = table.addRow();
         for (int i = 0; i < table.getColumnSize(); ++i) {
             Cell cell = row.getCell((short) i);
             Object value = getValue(cell);
             dataRow.setValue(i, value);
         }
+        dataRow.setValue("_id", String.valueOf(index));
     }
 
 
