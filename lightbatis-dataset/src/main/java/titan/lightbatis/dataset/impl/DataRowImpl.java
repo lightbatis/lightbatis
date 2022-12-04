@@ -132,7 +132,9 @@ public class DataRowImpl implements DataRow {
             buf.append(getValue(i));
             buf.append(", ");
         }
-        buf.setLength(buf.length() - 2);
+        if(buf.length() > 2) {
+            buf.setLength(buf.length() - 2);
+        }
         buf.append('}');
         return buf.toString();
     }

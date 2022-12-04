@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.sql.JDBCType;
 import java.sql.Timestamp;
 
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.record.RowRecord;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -31,7 +32,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.util.ResourceUtils;
 import titan.lightbatis.dataset.*;
 import titan.lightbatis.dataset.exception.IORuntimeException;
@@ -40,148 +42,113 @@ import titan.lightbatis.table.ColumnSchema;
 
 
 public class XlsReader implements DataReader, DataSetConstants {
+    public static String VERSION_2003 = "2003";
+    public static String VERSION_2007 = "2007";
 
-    /**
-     * データセットです。
-     */
     protected DataSet dataSet;
 
-    /**
-     * ワークブックです。
-     */
-    protected HSSFWorkbook workbook;
 
-    /**
-     * データフォーマットです。
-     */
-    protected HSSFDataFormat dataFormat;
+    protected Workbook workbook;
 
-    /**
-     * 文字列をトリミングするかどうか
-     */
+
+    protected DataFormat dataFormat;
+
+
     protected boolean trimString = true;
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param path
-     *            パス
-     */
+    private ExcelOption option = new ExcelOption();
+
     public XlsReader(String path) {
         this(path, true);
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param path
-     *            パス
-     * @param trimString
-     *            文字列をトリムするかどうか
-     */
+
     public XlsReader(String path, boolean trimString) {
         this(ResourceUtil.getResourceAsStream(path), trimString);
 
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param dirName
-     *            ディレクトリ名
-     * @param fileName
-     *            ファイル名
-     */
+
     public XlsReader(String dirName, String fileName) {
         this(dirName, fileName, true);
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param dirName
-     *            ディレクトリ名
-     * @param fileName
-     *            ファイル名
-     * @param trimString
-     *            文字列をトリムするかどうか
-     */
+
     public XlsReader(String dirName, String fileName, boolean trimString) {
         this(ResourceUtil.getResourceAsFile(dirName), fileName, trimString);
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param dir
-     *            ディレクトリ
-     * @param fileName
-     *            ファイル名
-     */
+
     public XlsReader(File dir, String fileName) {
         this(dir, fileName, true);
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param dir
-     *            ディレクトリ
-     * @param fileName
-     *            ファイル名
-     * @param trimString
-     *            文字列をトリムするかどうか
-     */
+
     public XlsReader(File dir, String fileName, boolean trimString) {
-        this(new File(dir, fileName), trimString);
+        this(new File(dir, fileName), trimString, new ExcelOption());
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param file
-     *            ファイル
-     */
-    public XlsReader(File file) {
-        this(file, true);
+
+    public XlsReader(File file, ExcelOption option) {
+        this(file, true, option);
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param file
-     *            ファイル
-     * @param trimString
-     *            文字列をトリムするかどうか
-     */
-    public XlsReader(File file, boolean trimString) {
-        this(FileInputStreamUtil.create(file), trimString);
+
+    public XlsReader(File file, boolean trimString, ExcelOption option) {
+        this.trimString = trimString;
+        this.option = option;
+        try{
+            String fileName = file.getName();
+            String ext = FileNameUtils.getExtension(fileName);
+            String version = VERSION_2007;
+            if (".xls".equals(ext.toLowerCase())) {
+                version = VERSION_2003;
+            }else {
+                version = VERSION_2007;
+            }
+            open(FileInputStreamUtil.create(file), version);
+        }catch (Exception ex) {
+            try {
+                open(FileInputStreamUtil.create(file), VERSION_2003);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param in
-     *            入力ストリーム
-     */
+
     public XlsReader(InputStream in) {
         this(in, true);
     }
 
-    /**
-     * {@link XlsReader}を作成します。
-     * 
-     * @param in
-     *            入力ストリーム
-     * @param trimString
-     *            文字列をトリムするかどうか
-     */
+
     public XlsReader(InputStream in, boolean trimString) {
         this.trimString = trimString;
-        try {
-            workbook = new HSSFWorkbook(in);
-        } catch (IOException ex) {
-            throw new IORuntimeException(ex);
+        try{
+            open(in, VERSION_2007);
+        }catch (Exception ex) {
+            try {
+                open(in, VERSION_2003);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+    protected void open(InputStream in , String version) throws Exception {
+        if (version.equals(VERSION_2007)) {
+            try {
+                workbook = new XSSFWorkbook(in);
+            } catch (IOException e) {
+                throw new Exception(e);
+            }
+        }
+        if (version.equals(VERSION_2003)) {
+            try {
+                workbook = new HSSFWorkbook(in);
+            } catch (Exception ex) {
+                throw ex;
+            }
         }
         dataFormat = workbook.createDataFormat();
         dataSet = new DataSetImpl();
@@ -194,16 +161,8 @@ public class XlsReader implements DataReader, DataSetConstants {
         return dataSet;
     }
 
-    /**
-     * テーブルを作成します。
-     * 
-     * @param sheetName
-     *            シート名
-     * @param sheet
-     *            シート
-     * @return テーブル
-     */
-    protected DataTable createTable(String sheetName, HSSFSheet sheet) {
+
+    protected DataTable createTable(String sheetName, Sheet sheet) {
         DataTable table = dataSet.addTable(sheetName);
         int rowCount = sheet.getLastRowNum();
         if (rowCount > 0) {
@@ -215,19 +174,19 @@ public class XlsReader implements DataReader, DataSetConstants {
         return table;
     }
 
-    /**
-     * カラムの情報をセットアップします。
-     * 
-     * @param table
-     *            テーブル
-     * @param sheet
-     *            シート
-     */
-    protected void setupColumns(DataTable table, HSSFSheet sheet) {
-        HSSFRow nameRow = sheet.getRow(0);
-        HSSFRow valueRow = sheet.getRow(1);
+
+    protected void setupColumns(DataTable table, Sheet sheet) {
+
+        Row nameRow = sheet.getRow(option.getColumnNameStartRow());
+        Row valueRow = sheet.getRow(option.getColumnNameStartRow() +1);
+
+//        for(int columnIndex =0; columnIndex < nameRow.getLastCellNum(); columnIndex++) {
+//            Cell cell = nameRow.getCell(columnIndex);
+//            System.out.println(cell);
+//        }
+
         for (int i = 0; i <= Short.MAX_VALUE; ++i) {
-            HSSFCell nameCell = nameRow.getCell((short) i);
+            Cell nameCell = nameRow.getCell( i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             if (nameCell == null) {
                 break;
             }
@@ -235,7 +194,7 @@ public class XlsReader implements DataReader, DataSetConstants {
             if (columnName.length() == 0) {
                 break;
             }
-            HSSFCell valueCell = null;
+            Cell valueCell = null;
             if (valueRow != null) {
                 for (int j = 1; j <= sheet.getLastRowNum(); j++) {
                     valueCell = sheet.getRow(j).getCell((short) i);
@@ -258,17 +217,10 @@ public class XlsReader implements DataReader, DataSetConstants {
         }
     }
 
-    /**
-     * シートの行をセットアップします。
-     * 
-     * @param table
-     *            テーブル
-     * @param sheet
-     *            シート
-     */
-    protected void setupRows(DataTable table, HSSFSheet sheet) {
+
+    protected void setupRows(DataTable table, Sheet sheet) {
         for (int i = 1; i <= sheet.getLastRowNum(); ++i) {
-            HSSFRow row = sheet.getRow(i);
+            Row row = sheet.getRow(i);
             if (row == null) {
                 break;
             }
@@ -276,45 +228,26 @@ public class XlsReader implements DataReader, DataSetConstants {
         }
     }
 
-    /**
-     * 行をセットアップします。
-     * 
-     * @param table
-     *            テーブル
-     * @param row
-     *            行
-     */
-    protected void setupRow(DataTable table, HSSFRow row) {
+
+    protected void setupRow(DataTable table, Row row) {
         DataRow dataRow = table.addRow();
         for (int i = 0; i < table.getColumnSize(); ++i) {
-            HSSFCell cell = row.getCell((short) i);
+            Cell cell = row.getCell((short) i);
             Object value = getValue(cell);
             dataRow.setValue(i, value);
         }
     }
 
-    /**
-     * セルがBase64でフォーマットされているかどうかを返します。
-     * 
-     * @param cell
-     *            セル
-     * @return セルがBase64でフォーマットされているかどうか
-     */
-    public boolean isCellBase64Formatted(HSSFCell cell) {
-        HSSFCellStyle cs = cell.getCellStyle();
+
+    public boolean isCellBase64Formatted(Cell cell) {
+        CellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
         return BASE64_FORMAT.equals(dataFormat.getFormat(dfNum));
     }
 
-    /**
-     * セルが日付のフォーマットかどうかを返します。
-     * 
-     * @param cell
-     *            セル
-     * @return セルが日付のフォーマットかどうか
-     */
-    public boolean isCellDateFormatted(HSSFCell cell) {
-        HSSFCellStyle cs = cell.getCellStyle();
+
+    public boolean isCellDateFormatted(Cell cell) {
+        CellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
         String format = dataFormat.getFormat(dfNum);
         if (StringUtils.isEmpty(format)) {
@@ -327,14 +260,8 @@ public class XlsReader implements DataReader, DataSetConstants {
         return false;
     }
 
-    /**
-     * セルの値を返します。
-     * 
-     * @param cell
-     *            セル
-     * @return セルの値
-     */
-    public Object getValue(HSSFCell cell) {
+
+    public Object getValue(Cell cell) {
         if (cell == null) {
             return null;
         }
@@ -375,7 +302,7 @@ public class XlsReader implements DataReader, DataSetConstants {
     }
 
 
-    protected ColumnSchema getColumnType(HSSFCell cell) {
+    protected ColumnSchema getColumnType(Cell cell) {
         ColumnSchema columnSchema = new ColumnSchema();
 
         switch (cell.getCellType())  {
@@ -432,13 +359,7 @@ public class XlsReader implements DataReader, DataSetConstants {
 //        }
 //    }
 
-    /**
-     * 整数かどうかを返します。
-     * 
-     * @param numericCellValue
-     *            numericな値
-     * @return 整数かどうか
-     */
+
     protected boolean isInt(final double numericCellValue) {
         return ((int) numericCellValue) == numericCellValue;
     }
