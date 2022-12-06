@@ -11,6 +11,7 @@ public class JdbcDatasetWriter implements DataWriter {
     private Boolean batch = false;
     public JdbcDatasetWriter(JdbcTemplate jdbcTemplate, Boolean batch) {
         this.jdbcTemplate = jdbcTemplate;
+        this.batch = batch;
     }
 
     @Override

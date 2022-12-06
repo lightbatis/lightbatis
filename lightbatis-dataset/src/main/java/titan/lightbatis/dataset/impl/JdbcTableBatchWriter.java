@@ -5,10 +5,7 @@ import titan.lightbatis.dataset.*;
 import titan.lightbatis.dataset.states.AbstractRowState;
 import titan.lightbatis.dataset.states.SqlContext;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JdbcTableBatchWriter implements TableWriter {
@@ -33,9 +30,13 @@ public class JdbcTableBatchWriter implements TableWriter {
                 String sql = entry.getKey();
                 int[] types = entry.getValue().get(0).getArgTypes();
                 List<Object[]> values = new ArrayList<>();
+
                 entry.getValue().forEach(sqlContext -> {
                     values.add(sqlContext.getArgs());
                 });
+                System.out.println("批处理:" + sql);
+                System.out.println("类型:" + Arrays.toString(types));
+                System.out.println("批处理条数：" + values.size());
                 jdbcTemplate.batchUpdate(sql, values, types);
             });
 
