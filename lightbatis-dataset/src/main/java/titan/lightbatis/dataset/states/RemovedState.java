@@ -30,7 +30,7 @@ public class RemovedState extends AbstractRowState {
         return "REMOVED";
     }
 
-    protected SqlContext getSqlContext(DataRow row) {
+    public SqlContext getSqlContext(DataRow row) {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List argList = new ArrayList();

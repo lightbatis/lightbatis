@@ -8,15 +8,24 @@ import titan.lightbatis.dataset.WriteException;
 public class JdbcDatasetWriter implements DataWriter {
     private JdbcTemplate jdbcTemplate = null;
 
-    public JdbcDatasetWriter(JdbcTemplate jdbcTemplate) {
+    private Boolean batch = false;
+    public JdbcDatasetWriter(JdbcTemplate jdbcTemplate, Boolean batch) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void write(DataSet dataSet) throws WriteException {
-        JdbcTableWriter tableWriter = new JdbcTableWriter(jdbcTemplate);
-        for (int i=0;i<dataSet.getTableSize();i++){
-            tableWriter.write(dataSet.getTable(i));
+        if (batch) {
+            JdbcTableBatchWriter tableWriter = new JdbcTableBatchWriter(jdbcTemplate);
+            for (int i=0;i<dataSet.getTableSize();i++){
+                tableWriter.write(dataSet.getTable(i));
+            }
+        }else {
+            JdbcTableWriter tableWriter = new JdbcTableWriter(jdbcTemplate);
+            for (int i=0;i<dataSet.getTableSize();i++){
+                tableWriter.write(dataSet.getTable(i));
+            }
         }
+
     }
 }

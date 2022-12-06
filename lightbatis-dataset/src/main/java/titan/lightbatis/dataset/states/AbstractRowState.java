@@ -38,7 +38,7 @@ public abstract class AbstractRowState implements RowState {
     }
 
 
-    protected abstract SqlContext getSqlContext(DataRow row);
+    public abstract SqlContext getSqlContext(DataRow row);
 
 
     protected void execute(UpdateHandler handler, Object[] args,

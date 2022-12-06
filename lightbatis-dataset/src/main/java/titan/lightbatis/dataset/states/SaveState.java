@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SaveState extends AbstractRowState{
     @Override
-    protected SqlContext getSqlContext(DataRow row) {
+    public SqlContext getSqlContext(DataRow row) {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List argList = new ArrayList();

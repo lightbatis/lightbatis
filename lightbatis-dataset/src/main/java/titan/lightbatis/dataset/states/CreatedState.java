@@ -29,7 +29,7 @@ public class CreatedState extends AbstractRowState {
         return "CREATED";
     }
 
-    protected SqlContext getSqlContext(DataRow row) {
+    public SqlContext getSqlContext(DataRow row) {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List argList = new ArrayList();

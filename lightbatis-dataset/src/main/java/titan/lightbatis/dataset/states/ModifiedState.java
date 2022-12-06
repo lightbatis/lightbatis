@@ -36,7 +36,7 @@ public class ModifiedState extends AbstractRowState {
         return "MODIFIED";
     }
 
-    protected SqlContext getSqlContext(DataRow row) {
+    public SqlContext getSqlContext(DataRow row) {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List argList = new ArrayList();
