@@ -3,7 +3,9 @@ package titan.lightbatis.dataset.impl;
 import org.springframework.jdbc.core.JdbcTemplate;
 import titan.lightbatis.dataset.*;
 import titan.lightbatis.dataset.states.AbstractRowState;
+import titan.lightbatis.dataset.states.RowStates;
 import titan.lightbatis.dataset.states.SqlContext;
+import titan.lightbatis.dataset.states.UnchangedState;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,9 +21,15 @@ public class JdbcTableBatchWriter implements TableWriter {
         for (int i=0; i< table.getRowSize(); i++) {
             DataRow row = table.getRow(i);
             RowState state = row.getState();
-            AbstractRowState rowState = (AbstractRowState)state;
-            SqlContext sqlContext = rowState.getSqlContext(row);
-            sqlList.add(sqlContext);
+            UnchangedState unchangedState = null;
+            if (state == RowStates.UNCHANGED) {
+                continue;
+            }
+            if (state instanceof AbstractRowState) {
+                AbstractRowState rowState = (AbstractRowState) state;
+                SqlContext sqlContext = rowState.getSqlContext(row);
+                sqlList.add(sqlContext);
+            }
         }
         if (sqlList.size() > 0) {
             Map<String, List<SqlContext>> sqlMap = sqlList.stream().collect(Collectors.groupingBy(SqlContext::getSql));
