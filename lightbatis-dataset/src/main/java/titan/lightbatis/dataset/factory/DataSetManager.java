@@ -25,9 +25,9 @@ public class DataSetManager {
     }
 
     public DataQuery getDataQuery(DataTable table) {
-        if (tableQuery.containsKey(table.getTableName())) {
-            return tableQuery.get(table.getTableName());
-        }
+//        if (tableQuery.containsKey(table.getTableName())) {
+//            return tableQuery.get(table.getTableName());
+//        }
         DataQueryImpl dataQuery = new DataQueryImpl(table);
         tableQuery.put(table.getTableName(), dataQuery);
         return dataQuery;

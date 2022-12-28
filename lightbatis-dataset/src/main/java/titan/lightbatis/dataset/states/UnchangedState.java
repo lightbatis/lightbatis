@@ -32,7 +32,7 @@ public class UnchangedState implements RowState {
     }
 
     @Override
-    public void update(JdbcTemplate jdbcTemplate, DataRow row) {
-
+    public int update(JdbcTemplate jdbcTemplate, DataRow row) {
+        return -1;
     }
 }

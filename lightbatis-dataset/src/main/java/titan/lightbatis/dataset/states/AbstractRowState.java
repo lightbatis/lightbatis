@@ -29,22 +29,22 @@ public abstract class AbstractRowState implements RowState {
     AbstractRowState() {
     }
 
-    public void update(JdbcTemplate jdbcTemplate, DataRow row) throws WriteException {
+    public int update(JdbcTemplate jdbcTemplate, DataRow row) throws WriteException {
         SqlContext ctx = getSqlContext(row);
         System.out.println(ctx.getSql());
         System.out.println(row.toString());
         UpdateHandler handler = new BasicUpdateHandler(jdbcTemplate, ctx.getSql());
-        execute(handler, ctx.getArgs(), ctx.getArgTypes());
+        return  execute(handler, ctx.getArgs(), ctx.getArgTypes());
     }
 
 
     public abstract SqlContext getSqlContext(DataRow row);
 
 
-    protected void execute(UpdateHandler handler, Object[] args,
+    protected int execute(UpdateHandler handler, Object[] args,
                            int[] argTypes) throws WriteException{
         try {
-            handler.execute(args, argTypes);
+          return  handler.execute(args, argTypes);
         }catch (SQLRuntimeException ex) {
             throw new WriteException(ex);
         }

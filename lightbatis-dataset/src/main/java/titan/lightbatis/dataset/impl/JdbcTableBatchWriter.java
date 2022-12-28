@@ -43,9 +43,9 @@ public class JdbcTableBatchWriter implements TableWriter {
                     values.add(sqlContext.getArgs());
                 });
                 System.out.println("批处理:" + sql);
-                System.out.println("类型:" + Arrays.toString(types));
                 System.out.println("批处理条数：" + values.size());
-                jdbcTemplate.batchUpdate(sql, values, types);
+                int[] counts= jdbcTemplate.batchUpdate(sql, values, types);
+                System.out.println("成功执行的条数：" + Arrays.toString(counts));
             });
 
         }

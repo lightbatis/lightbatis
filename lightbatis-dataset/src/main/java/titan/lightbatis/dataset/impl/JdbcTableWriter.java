@@ -13,7 +13,8 @@ public class JdbcTableWriter implements TableWriter {
         for (int i=0; i< table.getRowSize(); i++) {
             DataRow row = table.getRow(i);
             RowState state = row.getState();
-            state.update(jdbcTemplate, row);
+            int count = state.update(jdbcTemplate, row);
+            System.out.println("======= 成功执行 =" + count + " 条");
         }
     }
 }
