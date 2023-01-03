@@ -104,7 +104,7 @@ public class DataSetImpl implements DataSet {
         StringBuffer buf = new StringBuffer(100);
         for (int i = 0; i < getTableSize(); ++i) {
             buf.append(getTable(i));
-            buf.append("\n");
+            buf.append("\r\n\r\n");
         }
         return buf.toString();
     }

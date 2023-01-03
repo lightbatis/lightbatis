@@ -19,8 +19,14 @@ public class DataQueryImpl implements DataQuery {
         List<DataRow> rows = table.getRows();
         Optional<DataRow> rowOptional = rows.stream().filter((row)->{
            Object val = row.getValue(column);
-           if (val != null && val.equals(value)) {
-               return true;
+
+           if (val != null) {
+               String strVal = val.toString();
+               String val2 = value.toString();
+                if (strVal.equals(val2)) {
+                    return true;
+                }
+               return false;
            }
             return false;
         }).findFirst();
