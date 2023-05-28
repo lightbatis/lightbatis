@@ -3,10 +3,13 @@
  */
 package titan.lightbatis.mybatis;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.FactoryBean;
+import titan.lightbatis.mybatis.handler.JacksonTypeHandler;
 
 import static org.springframework.util.Assert.notNull;
 
@@ -60,6 +63,7 @@ public class LightbatisFactoryBean<T> extends SqlSessionDaoSupport implements Fa
             LightbatisMapperAnnotationBuilder lightbatisBuilder = new LightbatisMapperAnnotationBuilder(configuration, this.mapperInterface);
             lightbatisBuilder.parse();
         }
+        configuration.getTypeHandlerRegistry().register(JacksonTypeHandler.class);
         //直接针对接口处理通用接口方法对应的 MappedStatement 是安全的，通用方法不会出现 IncompleteElementException 的情况
         if (configuration.hasMapper(this.mapperInterface) && mapperBuilder != null && mapperBuilder.isExtendCommonMapper(this.mapperInterface)) {
             mapperBuilder.processConfiguration(getSqlSession().getConfiguration(), this.mapperInterface);

@@ -258,7 +258,7 @@ public class ExecuteSqlSource implements SqlSource {
             }
             String insertSQL = MybatisScriptFactory.buildSave(tableName, insertColumns, insertColumns, insertColumns, updateOn);
             sql.append(insertSQL);
-
+            //System.err.println(insertSQL);
             SqlSource sqlSource = languageDriver.createSqlSource(this.configuration, "<script>\n\t" + sql.toString() + "</script>", null);
             BoundSql boundSql =  sqlSource.getBoundSql(parameterObject);
             return boundSql;

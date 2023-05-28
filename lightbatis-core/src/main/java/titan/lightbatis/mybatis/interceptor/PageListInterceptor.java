@@ -122,10 +122,12 @@ public class PageListInterceptor implements Interceptor {
 				}else {
 					//如果参数只有一个值，不是以 map 的方式进行组装的，转换成 map
 					paramMap.put(ROW_ROUNDS_KEY, rowBounds);
-					Set<ParamMeta> predicates = meta.getPredicateParams();
-					if (!predicates.isEmpty()){
-						ParamMeta paramMeta = predicates.iterator().next();
-						paramMap.put(paramMeta.getName(), parameter);
+					if (meta != null) {
+						Set<ParamMeta> predicates = meta.getPredicateParams();
+						if (!predicates.isEmpty()){
+							ParamMeta paramMeta = predicates.iterator().next();
+							paramMap.put(paramMeta.getName(), parameter);
+						}
 					}
 				}
 				input = paramMap;

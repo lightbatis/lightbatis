@@ -261,6 +261,7 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
             try {
                 parseDynaticStatement(method);
             } catch (Exception e) {
+                e.printStackTrace(System.err);
                 configuration.addIncompleteMethod(new MethodResolver(this, method));
             }
         }else {
@@ -284,6 +285,9 @@ class LightbatisMapperAnnotationBuilder extends MapperAnnotationBuilder {
         LanguageDriver languageDriver = getLanguageDriver(method);
         MapperBuilder mapperBuilder= new MapperBuilder();
 
+        if (method.getName().equalsIgnoreCase("listPageBy")) {
+            System.out.println("listPageBy==================" + method.getName());
+        }
 
         //DynamicMethodSqlSource sqlSource = createDynaticSqlSource(method, parameterTypeClass, languageDriver);
 

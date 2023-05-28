@@ -7,9 +7,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import titan.lightbatis.table.ITableSchemaManager;
 import titan.lightbatis.table.TableSchema;
+import titan.lightbatis.utils.SpringContextUtil;
 import titan.lightbatis.web.DalConfig;
 import titan.lightbatis.web.EntityMeta;
 import titan.lightbatis.web.EntityRespository;
@@ -17,6 +19,7 @@ import titan.lightbatis.web.entity.*;
 import titan.lightbatis.web.generate.mapper.MethodMeta;
 import titan.lightbatis.web.service.GenerateService;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -51,7 +54,8 @@ public class DalController{
 	@ApiOperation(value = "列出当前数据库中所有的表及对应的实体类", response = TableEntitySchema.class, responseContainer = "List")
 	@GetMapping("table/entities")
 	public List<TableEntitySchema> tableEntities() {
-		List<TableSchema> tables = tableSchemaManager.listTables();
+		DataSource ds = SpringContextUtil.getBean("primaryDataSource");
+		List<TableSchema> tables = tableSchemaManager.listTables(ds, "primaryDataSource");
 		List<TableEntitySchema> entites = new ArrayList<TableEntitySchema>();
 		for (TableSchema table : tables) {
 			TableEntitySchema entitySchema = toEntitySchema(table);

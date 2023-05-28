@@ -162,6 +162,20 @@ public class DataSourceTableSchemaManager implements ITableSchemaManager, Initia
 	}
 
 	@Override
+	public List<TableSchema> listTables(DataSource dataSource,String dsName) {
+		if (!loadedAllTable) {
+			try {
+				loadTables(dataSource, dsName);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			loadedAllTable = true;
+		}
+		List<TableSchema> list = Collections.unmodifiableList(tables);
+		return list;
+	}
+
+	@Override
 	public void afterPropertiesSet() throws Exception {
 //		String[] names = applicationContext.getBeanNamesForType(DataSource.class);
 //		for (String name : names) {

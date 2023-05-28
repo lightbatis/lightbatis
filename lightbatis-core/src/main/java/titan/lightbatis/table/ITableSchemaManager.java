@@ -3,6 +3,7 @@
  */
 package titan.lightbatis.table;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 /**
@@ -25,6 +26,7 @@ public interface ITableSchemaManager {
 	 */
 	public abstract List<TableSchema> listTables();
 
+	public abstract List<TableSchema> listTables(DataSource dataSource,String dsName);
 
 	/*
 	 * 获取下一个自增长的ID

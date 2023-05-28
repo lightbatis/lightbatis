@@ -2,6 +2,7 @@ package titan.lightbatis.sample.model.entity;
 
 import javax.persistence.*;
 
+import com.alibaba.fastjson.JSONObject;
 import titan.lightbatis.annotations.DalEntity;
 
 import javax.annotation.Generated;
@@ -77,6 +78,10 @@ public class Member {
     @ApiModelProperty(value="企业审核状态", allowEmptyValue=true)
     @Column(name="verify_status", length=32)
     private String verifyStatus;
+
+    @Column(name="config", length=1073741824)
+    @ApiModelProperty(allowEmptyValue=true, value="表单配置;表单配置")
+    private JSONObject config;
 
 }
 

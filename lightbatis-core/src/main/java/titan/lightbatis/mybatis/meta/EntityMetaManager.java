@@ -3,6 +3,7 @@
  */
 package titan.lightbatis.mybatis.meta;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cursor.Cursor;
@@ -14,6 +15,7 @@ import titan.lightbatis.annotations.Revision;
 import titan.lightbatis.configuration.MapperConfig;
 import titan.lightbatis.exception.LightbatisException;
 import titan.lightbatis.generator.GeneratedValueType;
+import titan.lightbatis.mybatis.handler.JacksonTypeHandler;
 import titan.lightbatis.table.ColumnSchema;
 import titan.lightbatis.table.ITableSchemaManager;
 import titan.lightbatis.table.TableSchema;
@@ -192,6 +194,9 @@ public class EntityMetaManager {
 
 		// 创建并缓存EntityTable
 		EntityMeta entityTable = processEntity(entityClass,config);
+		if (entityTable == null) {
+			return null;
+		}
 		entityTable.setMappedStatementId(msId);
 		entityMetas.put(msId, entityTable);
 		entityTableMap.put(entityClass, entityTable);
@@ -355,6 +360,10 @@ public class EntityMetaManager {
 			} else {
 				entityColumn.setOrderBy(orderBy.value());
 			}
+		}
+		if (JSONObject.class.isAssignableFrom(entityColumn.getJavaType()) && entityColumn.getTypeHandler() == null ) {
+			entityColumn.setTypeHandler(JacksonTypeHandler.class);
+			//System.err.println("+++++++++================="+ JacksonTypeHandler.class.getCanonicalName());
 		}
 		// 如果类型是 List, 这里需要查找到元素的基类的类型
 		if (List.class.isAssignableFrom(entityColumn.getJavaType()) && entityColumn.getTypeHandler() == null) {

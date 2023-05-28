@@ -19,4 +19,7 @@ titan.lightbatis.mybatis.provider.impl.BaseMapperProvider.processKey
    * titan.lightbatis.mybatis.LightbatisFactoryBean.checkDaoConfig
    * LightbatisMapperAnnotationBuilder.parseStatement(Method)
    * LightbatisMapperAnnotationBuilder.getSqlSourceFromAnnotations -> ProviderSqlSource
+
+3. 执行查询类型的转换
+   * 
    

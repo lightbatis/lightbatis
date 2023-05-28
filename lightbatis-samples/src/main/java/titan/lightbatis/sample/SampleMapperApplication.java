@@ -6,7 +6,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 //import com.github.pagehelper.PageInterceptor;
+import com.alibaba.fastjson.JSONObject;
 import com.querydsl.core.types.Predicate;
+import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
@@ -79,8 +81,43 @@ public class SampleMapperApplication implements CommandLineRunner {
 //		listMembersWithIn();
 //		testService();
 //		selectMember();
+//		testJsonMember();
+		testListJsonMember();
+	}
+
+
+	private void testListJsonMember() {
+//		Member m= memberCrudService.get(886998043243577372L);
+//		System.out.println(m);
+//		System.out.println(m.getConfig());
+		PageList<Member> members = memberCrudService.list(Page.newPage(1));
+		printMembers(members);
+
+//		PageList<Member> memberPageList = memberMapper.listPageBy(Page.newPage(1));
+//		printMembers(memberPageList);
+//		List<Member> memberList = memberMapper.listMember();
+//		printMembers(memberList);
+
+
+//		List<Member> members = memberMapper.listMemberByKindId(1,new Page(10,1));
+//		printMembers(members);
+	}
+	private void testJsonMember() {
+		Member m = new Member();
+		m.setMemberName("ttttt");
+
+		JSONObject config = new JSONObject();
+		config.put("a","avalue");
+		config.put("b", "bvalue");
+		m.setConfig(config);
+
+		m.setConfig(config);
+
+		memberCrudService.save(m);
+
 	}
 	private void testService () {
+		FileAlterationListener fal = null;
 		System.out.println("============>>> " + memberCrudService);
 		Member member = memberCrudService.get(732258481750409216L);
 		System.out.println(member);
@@ -236,6 +273,7 @@ public class SampleMapperApplication implements CommandLineRunner {
 	}
 	private void printMembers(List<Member> members) {
 		System.out.println("====================== print members " + members.size());
+		System.out.println(members.get(0));
 		for (Member m : members) {
 
 			System.out.println(m);

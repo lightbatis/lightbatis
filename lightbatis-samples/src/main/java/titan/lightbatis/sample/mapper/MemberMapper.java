@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import titan.lightbatis.annotations.LightDelete;
 import titan.lightbatis.annotations.LightUpdate;
+import titan.lightbatis.mapper.CrudMapper;
 import titan.lightbatis.result.PageList;
 import titan.lightbatis.result.Page;
 import titan.lightbatis.mapper.LightbatisMapper;
@@ -21,7 +22,7 @@ import java.util.Map;
 /**
  * MemberMapper 企业表 Mapper
  */
-public interface MemberMapper extends LightbatisMapper<Member> {
+public interface MemberMapper extends CrudMapper<Member,Long> {
 
     /**
      * 根据企业ID 获取指定的一条企业数据。
